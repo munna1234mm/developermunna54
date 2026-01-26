@@ -96,11 +96,6 @@
                     <span class="material-symbols-outlined mr-3">money_off</span>
                     Withdrawals
                 </button>
-                <button onclick="switchView('support')" id="nav-support"
-                    class="nav-item w-full flex items-center px-6 py-3 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-colors text-left">
-                    <span class="material-symbols-outlined mr-3">support_agent</span>
-                    Live Support
-                </button>
             </nav>
 
             <div class="p-4 border-t border-slate-200 dark:border-slate-800">
@@ -531,264 +526,173 @@
             </div>
         </div>
 
-        <!-- VIEW: LIVE SUPPORT -->
-        <div id="view-support" class="view-section hidden h-full flex flex-col">
-            <div class="mb-4">
-                <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Live Support</h1>
-                <p class="text-sm text-slate-500">Respond to user inquiries in real-time.</p>
-            </div>
 
-            <div
-                class="flex-1 bg-white dark:bg-[#1a282f] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex">
-                <!-- Chat List -->
-                <div class="w-80 border-r border-slate-200 dark:border-slate-800 flex flex-col">
-                    <div class="p-4 border-b border-slate-200 dark:border-slate-800">
-                        <input type="text" placeholder="Search chats..."
-                            class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-lg text-sm">
-                    </div>
-                    <div class="flex-1 overflow-y-auto">
-                        <!-- Chat Item (Active) -->
-                        <div
-                            class="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer bg-slate-50 dark:bg-slate-800/50 border-l-4 border-primary">
-                            <div class="flex items-center justify-between mb-1">
-                                <h4 class="font-bold text-sm text-slate-900 dark:text-white">Munna Developer
-                                </h4>
-                                <span class="text-[10px] text-slate-500">Just now</span>
-                            </div>
-                            <p class="text-xs text-slate-500 truncate">I have a question about my withdrawal.
-                            </p>
-                        </div>
-                        <!-- Chat Item -->
-                        <div class="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer text-slate-500">
-                            <p class="text-xs">No other active chats.</p>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- View: Bot Settings -->
-                <div id="view-support" class="view-section hidden space-y-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">AI Bot Settings
-                            </h2>
-                            <p class="text-slate-500">Configure auto-replies for the user chat.</p>
-                        </div>
-                    </div>
+        </main>
+    </div>
+    </div>
 
-                    <!-- Add Rule Form -->
-                    <div
-                        class="bg-white dark:bg-[#1a282f] rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <h3 class="font-bold text-lg mb-4 text-slate-900 dark:text-white">Add New Rule</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Keyword
-                                    (e.g. 'hello')</label>
-                                <input type="text" id="rule-keyword"
-                                    class="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-primary"
-                                    placeholder="Enter keyword...">
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Bot
-                                    Reply</label>
-                                <div class="flex gap-2">
-                                    <input type="text" id="rule-reply"
-                                        class="flex-1 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-primary"
-                                        placeholder="Enter the automated reply...">
-                                    <button onclick="addBotRule()"
-                                        class="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg font-bold transition-all">Add</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Rules List -->
-                    <div
-                        class="bg-white dark:bg-[#1a282f] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                        <div class="p-6 border-b border-slate-200 dark:border-slate-800">
-                            <h3 class="font-bold text-lg text-slate-900 dark:text-white">Active Rules</h3>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm text-left">
-                                <thead class="text-xs text-slate-500 uppercase bg-slate-50 dark:bg-slate-800/50">
-                                    <tr>
-                                        <th class="px-6 py-3">Keyword</th>
-                                        <th class="px-6 py-3">Reply</th>
-                                        <th class="px-6 py-3 text-right">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="rules-table-body">
-                                    <!-- Rules injected here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                </main>
-            </div>
+    <!-- Photo Viewer Modal -->
+    <div id="photo-modal"
+        class="fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/80 p-4 animate-fade-in"
+        onclick="closePhotoModal()">
+        <div class="relative max-w-4xl w-full flex flex-col items-center">
+            <button class="absolute -top-10 right-0 text-white hover:text-red-400 transition-colors">
+                <span class="material-symbols-outlined text-4xl">close</span>
+            </button>
+            <img id="photo-modal-img" src="" class="max-w-full max-h-[85vh] rounded-lg shadow-2xl animate-scale-up"
+                onclick="event.stopPropagation()">
         </div>
+    </div>
 
-        <!-- Photo Viewer Modal -->
-        <div id="photo-modal"
-            class="fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/80 p-4 animate-fade-in"
-            onclick="closePhotoModal()">
-            <div class="relative max-w-4xl w-full flex flex-col items-center">
-                <button class="absolute -top-10 right-0 text-white hover:text-red-400 transition-colors">
-                    <span class="material-symbols-outlined text-4xl">close</span>
-                </button>
-                <img id="photo-modal-img" src="" class="max-w-full max-h-[85vh] rounded-lg shadow-2xl animate-scale-up"
-                    onclick="event.stopPropagation()">
-            </div>
-        </div>
+    <script>
+        /* --- Firebase Config & Init --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyBYvecq_HYeylhwCXaLot2A1U_9pvXMWXA",
+            authDomain: "developerp2p.firebaseapp.com",
+            projectId: "developerp2p",
+            storageBucket: "developerp2p.firebasestorage.app",
+            messagingSenderId: "85381141511",
+            appId: "1:85381141511:web:76264b530079246e8246a2",
+            measurementId: "G-882R3H9WMY"
+        };
 
-        <script>
-            /* --- Firebase Config & Init --- */
-            const firebaseConfig = {
-                apiKey: "AIzaSyBYvecq_HYeylhwCXaLot2A1U_9pvXMWXA",
-                authDomain: "developerp2p.firebaseapp.com",
-                projectId: "developerp2p",
-                storageBucket: "developerp2p.firebasestorage.app",
-                messagingSenderId: "85381141511",
-                appId: "1:85381141511:web:76264b530079246e8246a2",
-                measurementId: "G-882R3H9WMY"
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        /* --- Node Names --- */
+        const TRX_NODE = 'transactions';
+        const USERS_NODE = 'users';
+        const P2P_NODE = 'p2p_ads';
+        const SETTINGS_NODE = 'settings';
+        const RULES_NODE = 'bot_rules';
+
+        let editingP2PId = null;
+
+        /* --- Navigation --- */
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            const view = document.getElementById(`view-${viewId}`);
+            if (view) view.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active', 'text-primary');
+                el.classList.add('text-slate-500');
+            });
+
+            const activeNav = document.getElementById(`nav-${viewId}`);
+            if (activeNav) {
+                activeNav.classList.add('active');
+                activeNav.classList.remove('text-slate-500');
+            }
+        }
+
+        /* --- P2P Logic --- */
+        function toggleP2PForm() {
+            const form = document.getElementById('p2p-form-container');
+            form.classList.toggle('hidden');
+            if (form.classList.contains('hidden')) {
+                editingP2PId = null;
+                document.getElementById('p2p-type').value = 'buy';
+                document.getElementById('p2p-asset').value = 'BDT';
+                document.getElementById('p2p-price').value = '';
+                document.getElementById('p2p-amount').value = '';
+                document.getElementById('p2p-min').value = '';
+                document.getElementById('p2p-max').value = '';
+                document.getElementById('p2p-target-link').value = '';
+                document.getElementById('p2p-star-count').value = '';
+                document.getElementById('p2p-target-link-box').classList.add('hidden');
+                document.getElementById('p2p-star-count-box').classList.add('hidden');
+            }
+        }
+
+        document.addEventListener('change', (e) => {
+            if (e.target.id === 'p2p-asset') {
+                const isStars = e.target.value === 'Stars';
+                document.getElementById('p2p-target-link-box').classList.toggle('hidden', !isStars);
+                document.getElementById('p2p-star-count-box').classList.toggle('hidden', !isStars);
+            }
+        });
+
+        function saveAd() {
+            const type = document.getElementById('p2p-type').value;
+            const asset = document.getElementById('p2p-asset').value;
+            const price = document.getElementById('p2p-price').value;
+            const total = document.getElementById('p2p-amount').value;
+            const min = document.getElementById('p2p-min').value;
+            const max = document.getElementById('p2p-max').value;
+            const targetLink = document.getElementById('p2p-target-link').value;
+            const starCount = document.getElementById('p2p-star-count').value;
+
+            if (!price || !total || !min || !max) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            const adData = {
+                type, asset, price, total, min, max,
+                targetLink, starCount,
+                available: total,
+                status: 'online',
+                timestamp: firebase.database.ServerValue.TIMESTAMP
             };
 
-            firebase.initializeApp(firebaseConfig);
-            const db = firebase.database();
-
-            /* --- Node Names --- */
-            const TRX_NODE = 'transactions';
-            const USERS_NODE = 'users';
-            const P2P_NODE = 'p2p_ads';
-            const SETTINGS_NODE = 'settings';
-            const RULES_NODE = 'bot_rules';
-
-            let editingP2PId = null;
-
-            /* --- Navigation --- */
-            function switchView(viewId) {
-                document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-                const view = document.getElementById(`view-${viewId}`);
-                if (view) view.classList.remove('hidden');
-
-                document.querySelectorAll('.nav-item').forEach(el => {
-                    el.classList.remove('active', 'text-primary');
-                    el.classList.add('text-slate-500');
-                });
-
-                const activeNav = document.getElementById(`nav-${viewId}`);
-                if (activeNav) {
-                    activeNav.classList.add('active');
-                    activeNav.classList.remove('text-slate-500');
-                }
+            if (editingP2PId) {
+                db.ref(`${P2P_NODE}/${editingP2PId}`).update(adData)
+                    .then(() => { alert('Ad Updated!'); toggleP2PForm(); });
+            } else {
+                const newRef = db.ref(P2P_NODE).push();
+                adData.id = newRef.key;
+                newRef.set(adData)
+                    .then(() => { alert('Ad Published!'); toggleP2PForm(); });
             }
+        }
 
-            /* --- P2P Logic --- */
-            function toggleP2PForm() {
-                const form = document.getElementById('p2p-form-container');
-                form.classList.toggle('hidden');
-                if (form.classList.contains('hidden')) {
-                    editingP2PId = null;
-                    document.getElementById('p2p-type').value = 'buy';
-                    document.getElementById('p2p-asset').value = 'BDT';
-                    document.getElementById('p2p-price').value = '';
-                    document.getElementById('p2p-amount').value = '';
-                    document.getElementById('p2p-min').value = '';
-                    document.getElementById('p2p-max').value = '';
-                    document.getElementById('p2p-target-link').value = '';
-                    document.getElementById('p2p-star-count').value = '';
-                    document.getElementById('p2p-target-link-box').classList.add('hidden');
-                    document.getElementById('p2p-star-count-box').classList.add('hidden');
-                }
-            }
+        function editAd(id) {
+            db.ref(`${P2P_NODE}/${id}`).once('value', snapshot => {
+                const ad = snapshot.val();
+                if (!ad) return;
+                editingP2PId = id;
+                document.getElementById('p2p-type').value = ad.type;
+                document.getElementById('p2p-asset').value = ad.asset;
+                document.getElementById('p2p-price').value = ad.price;
+                document.getElementById('p2p-amount').value = ad.total;
+                document.getElementById('p2p-min').value = ad.min;
+                document.getElementById('p2p-max').value = ad.max;
+                document.getElementById('p2p-target-link').value = ad.targetLink || '';
+                document.getElementById('p2p-star-count').value = ad.starCount || '';
 
-            document.addEventListener('change', (e) => {
-                if (e.target.id === 'p2p-asset') {
-                    const isStars = e.target.value === 'Stars';
-                    document.getElementById('p2p-target-link-box').classList.toggle('hidden', !isStars);
-                    document.getElementById('p2p-star-count-box').classList.toggle('hidden', !isStars);
-                }
+                const isStars = ad.asset === 'Stars';
+                document.getElementById('p2p-target-link-box').classList.toggle('hidden', !isStars);
+                document.getElementById('p2p-star-count-box').classList.toggle('hidden', !isStars);
+
+                document.getElementById('p2p-form-container').classList.remove('hidden');
+                document.getElementById('p2p-form-container').scrollIntoView({ behavior: 'smooth' });
             });
+        }
 
-            function saveAd() {
-                const type = document.getElementById('p2p-type').value;
-                const asset = document.getElementById('p2p-asset').value;
-                const price = document.getElementById('p2p-price').value;
-                const total = document.getElementById('p2p-amount').value;
-                const min = document.getElementById('p2p-min').value;
-                const max = document.getElementById('p2p-max').value;
-                const targetLink = document.getElementById('p2p-target-link').value;
-                const starCount = document.getElementById('p2p-star-count').value;
+        function deleteAd(id) {
+            if (!confirm('Delete this ad?')) return;
+            db.ref(`${P2P_NODE}/${id}`).remove();
+        }
 
-                if (!price || !total || !min || !max) {
-                    alert('Please fill all fields');
-                    return;
-                }
+        // Real-time P2P Ads Listener
+        db.ref(P2P_NODE).on('value', snapshot => {
+            const adsObj = snapshot.val() || {};
+            const ads = Object.values(adsObj);
+            renderP2PAds(ads);
+        });
 
-                const adData = {
-                    type, asset, price, total, min, max,
-                    targetLink, starCount,
-                    available: total,
-                    status: 'online',
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
-                };
+        function renderP2PAds(ads) {
+            const tbody = document.querySelector('#view-p2p tbody');
+            if (!tbody) return;
 
-                if (editingP2PId) {
-                    db.ref(`${P2P_NODE}/${editingP2PId}`).update(adData)
-                        .then(() => { alert('Ad Updated!'); toggleP2PForm(); });
-                } else {
-                    const newRef = db.ref(P2P_NODE).push();
-                    adData.id = newRef.key;
-                    newRef.set(adData)
-                        .then(() => { alert('Ad Published!'); toggleP2PForm(); });
-                }
+            if (ads.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-slate-500">No active advertisements.</td></tr>`;
+                return;
             }
 
-            function editAd(id) {
-                db.ref(`${P2P_NODE}/${id}`).once('value', snapshot => {
-                    const ad = snapshot.val();
-                    if (!ad) return;
-                    editingP2PId = id;
-                    document.getElementById('p2p-type').value = ad.type;
-                    document.getElementById('p2p-asset').value = ad.asset;
-                    document.getElementById('p2p-price').value = ad.price;
-                    document.getElementById('p2p-amount').value = ad.total;
-                    document.getElementById('p2p-min').value = ad.min;
-                    document.getElementById('p2p-max').value = ad.max;
-                    document.getElementById('p2p-target-link').value = ad.targetLink || '';
-                    document.getElementById('p2p-star-count').value = ad.starCount || '';
-
-                    const isStars = ad.asset === 'Stars';
-                    document.getElementById('p2p-target-link-box').classList.toggle('hidden', !isStars);
-                    document.getElementById('p2p-star-count-box').classList.toggle('hidden', !isStars);
-
-                    document.getElementById('p2p-form-container').classList.remove('hidden');
-                    document.getElementById('p2p-form-container').scrollIntoView({ behavior: 'smooth' });
-                });
-            }
-
-            function deleteAd(id) {
-                if (!confirm('Delete this ad?')) return;
-                db.ref(`${P2P_NODE}/${id}`).remove();
-            }
-
-            // Real-time P2P Ads Listener
-            db.ref(P2P_NODE).on('value', snapshot => {
-                const adsObj = snapshot.val() || {};
-                const ads = Object.values(adsObj);
-                renderP2PAds(ads);
-            });
-
-            function renderP2PAds(ads) {
-                const tbody = document.querySelector('#view-p2p tbody');
-                if (!tbody) return;
-
-                if (ads.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-slate-500">No active advertisements.</td></tr>`;
-                    return;
-                }
-
-                tbody.innerHTML = ads.map(ad => `
+            tbody.innerHTML = ads.map(ad => `
                     <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                         <td class="px-6 py-4">
                             <span class="${ad.type === 'buy' ? 'text-green-500 bg-green-500/10' : 'text-red-500 bg-red-500/10'} font-bold px-2 py-0.5 rounded text-xs uppercase">${ad.type}</span>
@@ -807,21 +711,21 @@
                         </td>
                     </tr>
                 `).join('');
+        }
+
+        /* --- User Logic --- */
+
+
+        function renderUsers(users) {
+            const tbody = document.querySelector('#view-users tbody');
+            if (!tbody) return;
+
+            if (users.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">No users found.</td></tr>`;
+                return;
             }
 
-            /* --- User Logic --- */
-
-
-            function renderUsers(users) {
-                const tbody = document.querySelector('#view-users tbody');
-                if (!tbody) return;
-
-                if (users.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">No users found.</td></tr>`;
-                    return;
-                }
-
-                tbody.innerHTML = users.map(u => `
+            tbody.innerHTML = users.map(u => `
                     <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-3">
@@ -840,62 +744,62 @@
                         </td>
                     </tr>
                 `).join('');
+        }
+
+        function deleteUser(id) {
+            if (!confirm('Delete user?')) return;
+            db.ref(`${USERS_NODE}/${id}`).remove();
+        }
+
+        /* --- Transaction Logic --- */
+        db.ref(TRX_NODE).on('value', snapshot => {
+            const trxsObj = snapshot.val() || {};
+            const trxs = Object.values(trxsObj);
+            renderDeposits(trxs);
+            renderWithdrawals(trxs);
+            updateDashboard(trxs, null);
+        });
+
+        db.ref(USERS_NODE).on('value', snapshot => {
+            const usersObj = snapshot.val() || {};
+            const users = Object.values(usersObj);
+            renderUsers(users);
+            updateDashboard(null, users);
+        });
+
+        function updateDashboard(trxs, users) {
+            if (trxs) {
+                const approved = trxs.filter(t => t.status === 'approved' && (t.type === 'deposit' || t.type === 'p2p_trade'));
+                const totalCollection = approved.reduce((acc, t) => acc + (t.type === 'p2p_trade' ? (t.reward || 0) : (t.amount || 0)), 0);
+                const pending = trxs.filter(t => t.status === 'pending').length;
+
+                const colEl = document.getElementById('dash-total-collection');
+                const penEl = document.getElementById('dash-pending-reqs');
+                if (colEl) colEl.textContent = `${totalCollection.toFixed(2)} BDT`;
+                if (penEl) penEl.textContent = pending;
+            }
+            if (users) {
+                const userEl = document.getElementById('dash-total-users');
+                if (userEl) userEl.textContent = users.length;
+            }
+        }
+
+        function renderDeposits(trxs) {
+            const pending = trxs.filter(t => (t.type === 'deposit' || t.type === 'p2p_trade') && t.status === 'pending');
+            const tbody = document.getElementById('deposits-table-body');
+            if (!tbody) return;
+
+            if (pending.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">No pending deposits.</td></tr>`;
+                return;
             }
 
-            function deleteUser(id) {
-                if (!confirm('Delete user?')) return;
-                db.ref(`${USERS_NODE}/${id}`).remove();
-            }
+            tbody.innerHTML = pending.map(t => {
+                const isStars = t.type === 'p2p_trade';
+                const displayAmt = isStars ? `${t.reward.toFixed(2)} BDT (${t.amount} Stars)` : `${t.amount} BDT`;
+                const methodInfo = isStars ? `<p class="uppercase text-xs font-bold text-primary">P2P: ${t.asset}</p><p class="text-[10px] text-slate-400 truncate max-w-[150px]">${t.sender}</p>` : `<p class="uppercase text-xs font-bold">${t.method}</p><p class="font-mono text-xs text-slate-500">${t.sender}</p>`;
 
-            /* --- Transaction Logic --- */
-            db.ref(TRX_NODE).on('value', snapshot => {
-                const trxsObj = snapshot.val() || {};
-                const trxs = Object.values(trxsObj);
-                renderDeposits(trxs);
-                renderWithdrawals(trxs);
-                updateDashboard(trxs, null);
-            });
-
-            db.ref(USERS_NODE).on('value', snapshot => {
-                const usersObj = snapshot.val() || {};
-                const users = Object.values(usersObj);
-                renderUsers(users);
-                updateDashboard(null, users);
-            });
-
-            function updateDashboard(trxs, users) {
-                if (trxs) {
-                    const approved = trxs.filter(t => t.status === 'approved' && (t.type === 'deposit' || t.type === 'p2p_trade'));
-                    const totalCollection = approved.reduce((acc, t) => acc + (t.type === 'p2p_trade' ? (t.reward || 0) : (t.amount || 0)), 0);
-                    const pending = trxs.filter(t => t.status === 'pending').length;
-
-                    const colEl = document.getElementById('dash-total-collection');
-                    const penEl = document.getElementById('dash-pending-reqs');
-                    if (colEl) colEl.textContent = `${totalCollection.toFixed(2)} BDT`;
-                    if (penEl) penEl.textContent = pending;
-                }
-                if (users) {
-                    const userEl = document.getElementById('dash-total-users');
-                    if (userEl) userEl.textContent = users.length;
-                }
-            }
-
-            function renderDeposits(trxs) {
-                const pending = trxs.filter(t => (t.type === 'deposit' || t.type === 'p2p_trade') && t.status === 'pending');
-                const tbody = document.getElementById('deposits-table-body');
-                if (!tbody) return;
-
-                if (pending.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">No pending deposits.</td></tr>`;
-                    return;
-                }
-
-                tbody.innerHTML = pending.map(t => {
-                    const isStars = t.type === 'p2p_trade';
-                    const displayAmt = isStars ? `${t.reward.toFixed(2)} BDT (${t.amount} Stars)` : `${t.amount} BDT`;
-                    const methodInfo = isStars ? `<p class="uppercase text-xs font-bold text-primary">P2P: ${t.asset}</p><p class="text-[10px] text-slate-400 truncate max-w-[150px]">${t.sender}</p>` : `<p class="uppercase text-xs font-bold">${t.method}</p><p class="font-mono text-xs text-slate-500">${t.sender}</p>`;
-
-                    return `
+                return `
                     <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30">
                         <td class="px-6 py-4">
                             <p class="font-medium">${t.userName}</p>
@@ -910,20 +814,20 @@
                         </td>
                     </tr>
                 `;
-                }).join('');
+            }).join('');
+        }
+
+        function renderWithdrawals(trxs) {
+            const pending = trxs.filter(t => t.type === 'withdrawal' && t.status === 'pending');
+            const tbody = document.getElementById('withdrawals-table-body');
+            if (!tbody) return;
+
+            if (pending.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">No pending withdrawals.</td></tr>`;
+                return;
             }
 
-            function renderWithdrawals(trxs) {
-                const pending = trxs.filter(t => t.type === 'withdrawal' && t.status === 'pending');
-                const tbody = document.getElementById('withdrawals-table-body');
-                if (!tbody) return;
-
-                if (pending.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">No pending withdrawals.</td></tr>`;
-                    return;
-                }
-
-                tbody.innerHTML = pending.map(t => `
+            tbody.innerHTML = pending.map(t => `
                     <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                         <td class="px-6 py-4"><p class="font-medium">${t.userName}</p><p class="text-xs text-slate-500">ID: ${t.userId}</p></td>
                         <td class="px-6 py-4 font-bold text-red-500">-${t.amount} BDT</td>
@@ -935,135 +839,135 @@
                         </td>
                     </tr>
                 `).join('');
-            }
+        }
 
-            function approveDeposit(trxId) {
-                if (!confirm('Approve?')) return;
-                db.ref(`${TRX_NODE}/${trxId}`).once('value', snapshot => {
-                    const trx = snapshot.val();
-                    if (!trx) return;
+        function approveDeposit(trxId) {
+            if (!confirm('Approve?')) return;
+            db.ref(`${TRX_NODE}/${trxId}`).once('value', snapshot => {
+                const trx = snapshot.val();
+                if (!trx) return;
 
-                    db.ref(`${TRX_NODE}/${trxId}`).update({ status: 'approved' });
+                db.ref(`${TRX_NODE}/${trxId}`).update({ status: 'approved' });
+                db.ref(`${USERS_NODE}/${trx.userId}`).once('value', uSnap => {
+                    const user = uSnap.val() || {};
+                    const addAmt = trx.type === 'p2p_trade' ? (trx.reward || 0) : (trx.amount || 0);
+                    const newBal = (user.balance || 0) + addAmt;
+                    const newHold = Math.max(0, (user.balance_hold || 0) - (trx.type === 'deposit' ? trx.amount : 0));
+                    db.ref(`${USERS_NODE}/${trx.userId}`).update({ balance: newBal, balance_hold: newHold });
+                });
+                alert('Approved!');
+            });
+        }
+
+        function rejectDeposit(trxId) {
+            if (!confirm('Reject?')) return;
+            db.ref(`${TRX_NODE}/${trxId}`).once('value', snapshot => {
+                const trx = snapshot.val();
+                if (!trx) return;
+
+                db.ref(`${TRX_NODE}/${trxId}`).update({ status: 'rejected' });
+                db.ref(`${USERS_NODE}/${trx.userId}`).once('value', uSnap => {
+                    const user = uSnap.val() || {};
+                    const newHold = Math.max(0, (user.balance_hold || 0) - trx.amount);
+                    db.ref(`${USERS_NODE}/${trx.userId}`).update({ balance_hold: newHold });
+                });
+            });
+        }
+
+        function updateWithdrawStatus(id, status) {
+            if (!confirm(`${status}?`)) return;
+            db.ref(`${TRX_NODE}/${id}`).once('value', snapshot => {
+                const trx = snapshot.val();
+                if (!trx) return;
+
+                db.ref(`${TRX_NODE}/${id}`).update({ status: status });
+                if (status === 'rejected') {
                     db.ref(`${USERS_NODE}/${trx.userId}`).once('value', uSnap => {
                         const user = uSnap.val() || {};
-                        const addAmt = trx.type === 'p2p_trade' ? (trx.reward || 0) : (trx.amount || 0);
-                        const newBal = (user.balance || 0) + addAmt;
-                        const newHold = Math.max(0, (user.balance_hold || 0) - (trx.type === 'deposit' ? trx.amount : 0));
-                        db.ref(`${USERS_NODE}/${trx.userId}`).update({ balance: newBal, balance_hold: newHold });
+                        const newBal = (user.balance || 0) + trx.amount;
+                        db.ref(`${USERS_NODE}/${trx.userId}`).update({ balance: newBal });
                     });
-                    alert('Approved!');
-                });
-            }
-
-            function rejectDeposit(trxId) {
-                if (!confirm('Reject?')) return;
-                db.ref(`${TRX_NODE}/${trxId}`).once('value', snapshot => {
-                    const trx = snapshot.val();
-                    if (!trx) return;
-
-                    db.ref(`${TRX_NODE}/${trxId}`).update({ status: 'rejected' });
-                    db.ref(`${USERS_NODE}/${trx.userId}`).once('value', uSnap => {
-                        const user = uSnap.val() || {};
-                        const newHold = Math.max(0, (user.balance_hold || 0) - trx.amount);
-                        db.ref(`${USERS_NODE}/${trx.userId}`).update({ balance_hold: newHold });
-                    });
-                });
-            }
-
-            function updateWithdrawStatus(id, status) {
-                if (!confirm(`${status}?`)) return;
-                db.ref(`${TRX_NODE}/${id}`).once('value', snapshot => {
-                    const trx = snapshot.val();
-                    if (!trx) return;
-
-                    db.ref(`${TRX_NODE}/${id}`).update({ status: status });
-                    if (status === 'rejected') {
-                        db.ref(`${USERS_NODE}/${trx.userId}`).once('value', uSnap => {
-                            const user = uSnap.val() || {};
-                            const newBal = (user.balance || 0) + trx.amount;
-                            db.ref(`${USERS_NODE}/${trx.userId}`).update({ balance: newBal });
-                        });
-                    }
-                    alert(`Withdrawal ${status}!`);
-                });
-            }
-
-            /* --- Settings Logic --- */
-            db.ref(SETTINGS_NODE).on('value', snapshot => {
-                const settings = snapshot.val();
-                if (settings) loadSettings(settings);
+                }
+                alert(`Withdrawal ${status}!`);
             });
+        }
 
-            function loadSettings(settings) {
-                document.getElementById('set-bkash-num').value = settings.bkashNum || '';
-                document.getElementById('set-nagad-num').value = settings.nagadNum || '';
-                document.getElementById('set-binance-id').value = settings.binanceId || '';
-                document.getElementById('set-bkash-min').value = settings.bkashMin || 10;
-                document.getElementById('set-nagad-min').value = settings.nagadMin || 10;
-                document.getElementById('set-binance-min').value = settings.binanceMin || 0;
-            }
+        /* --- Settings Logic --- */
+        db.ref(SETTINGS_NODE).on('value', snapshot => {
+            const settings = snapshot.val();
+            if (settings) loadSettings(settings);
+        });
 
-            function saveSettings() {
-                const settings = {
-                    bkashNum: document.getElementById('set-bkash-num').value,
-                    nagadNum: document.getElementById('set-nagad-num').value,
-                    binanceId: document.getElementById('set-binance-id').value,
-                    bkashMin: parseFloat(document.getElementById('set-bkash-min').value) || 0,
-                    nagadMin: parseFloat(document.getElementById('set-nagad-min').value) || 0,
-                    binanceMin: parseFloat(document.getElementById('set-binance-min').value) || 0
-                };
-                db.ref(SETTINGS_NODE).set(settings).then(() => alert('Settings Saved!'));
-            }
+        function loadSettings(settings) {
+            document.getElementById('set-bkash-num').value = settings.bkashNum || '';
+            document.getElementById('set-nagad-num').value = settings.nagadNum || '';
+            document.getElementById('set-binance-id').value = settings.binanceId || '';
+            document.getElementById('set-bkash-min').value = settings.bkashMin || 10;
+            document.getElementById('set-nagad-min').value = settings.nagadMin || 10;
+            document.getElementById('set-binance-min').value = settings.binanceMin || 0;
+        }
 
-            /* --- Bot Rules --- */
-            db.ref(RULES_NODE).on('value', snapshot => {
-                const rulesObj = snapshot.val() || {};
-                const rules = Object.entries(rulesObj).map(([id, data]) => ({ id, ...data }));
-                renderRules(rules);
-            });
+        function saveSettings() {
+            const settings = {
+                bkashNum: document.getElementById('set-bkash-num').value,
+                nagadNum: document.getElementById('set-nagad-num').value,
+                binanceId: document.getElementById('set-binance-id').value,
+                bkashMin: parseFloat(document.getElementById('set-bkash-min').value) || 0,
+                nagadMin: parseFloat(document.getElementById('set-nagad-min').value) || 0,
+                binanceMin: parseFloat(document.getElementById('set-binance-min').value) || 0
+            };
+            db.ref(SETTINGS_NODE).set(settings).then(() => alert('Settings Saved!'));
+        }
 
-            function renderRules(rules) {
-                const tbody = document.getElementById('rules-table-body');
-                if (!tbody) return;
-                tbody.innerHTML = rules.length === 0 ? `<tr><td colspan="3" class="px-6 py-8 text-center">No rules.</td></tr>` :
-                    rules.map(r => `<tr class="border-b last:border-0 hover:bg-slate-50"><td class="px-6 py-4 font-mono text-primary">${r.keyword}</td><td class="px-6 py-4 text-slate-600">${r.reply}</td><td class="px-6 py-4 text-right"><button onclick="deleteRule('${r.id}')" class="text-red-500 font-bold uppercase text-xs">Delete</button></td></tr>`).join('');
-            }
+        /* --- Bot Rules --- */
+        db.ref(RULES_NODE).on('value', snapshot => {
+            const rulesObj = snapshot.val() || {};
+            const rules = Object.entries(rulesObj).map(([id, data]) => ({ id, ...data }));
+            renderRules(rules);
+        });
 
-            function addBotRule() {
-                const k = document.getElementById('rule-keyword');
-                const r = document.getElementById('rule-reply');
-                if (!k.value || !r.value) return;
-                db.ref(RULES_NODE).push({ keyword: k.value.trim().toLowerCase(), reply: r.value.trim() });
-                k.value = ''; r.value = '';
-            }
+        function renderRules(rules) {
+            const tbody = document.getElementById('rules-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = rules.length === 0 ? `<tr><td colspan="3" class="px-6 py-8 text-center">No rules.</td></tr>` :
+                rules.map(r => `<tr class="border-b last:border-0 hover:bg-slate-50"><td class="px-6 py-4 font-mono text-primary">${r.keyword}</td><td class="px-6 py-4 text-slate-600">${r.reply}</td><td class="px-6 py-4 text-right"><button onclick="deleteRule('${r.id}')" class="text-red-500 font-bold uppercase text-xs">Delete</button></td></tr>`).join('');
+        }
 
-            function deleteRule(id) {
-                db.ref(`${RULES_NODE}/${id}`).remove();
-            }
+        function addBotRule() {
+            const k = document.getElementById('rule-keyword');
+            const r = document.getElementById('rule-reply');
+            if (!k.value || !r.value) return;
+            db.ref(RULES_NODE).push({ keyword: k.value.trim().toLowerCase(), reply: r.value.trim() });
+            k.value = ''; r.value = '';
+        }
 
-            function viewPhoto(src) {
-                const modal = document.getElementById('photo-modal');
-                const img = document.getElementById('photo-modal-img');
-                img.src = src;
-                modal.classList.remove('hidden');
-            }
+        function deleteRule(id) {
+            db.ref(`${RULES_NODE}/${id}`).remove();
+        }
 
-            function closePhotoModal() {
-                document.getElementById('photo-modal').classList.add('hidden');
-            }
+        function viewPhoto(src) {
+            const modal = document.getElementById('photo-modal');
+            const img = document.getElementById('photo-modal-img');
+            img.src = src;
+            modal.classList.remove('hidden');
+        }
 
-            /* --- Init --- */
-            document.addEventListener('DOMContentLoaded', () => {
-                const hash = window.location.hash.replace('#', '') || 'dashboard';
-                const validViews = ['dashboard', 'users', 'p2p', 'settings', 'deposits', 'withdrawals', 'support'];
-                switchView(validViews.includes(hash) ? hash : 'dashboard');
+        function closePhotoModal() {
+            document.getElementById('photo-modal').classList.add('hidden');
+        }
 
-                setInterval(() => {
-                    const dot = document.getElementById('sync-status-dot');
-                    if (dot) dot.classList.toggle('opacity-50');
-                }, 2000);
-            });
-        </script>
+        /* --- Init --- */
+        document.addEventListener('DOMContentLoaded', () => {
+            const hash = window.location.hash.replace('#', '') || 'dashboard';
+            const validViews = ['dashboard', 'users', 'p2p', 'settings', 'deposits', 'withdrawals', 'support'];
+            switchView(validViews.includes(hash) ? hash : 'dashboard');
+
+            setInterval(() => {
+                const dot = document.getElementById('sync-status-dot');
+                if (dot) dot.classList.toggle('opacity-50');
+            }, 2000);
+        });
+    </script>
 </body>
 
 </html>
