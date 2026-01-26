@@ -654,12 +654,38 @@
             }
         });
 
-        // Initialize
+        function resetChat() {
+            if (confirm('Are you sure you want to clear all chat history? This cannot be undone.')) {
+                localStorage.removeItem(CHAT_STORAGE_KEY);
+                renderAdminChat();
+            }
+        }
+
+        // Initialize and Event Listeners
         document.addEventListener('DOMContentLoaded', () => {
             const hash = window.location.hash.replace('#', '');
             if (['dashboard', 'users', 'p2p', 'support'].includes(hash)) {
                 switchView(hash);
             }
+
+            // Chat Input Enter Key
+            const chatInput = document.getElementById('admin-chat-input');
+            if (chatInput) {
+                chatInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendAdminReply();
+                    }
+                });
+            }
+
+            // Sync Status Check
+            setInterval(() => {
+                const statusDot = document.getElementById('sync-status-dot');
+                if (statusDot) {
+                    statusDot.classList.toggle('opacity-50');
+                }
+            }, 2000);
         });
     </script>
 </body>
