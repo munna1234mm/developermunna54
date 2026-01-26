@@ -1157,6 +1157,7 @@
             tg.HapticFeedback.notificationOccurred('success');
             tg.showAlert('Deposit Submitted! Pending Approval.');
             closeDepositModal();
+            renderHistory();
 
             // Reset Form (Wait for anim)
             setTimeout(() => {
