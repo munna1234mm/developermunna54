@@ -78,6 +78,11 @@
                     <span class="material-symbols-outlined mr-3">currency_exchange</span>
                     P2P System
                 </button>
+                <button onclick="switchView('deposits')" id="nav-deposits"
+                    class="nav-item w-full flex items-center px-6 py-3 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-colors text-left">
+                    <span class="material-symbols-outlined mr-3">payments</span>
+                    Deposit Requests
+                </button>
                 <!-- New Support Tab -->
                 <button onclick="switchView('support')" id="nav-support"
                     class="nav-item w-full flex items-center px-6 py-3 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-colors text-left">
@@ -209,7 +214,7 @@
                                                 class="inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded-full bg-green-100 text-green-600 dark:bg-green-500/10 dark:text-green-500">Verified</span>
                                         </td>
                                         <td class="px-6 py-4">
-                                            <p class="font-medium">12,500.00 USDT</p>
+                                            <p class="font-medium">12,500.00 BDT</p>
                                             <p class="text-xs text-slate-500">≈ $12,500.00</p>
                                         </td>
                                         <td class="px-6 py-4">User</td>
@@ -242,7 +247,7 @@
                                                 class="inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded-full bg-yellow-100 text-yellow-600 dark:bg-yellow-500/10 dark:text-yellow-500">Pending</span>
                                         </td>
                                         <td class="px-6 py-4">
-                                            <p class="font-medium">450.00 USDT</p>
+                                            <p class="font-medium">450.00 BDT</p>
                                             <p class="text-xs text-slate-500">≈ $450.00</p>
                                         </td>
                                         <td class="px-6 py-4">User</td>
@@ -269,6 +274,35 @@
                                 <button
                                     class="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Next</button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW: DEPOSIT REQUESTS -->
+                <div id="view-deposits" class="view-section hidden">
+                    <div class="mb-8">
+                        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Deposit Requests</h1>
+                        <p class="text-sm text-slate-500">Approve or reject manual deposit proofs.</p>
+                    </div>
+
+                    <div
+                        class="bg-white dark:bg-[#1a282f] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead
+                                    class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase tracking-wider text-xs">
+                                    <tr>
+                                        <th class="px-6 py-3">User</th>
+                                        <th class="px-6 py-3">Amount</th>
+                                        <th class="px-6 py-3">Method / Sender</th>
+                                        <th class="px-6 py-3">Proof</th>
+                                        <th class="px-6 py-3 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="deposits-table-body" class="divide-y divide-slate-200 dark:divide-slate-800">
+                                    <!-- Injected -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -310,7 +344,7 @@
                                     class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Asset</label>
                                 <select
                                     class="w-full bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg text-sm">
-                                    <option value="USDT">USDT</option>
+                                    <option value="BDT">BDT</option>
                                     <option value="BTC">BTC</option>
                                     <option value="ETH">ETH</option>
                                 </select>
@@ -368,11 +402,11 @@
                                     <td class="px-6 py-4">
                                         <span
                                             class="text-green-500 font-bold bg-green-500/10 px-2 py-0.5 rounded text-xs">BUY</span>
-                                        <span class="ml-2 font-medium">USDT</span>
+                                        <span class="ml-2 font-medium">BDT</span>
                                     </td>
                                     <td class="px-6 py-4 font-bold">$1.02</td>
                                     <td class="px-6 py-4 text-slate-500">$100 - $5,000</td>
-                                    <td class="px-6 py-4">4,520 USDT</td>
+                                    <td class="px-6 py-4">4,520 BDT</td>
                                     <td class="px-6 py-4">
                                         <span class="inline-flex size-2 rounded-full bg-green-500"></span>
                                         <span class="ml-2 text-xs">Online</span>
@@ -386,11 +420,11 @@
                                     <td class="px-6 py-4">
                                         <span
                                             class="text-red-500 font-bold bg-red-500/10 px-2 py-0.5 rounded text-xs">SELL</span>
-                                        <span class="ml-2 font-medium">USDT</span>
+                                        <span class="ml-2 font-medium">BDT</span>
                                     </td>
                                     <td class="px-6 py-4 font-bold">$0.99</td>
                                     <td class="px-6 py-4 text-slate-500">$50 - $1,000</td>
-                                    <td class="px-6 py-4">1,200 USDT</td>
+                                    <td class="px-6 py-4">1,200 BDT</td>
                                     <td class="px-6 py-4">
                                         <span class="inline-flex size-2 rounded-full bg-slate-400"></span>
                                         <span class="ml-2 text-xs">Offline</span>
@@ -539,6 +573,9 @@
             if (viewId === 'users') {
                 renderUsers();
             }
+            if (viewId === 'deposits') {
+                renderDeposits();
+            }
         }
 
         function toggleP2PForm() {
@@ -593,7 +630,7 @@
                         <span class="inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded-full bg-green-100 text-green-600 dark:bg-green-500/10 dark:text-green-500">${u.status}</span>
                     </td>
                     <td class="px-6 py-4">
-                        <p class="font-medium">${u.balance.toFixed(2)} USDT</p>
+                        <p class="font-medium">${u.balance.toFixed(2)} BDT</p>
                     </td>
                     <td class="px-6 py-4">User</td>
                     <td class="px-6 py-4 text-right">
@@ -602,6 +639,100 @@
                 </tr>
             `).join('');
         }
+
+        /* --- Deposit Logic --- */
+        const TRX_STORAGE_KEY = 'wallet_transactions';
+
+        function renderDeposits() {
+            const trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
+            const pending = trxs.filter(t => t.type === 'deposit' && t.status === 'pending');
+            const tbody = document.getElementById('deposits-table-body');
+
+            if (!tbody) return;
+
+            if (pending.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">No pending deposits.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = pending.map(t => `
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30">
+                    <td class="px-6 py-4">
+                        <p class="font-medium text-slate-900 dark:text-white">${t.userName}</p>
+                        <p class="text-xs text-slate-500">ID: ${t.userId}</p>
+                    </td>
+                    <td class="px-6 py-4 font-bold text-green-500">+${t.amount} BDT</td>
+                    <td class="px-6 py-4">
+                        <p class="uppercase text-xs font-bold">${t.method}</p>
+                        <p class="font-mono text-xs text-slate-500">${t.sender}</p>
+                    </td>
+                    <td class="px-6 py-4">
+                        ${t.photo ? `<a href="${t.photo}" target="_blank" class="text-primary underline text-xs">View Photo</a>` : '<span class="text-slate-400 text-xs">No Photo</span>'}
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="approveDeposit('${t.id}')" class="bg-green-500 text-white px-3 py-1 rounded text-xs font-bold hover:bg-green-600 mr-2">Approve</button>
+                        <button onclick="rejectDeposit('${t.id}')" class="bg-red-500 text-white px-3 py-1 rounded text-xs font-bold hover:bg-red-600">Reject</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function approveDeposit(trxId) {
+            if (!confirm('Approve this deposit? Funds will be added to user.')) return;
+
+            let trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
+            const idx = trxs.findIndex(t => t.id === trxId);
+            if (idx === -1) return;
+
+            const trx = trxs[idx];
+            trx.status = 'approved';
+            trxs[idx] = trx;
+            localStorage.setItem(TRX_STORAGE_KEY, JSON.stringify(trxs));
+
+            // Update User Balance
+            let users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+            const uIdx = users.findIndex(u => u.id == trx.userId);
+            if (uIdx >= 0) {
+                users[uIdx].balance += trx.amount; // Add to Main
+                if (users[uIdx].balance_hold >= trx.amount) {
+                    users[uIdx].balance_hold -= trx.amount; // Release from Hold
+                } else {
+                    users[uIdx].balance_hold = 0;
+                }
+                localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+            }
+
+            renderDeposits();
+            alert('Deposit Approved!');
+        }
+
+        function rejectDeposit(trxId) {
+            if (!confirm('Reject this deposit?')) return;
+
+            let trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
+            const idx = trxs.findIndex(t => t.id === trxId);
+            if (idx === -1) return;
+
+            const trx = trxs[idx];
+            trx.status = 'rejected';
+            trxs[idx] = trx;
+            localStorage.setItem(TRX_STORAGE_KEY, JSON.stringify(trxs));
+
+            // Remove from User Hold
+            let users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+            const uIdx = users.findIndex(u => u.id == trx.userId);
+            if (uIdx >= 0) {
+                if (users[uIdx].balance_hold >= trx.amount) {
+                    users[uIdx].balance_hold -= trx.amount;
+                } else {
+                    users[uIdx].balance_hold = 0;
+                }
+                localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+            }
+
+            renderDeposits();
+        }
+        /* --- End Deposit Logic --- */
 
         function deleteUser(id) {
             if (!confirm('Delete this user?')) return;
