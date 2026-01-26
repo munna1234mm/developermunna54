@@ -1,21 +1,32 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
+
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
     <title>Wallet Balance</title>
     <!-- Telegram Web App Script -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+
+    <!-- CSS Variables for Theming -->
+    <style>
+        :root {
+            --color-primary: 19, 171, 236;
+            /* Default Blue #13abec */
+        }
+    </style>
+
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#13abec",
+                        "primary": "rgb(var(--color-primary))",
                         "background-light": "#f6f7f8",
                         "background-dark": "#101c22",
                         "success-green": "#22c55e",
@@ -38,54 +49,78 @@
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
-            overflow: hidden; 
+            overflow: hidden;
         }
+
         .safe-area-top {
             padding-top: var(--tg-safe-area-inset-top, 0px);
         }
+
         .safe-area-bottom {
             padding-bottom: var(--tg-safe-area-inset-bottom, 0px);
         }
+
         main {
-            height: calc(100dvh - 64px - 64px); /* Header + Nav */
+            height: calc(100dvh - 64px - 64px);
+            /* Header + Nav */
             overflow-y: auto;
         }
+
         main::-webkit-scrollbar {
             display: none;
         }
+
         .ios-blur {
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
         }
+
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
+
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
+
+        /* Theme Circle Active Check */
+        .theme-circle.active {
+            ring-width: 2px;
+            ring-color: white;
+            ring-offset-width: 2px;
+            ring-offset-color: #101c22;
+        }
     </style>
 </head>
+
 <body class="bg-background-light dark:bg-background-dark font-display text-white transition-colors duration-300">
     <div id="app" class="relative flex h-screen w-full flex-col overflow-hidden">
-        
+
         <!-- TopAppBar -->
-        <header class="safe-area-top flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-50">
+        <header
+            class="safe-area-top flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-50">
             <div class="flex size-12 shrink-0 items-center">
-                <div id="user-avatar" class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20" 
-                     style='background-image: url("https://ui-avatars.com/api/?name=User&background=13abec&color=fff");'>
+                <div id="user-avatar"
+                    class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20"
+                    style='background-image: url("https://ui-avatars.com/api/?name=User&background=13abec&color=fff");'>
                 </div>
             </div>
-            <h2 id="page-title" class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Wallet</h2>
+            <h2 id="page-title"
+                class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">
+                Wallet</h2>
             <div class="flex w-12 items-center justify-end gap-2">
                 <div id="p2p-actions" class="hidden flex gap-1">
-                    <button class="flex items-center justify-center size-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                    <button
+                        class="flex items-center justify-center size-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
                         <span class="material-symbols-outlined text-[20px]">history</span>
                     </button>
-                    <button class="flex items-center justify-center size-8 rounded-full bg-slate-100 dark:bg-slate-800 text-primary">
+                    <button
+                        class="flex items-center justify-center size-8 rounded-full bg-slate-100 dark:bg-slate-800 text-primary">
                         <span class="material-symbols-outlined text-[20px]">add_box</span>
                     </button>
                 </div>
-                <button onclick="tgAction('help')" class="flex size-10 cursor-pointer items-center justify-center rounded-full bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white transition-colors">
+                <button onclick="tgAction('help')"
+                    class="flex size-10 cursor-pointer items-center justify-center rounded-full bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white transition-colors">
                     <span class="material-symbols-outlined text-[24px]">help</span>
                 </button>
             </div>
@@ -93,25 +128,29 @@
 
         <!-- Main Content Area -->
         <main id="main-scroll" class="flex-1 pb-24">
-            
+
             <!-- Balance Tab -->
             <div id="tab-balance" class="tab-content">
                 <div class="flex flex-col items-center justify-center py-8">
-                    <h1 class="text-slate-900 dark:text-white tracking-tight text-[40px] font-bold leading-tight px-4 text-center">
+                    <h1
+                        class="text-slate-900 dark:text-white tracking-tight text-[40px] font-bold leading-tight px-4 text-center">
                         1,240.50 <span class="text-primary text-[28px]">USDT</span>
                     </h1>
-                    <p class="text-slate-500 dark:text-[#9db1b9] text-base font-medium leading-normal pt-1 px-4 text-center">
+                    <p
+                        class="text-slate-500 dark:text-[#9db1b9] text-base font-medium leading-normal pt-1 px-4 text-center">
                         ≈ $1,240.50 USD
                     </p>
                 </div>
 
                 <div class="flex justify-center mb-6">
                     <div class="flex flex-1 gap-4 px-4 max-w-[480px] justify-center w-full">
-                        <button onclick="handleSend()" class="flex flex-1 items-center justify-center gap-2 rounded-xl h-14 bg-primary text-white text-base font-bold transition-transform active:scale-95 shadow-lg shadow-primary/20">
+                        <button onclick="handleSend()"
+                            class="flex flex-1 items-center justify-center gap-2 rounded-xl h-14 bg-primary text-white text-base font-bold transition-transform active:scale-95 shadow-lg shadow-primary/20">
                             <span class="material-symbols-outlined">north_east</span>
                             <span class="truncate text-lg">Send</span>
                         </button>
-                        <button onclick="handleReceive()" class="flex flex-1 items-center justify-center gap-2 rounded-xl h-14 bg-primary text-white text-base font-bold transition-transform active:scale-95 shadow-lg shadow-primary/20">
+                        <button onclick="handleReceive()"
+                            class="flex flex-1 items-center justify-center gap-2 rounded-xl h-14 bg-primary text-white text-base font-bold transition-transform active:scale-95 shadow-lg shadow-primary/20">
                             <span class="material-symbols-outlined">south_west</span>
                             <span class="truncate text-lg">Receive</span>
                         </button>
@@ -119,7 +158,8 @@
                 </div>
 
                 <div class="px-4 mb-8">
-                    <div onclick="switchTab('p2p')" class="bg-primary/10 border border-primary/20 rounded-xl p-4 flex items-center justify-between cursor-pointer active:opacity-80">
+                    <div onclick="switchTab('p2p')"
+                        class="bg-primary/10 border border-primary/20 rounded-xl p-4 flex items-center justify-between cursor-pointer active:opacity-80">
                         <div class="flex items-center gap-3">
                             <div class="bg-primary/20 p-2 rounded-lg text-primary">
                                 <span class="material-symbols-outlined">currency_exchange</span>
@@ -135,13 +175,16 @@
 
                 <div class="bg-white dark:bg-slate-900/50 rounded-t-[32px] pt-2 shadow-2xl">
                     <div class="flex items-center justify-between px-6 pt-6 pb-4">
-                        <h3 class="text-slate-900 dark:text-white text-xl font-bold tracking-[-0.015em]">Recent Activity</h3>
+                        <h3 class="text-slate-900 dark:text-white text-xl font-bold tracking-[-0.015em]">Recent Activity
+                        </h3>
                         <button class="text-primary text-sm font-semibold">See all</button>
                     </div>
-                    
+
                     <div class="space-y-1 px-4 pb-10">
-                        <div class="flex items-center p-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
-                            <div class="size-12 rounded-full bg-green-500/10 text-green-500 flex items-center justify-center mr-4">
+                        <div
+                            class="flex items-center p-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+                            <div
+                                class="size-12 rounded-full bg-green-500/10 text-green-500 flex items-center justify-center mr-4">
                                 <span class="material-symbols-outlined">call_received</span>
                             </div>
                             <div class="flex-1">
@@ -162,12 +205,15 @@
                 <div class="sticky top-0 z-40 bg-background-light dark:bg-background-dark/95 backdrop-blur-md">
                     <div class="px-4 py-2">
                         <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
-                            <button onclick="toggleP2PType('buy')" id="btn-p2p-buy" class="flex-1 py-2 text-sm font-bold rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm transition-all">Buy</button>
-                            <button onclick="toggleP2PType('sell')" id="btn-p2p-sell" class="flex-1 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 transition-all">Sell</button>
+                            <button onclick="toggleP2PType('buy')" id="btn-p2p-buy"
+                                class="flex-1 py-2 text-sm font-bold rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm transition-all">Buy</button>
+                            <button onclick="toggleP2PType('sell')" id="btn-p2p-sell"
+                                class="flex-1 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 transition-all">Sell</button>
                         </div>
                     </div>
                     <div class="flex gap-2 px-4 py-3 overflow-x-auto no-scrollbar">
-                        <button class="flex h-9 shrink-0 items-center justify-center gap-x-1 rounded-full bg-primary/10 border border-primary/20 px-4">
+                        <button
+                            class="flex h-9 shrink-0 items-center justify-center gap-x-1 rounded-full bg-primary/10 border border-primary/20 px-4">
                             <p class="text-primary text-xs font-semibold">USDT/USD</p>
                             <span class="material-symbols-outlined text-primary text-[16px]">expand_more</span>
                         </button>
@@ -175,14 +221,18 @@
                 </div>
 
                 <div class="px-4 space-y-3 pb-10">
-                    <div class="flex flex-col bg-white dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <div
+                        class="flex flex-col bg-white dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
                         <div class="flex justify-between items-start mb-3">
                             <div class="flex items-center gap-3">
-                                <div class="size-10 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold">CK</div>
+                                <div
+                                    class="size-10 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold">
+                                    CK</div>
                                 <div>
                                     <div class="flex items-center gap-1 text-slate-900 dark:text-white">
                                         <p class="text-sm font-bold">CryptoKing</p>
-                                        <span class="material-symbols-outlined text-primary text-[14px] fill-current">verified</span>
+                                        <span
+                                            class="material-symbols-outlined text-primary text-[14px] fill-current">verified</span>
                                     </div>
                                     <p class="text-[11px] text-slate-500 dark:text-slate-400">1,240 orders | 98.5%</p>
                                 </div>
@@ -195,67 +245,85 @@
                         <div class="flex justify-between items-end">
                             <div class="space-y-1">
                                 <div class="flex items-center gap-2 text-xs">
-                                    <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 rounded text-slate-600 dark:text-slate-300">Bank Transfer</span>
+                                    <span
+                                        class="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 rounded text-slate-600 dark:text-slate-300">Bank
+                                        Transfer</span>
                                 </div>
                                 <p class="text-xs text-slate-500 dark:text-slate-400">Limit: $100.00 - $2,500.00</p>
                             </div>
-                            <button onclick="handleP2PAction('buy')" class="bg-success-green hover:bg-success-green/90 text-white px-6 py-2 rounded-lg text-sm font-bold transition-colors">Buy</button>
+                            <button onclick="handleP2PAction('buy')"
+                                class="bg-success-green hover:bg-success-green/90 text-white px-6 py-2 rounded-lg text-sm font-bold transition-colors">Buy</button>
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Referral Tab -->
             <div id="tab-referral" class="tab-content hidden">
                 <div class="flex flex-col pb-24">
                     <div class="px-4 py-4">
-                        <div class="bg-cover bg-center flex flex-col justify-end overflow-hidden rounded-xl min-h-[200px] shadow-lg relative" 
-                             style='background-image: linear-gradient(180deg, rgba(19, 171, 236, 0.2) 0%, rgba(16, 28, 34, 0.9) 100%), url("https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=800&q=80");'>
+                        <div class="bg-cover bg-center flex flex-col justify-end overflow-hidden rounded-xl min-h-[200px] shadow-lg relative"
+                            style='background-image: linear-gradient(180deg, rgba(var(--color-primary), 0.2) 0%, rgba(16, 28, 34, 0.9) 100%), url("https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=800&q=80");'>
                             <div class="flex flex-col p-6 space-y-2">
-                                <span class="bg-primary text-white text-[10px] font-extrabold uppercase tracking-widest px-2 py-1 rounded w-fit">Limited Offer</span>
-                                <p class="text-white tracking-tight text-2xl font-bold leading-tight">Get 10% of your friends' trading fees</p>
+                                <span
+                                    class="bg-primary text-white text-[10px] font-extrabold uppercase tracking-widest px-2 py-1 rounded w-fit">Limited
+                                    Offer</span>
+                                <p class="text-white tracking-tight text-2xl font-bold leading-tight">Get 10% of your
+                                    friends' trading fees</p>
                             </div>
                         </div>
                     </div>
                     <div class="px-4 py-2">
-                        <div class="bg-primary/10 dark:bg-primary/5 border border-primary/20 rounded-xl p-4 flex flex-col gap-3">
+                        <div
+                            class="bg-primary/10 dark:bg-primary/5 border border-primary/20 rounded-xl p-4 flex flex-col gap-3">
                             <div class="flex items-center justify-between">
-                                <h3 class="text-slate-900 dark:text-white text-[10px] font-bold uppercase tracking-wider">Your Referral Link</h3>
+                                <h3
+                                    class="text-slate-900 dark:text-white text-[10px] font-bold uppercase tracking-wider">
+                                    Your Referral Link</h3>
                             </div>
-                            <div class="flex items-center gap-2 bg-white dark:bg-background-dark border border-slate-200 dark:border-slate-700 rounded-lg p-3">
-                                <span id="ref-link" class="text-slate-600 dark:text-slate-400 text-xs truncate flex-1 font-mono">t.me/WalletBot?start=ref_12345</span>
-                                <button onclick="copyRefLink()" class="flex items-center justify-center text-primary hover:bg-primary/10 p-1 rounded transition-colors">
+                            <div
+                                class="flex items-center gap-2 bg-white dark:bg-background-dark border border-slate-200 dark:border-slate-700 rounded-lg p-3">
+                                <span id="ref-link"
+                                    class="text-slate-600 dark:text-slate-400 text-xs truncate flex-1 font-mono">t.me/WalletBot?start=ref_12345</span>
+                                <button onclick="copyRefLink()"
+                                    class="flex items-center justify-center text-primary hover:bg-primary/10 p-1 rounded transition-colors">
                                     <span class="material-symbols-outlined text-[20px]">content_copy</span>
                                 </button>
                             </div>
                         </div>
                     </div>
                     <div class="px-4 mt-8">
-                        <button onclick="inviteFriends()" class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">
+                        <button onclick="inviteFriends()"
+                            class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">
                             <span class="material-symbols-outlined">send</span>
                             Invite Friends
                         </button>
                     </div>
                 </div>
             </div>
-            
-            <!-- Profile Tab (Newly Integrated) -->
+
+            <!-- Profile Tab -->
             <div id="tab-profile" class="tab-content hidden">
                 <div class="pb-12">
                     <!-- Profile Header -->
                     <div class="flex flex-col items-center py-6 px-4">
                         <div class="relative">
-                            <div id="profile-pic-large" class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-28 w-28 border-4 border-primary/20" 
-                                 style='background-image: url("https://ui-avatars.com/api/?name=User&background=13abec&color=fff");'>
+                            <div id="profile-pic-large"
+                                class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-28 w-28 border-4 border-primary/20"
+                                style='background-image: url("https://ui-avatars.com/api/?name=User&background=13abec&color=fff");'>
                             </div>
-                            <div class="absolute bottom-1 right-1 bg-primary text-white rounded-full p-1 border-2 border-background-dark flex items-center justify-center">
+                            <div
+                                class="absolute bottom-1 right-1 bg-primary text-white rounded-full p-1 border-2 border-background-dark flex items-center justify-center">
                                 <span class="material-symbols-outlined text-[16px] font-bold">verified</span>
                             </div>
                         </div>
                         <div class="mt-4 text-center">
-                            <h1 id="profile-name" class="text-slate-900 dark:text-white text-2xl font-bold tracking-tight">User Name</h1>
-                            <p id="profile-username" class="text-slate-500 dark:text-slate-400 text-sm font-medium">@username</p>
-                            <div class="mt-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-semibold">
+                            <h1 id="profile-name"
+                                class="text-slate-900 dark:text-white text-2xl font-bold tracking-tight">User Name</h1>
+                            <p id="profile-username" class="text-slate-500 dark:text-slate-400 text-sm font-medium">
+                                @username</p>
+                            <div
+                                class="mt-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-semibold">
                                 <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
                                 Verified User
                             </div>
@@ -264,16 +332,22 @@
 
                     <!-- Quick Stats -->
                     <div class="flex gap-3 px-4 mb-8">
-                        <div class="flex-1 flex flex-col gap-1 rounded-xl p-4 bg-white dark:bg-[#1a282f] shadow-sm border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white">
-                            <p class="text-slate-500 dark:text-slate-400 text-[10px] font-medium uppercase tracking-wider">Total Balance</p>
+                        <div
+                            class="flex-1 flex flex-col gap-1 rounded-xl p-4 bg-white dark:bg-[#1a282f] shadow-sm border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white">
+                            <p
+                                class="text-slate-500 dark:text-slate-400 text-[10px] font-medium uppercase tracking-wider">
+                                Total Balance</p>
                             <p class="text-xl font-bold leading-tight">$1,240.50</p>
                             <p class="text-emerald-500 text-[10px] font-semibold flex items-center gap-0.5">
                                 <span class="material-symbols-outlined text-[12px]">trending_up</span>
                                 +5.2%
                             </p>
                         </div>
-                        <div class="flex-1 flex flex-col gap-1 rounded-xl p-4 bg-white dark:bg-[#1a282f] shadow-sm border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white">
-                            <p class="text-slate-500 dark:text-slate-400 text-[10px] font-medium uppercase tracking-wider">Referrals</p>
+                        <div
+                            class="flex-1 flex flex-col gap-1 rounded-xl p-4 bg-white dark:bg-[#1a282f] shadow-sm border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white">
+                            <p
+                                class="text-slate-500 dark:text-slate-400 text-[10px] font-medium uppercase tracking-wider">
+                                Referrals</p>
                             <p class="text-xl font-bold leading-tight">128 Users</p>
                             <p class="text-primary text-[10px] font-semibold flex items-center gap-0.5">
                                 <span class="material-symbols-outlined text-[12px]">group</span>
@@ -282,61 +356,71 @@
                         </div>
                     </div>
 
-                    <!-- Menu Section: Account -->
-                    <div class="mb-6">
-                        <h3 class="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest px-6 mb-2">Account & Security</h3>
-                        <div class="mx-4 bg-white dark:bg-[#1a282f] rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm">
-                            <div onclick="tgAction('security')" class="flex items-center gap-4 px-4 py-3.5 active:bg-slate-50 dark:active:bg-white/5 cursor-pointer border-b border-slate-100 dark:border-slate-800/50">
-                                <div class="flex items-center justify-center rounded-lg bg-primary/20 text-primary shrink-0 size-10">
-                                    <span class="material-symbols-outlined">shield_lock</span>
-                                </div>
-                                <div class="flex-1 text-slate-900 dark:text-white">
-                                    <p class="text-sm font-medium">Security</p>
-                                    <p class="text-[10px] text-slate-500 dark:text-slate-400">2FA, Passwords, Devices</p>
-                                </div>
-                                <span class="material-symbols-outlined text-slate-400">chevron_right</span>
-                            </div>
-                            <div class="flex items-center gap-4 px-4 py-3.5 active:bg-slate-50 dark:active:bg-white/5 cursor-pointer border-b border-slate-100 dark:border-slate-800/50">
-                                <div class="flex items-center justify-center rounded-lg bg-purple-500/20 text-purple-500 shrink-0 size-10">
-                                    <span class="material-symbols-outlined">account_balance_wallet</span>
-                                </div>
-                                <div class="flex-1 text-slate-900 dark:text-white">
-                                    <p class="text-sm font-medium">Payment Methods</p>
-                                    <p class="text-[10px] text-slate-500 dark:text-slate-400">Manage bank accounts & P2P</p>
-                                </div>
-                                <span class="material-symbols-outlined text-slate-400">chevron_right</span>
-                            </div>
-                            <div class="flex items-center gap-4 px-4 py-3.5 active:bg-slate-50 dark:active:bg-white/5 cursor-pointer">
-                                <div class="flex items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-500 shrink-0 size-10">
-                                    <span class="material-symbols-outlined">badge</span>
-                                </div>
-                                <div class="flex-1 text-slate-900 dark:text-white">
-                                    <p class="text-sm font-medium">Identity Verification</p>
-                                    <p class="text-[10px] text-emerald-500 font-medium">Level 2 - Completed</p>
-                                </div>
-                                <span class="material-symbols-outlined text-slate-400">chevron_right</span>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Preferences -->
                     <div class="mb-6">
-                        <h3 class="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest px-6 mb-2">Preferences</h3>
-                        <div class="mx-4 bg-white dark:bg-[#1a282f] rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm">
-                            <div class="flex items-center gap-4 px-4 py-3.5 active:bg-slate-50 dark:active:bg-white/5 cursor-pointer border-b border-slate-100 dark:border-slate-800/50 text-slate-900 dark:text-white">
-                                <div class="flex items-center justify-center rounded-lg bg-orange-500/20 text-orange-500 shrink-0 size-10">
-                                    <span class="material-symbols-outlined">notifications_active</span>
+                        <h3
+                            class="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest px-6 mb-2">
+                            Preferences</h3>
+                        <div
+                            class="mx-4 bg-white dark:bg-[#1a282f] rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <div id="theme-menu-btn" onclick="toggleThemeMenu()"
+                                class="flex items-center gap-4 px-4 py-3.5 active:bg-slate-50 dark:active:bg-white/5 cursor-pointer border-b border-slate-100 dark:border-slate-800/50 text-slate-900 dark:text-white">
+                                <div
+                                    class="flex items-center justify-center rounded-lg bg-pink-500/20 text-pink-500 shrink-0 size-10">
+                                    <span class="material-symbols-outlined">palette</span>
                                 </div>
-                                <p class="text-sm font-medium flex-1">Notification Settings</p>
+                                <p class="text-sm font-medium flex-1">App Theme</p>
                                 <span class="material-symbols-outlined text-slate-400">chevron_right</span>
                             </div>
-                            <div class="flex items-center gap-4 px-4 py-3.5 active:bg-slate-50 dark:active:bg-white/5 cursor-pointer text-slate-900 dark:text-white">
-                                <div class="flex items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-500 shrink-0 size-10">
+
+                            <!-- Hidden Theme Selector Section inside the menu item for animation effect later, or use modal. Let's use simple hidden toggle for now -->
+                            <div id="theme-selector-area"
+                                class="hidden bg-slate-50 dark:bg-black/20 p-4 border-b border-slate-100 dark:border-slate-800/50">
+                                <p class="text-xs text-slate-500 mb-3 ml-1">Select Accent Day</p>
+                                <div class="flex gap-4 justify-around">
+                                    <div onclick="setTheme('19, 171, 236')"
+                                        class="cursor-pointer flex flex-col items-center gap-1">
+                                        <div
+                                            class="w-8 h-8 rounded-full bg-[#13abec] ring-2 ring-transparent transition-all">
+                                        </div>
+                                        <span class="text-[10px] text-slate-500">Blue</span>
+                                    </div>
+                                    <div onclick="setTheme('34, 197, 94')"
+                                        class="cursor-pointer flex flex-col items-center gap-1">
+                                        <div
+                                            class="w-8 h-8 rounded-full bg-[#22c55e] ring-2 ring-transparent transition-all">
+                                        </div>
+                                        <span class="text-[10px] text-slate-500">Green</span>
+                                    </div>
+                                    <div onclick="setTheme('168, 85, 247')"
+                                        class="cursor-pointer flex flex-col items-center gap-1">
+                                        <div
+                                            class="w-8 h-8 rounded-full bg-[#a855f7] ring-2 ring-transparent transition-all">
+                                        </div>
+                                        <span class="text-[10px] text-slate-500">Purple</span>
+                                    </div>
+                                    <div onclick="setTheme('249, 115, 22')"
+                                        class="cursor-pointer flex flex-col items-center gap-1">
+                                        <div
+                                            class="w-8 h-8 rounded-full bg-[#f97316] ring-2 ring-transparent transition-all">
+                                        </div>
+                                        <span class="text-[10px] text-slate-500">Orange</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div onclick="toggleDarkMode()"
+                                class="flex items-center gap-4 px-4 py-3.5 active:bg-slate-50 dark:active:bg-white/5 cursor-pointer text-slate-900 dark:text-white">
+                                <div
+                                    class="flex items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-500 shrink-0 size-10">
                                     <span class="material-symbols-outlined">dark_mode</span>
                                 </div>
                                 <p class="text-sm font-medium flex-1">Dark Mode</p>
-                                <div class="w-10 h-5 bg-primary rounded-full relative shadow-inner">
-                                    <div class="absolute right-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-md"></div>
+                                <div id="dark-mode-toggle"
+                                    class="w-10 h-5 bg-slate-300 dark:bg-primary rounded-full relative shadow-inner transition-colors duration-300">
+                                    <div
+                                        class="absolute left-0.5 dark:left-auto dark:right-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-md transition-all">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -344,11 +428,13 @@
 
                     <!-- Logout -->
                     <div class="px-4 pb-8">
-                        <button onclick="Telegram.WebApp.close()" class="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-red-500/10 text-red-500 font-bold border border-red-500/20 active:bg-red-500/20 transition-colors">
+                        <button onclick="Telegram.WebApp.close()"
+                            class="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-red-500/10 text-red-500 font-bold border border-red-500/20 active:bg-red-500/20 transition-colors">
                             <span class="material-symbols-outlined">logout</span>
                             Logout
                         </button>
-                        <p class="text-center text-slate-500 text-[10px] mt-4 opacity-50 uppercase tracking-widest">App Version 2.4.0</p>
+                        <p class="text-center text-slate-500 text-[10px] mt-4 opacity-50 uppercase tracking-widest">App
+                            Version 2.5.0</p>
                     </div>
                 </div>
             </div>
@@ -356,21 +442,27 @@
         </main>
 
         <!-- Bottom Navigation Bar -->
-        <nav class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 safe-area-bottom z-50">
+        <nav
+            class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 safe-area-bottom z-50">
             <div class="flex justify-around items-center h-16">
-                <button onclick="switchTab('balance')" id="nav-balance" class="nav-btn flex flex-col items-center justify-center gap-1 text-primary">
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">account_balance_wallet</span>
+                <button onclick="switchTab('balance')" id="nav-balance"
+                    class="nav-btn flex flex-col items-center justify-center gap-1 text-primary">
+                    <span class="material-symbols-outlined"
+                        style="font-variation-settings: 'FILL' 1">account_balance_wallet</span>
                     <span class="text-[10px] font-bold">Balance</span>
                 </button>
-                <button onclick="switchTab('p2p')" id="nav-p2p" class="nav-btn flex flex-col items-center justify-center gap-1 text-slate-400">
+                <button onclick="switchTab('p2p')" id="nav-p2p"
+                    class="nav-btn flex flex-col items-center justify-center gap-1 text-slate-400">
                     <span class="material-symbols-outlined">swap_horizontal_circle</span>
                     <span class="text-[10px] font-medium">P2P</span>
                 </button>
-                <button onclick="switchTab('referral')" id="nav-referral" class="nav-btn flex flex-col items-center justify-center gap-1 text-slate-400">
+                <button onclick="switchTab('referral')" id="nav-referral"
+                    class="nav-btn flex flex-col items-center justify-center gap-1 text-slate-400">
                     <span class="material-symbols-outlined">group</span>
                     <span class="text-[10px] font-medium">Referral</span>
                 </button>
-                <button onclick="switchTab('profile')" id="nav-profile" class="nav-btn flex flex-col items-center justify-center gap-1 text-slate-400">
+                <button onclick="switchTab('profile')" id="nav-profile"
+                    class="nav-btn flex flex-col items-center justify-center gap-1 text-slate-400">
                     <span class="material-symbols-outlined">person</span>
                     <span class="text-[10px] font-medium">Profile</span>
                 </button>
@@ -381,12 +473,60 @@
     <script>
         const tg = window.Telegram.WebApp;
 
+        // Theme Management
+        function initTheme() {
+            // Load Dark Mode
+            const isDark = localStorage.getItem('isDark') === 'true' || document.documentElement.classList.contains('dark');
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+
+            // Load Color Theme
+            const savedColor = localStorage.getItem('themeColor');
+            if (savedColor) {
+                setTheme(savedColor, false);
+            }
+        }
+
+        function toggleDarkMode() {
+            const el = document.documentElement;
+            el.classList.toggle('dark');
+            const isDark = el.classList.contains('dark');
+            localStorage.setItem('isDark', isDark);
+
+            // Haptic
+            if (window.Telegram?.WebApp?.HapticFeedback) {
+                window.Telegram.WebApp.HapticFeedback.selectionChanged();
+            }
+
+            // Update Toggle UI visually handled by CSS class 'dark' on parent
+        }
+
+        function toggleThemeMenu() {
+            const selector = document.getElementById('theme-selector-area');
+            selector.classList.toggle('hidden');
+        }
+
+        function setTheme(colorRgb, save = true) {
+            document.documentElement.style.setProperty('--color-primary', colorRgb);
+
+            if (save) {
+                localStorage.setItem('themeColor', colorRgb);
+                if (window.Telegram?.WebApp?.HapticFeedback) {
+                    window.Telegram.WebApp.HapticFeedback.selectionChanged();
+                }
+            }
+        }
+
         function initApp() {
             tg.ready();
             tg.expand();
-            
+            initTheme();
+
             if (tg.themeParams.bg_color) {
-                document.body.style.backgroundColor = tg.themeParams.bg_color;
+                // document.body.style.backgroundColor = tg.themeParams.bg_color; // Optional: Override with standard colors for consistency
             }
 
             const user = tg.initDataUnsafe?.user;
@@ -409,7 +549,7 @@
 
         function switchTab(tabId) {
             tg.HapticFeedback.impactOccurred('light');
-            
+
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(el => {
                 el.classList.remove('text-primary');
@@ -419,7 +559,7 @@
             });
 
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-            
+
             const activeNav = document.getElementById(`nav-${tabId}`);
             activeNav.classList.add('text-primary');
             activeNav.classList.remove('text-slate-400');
@@ -434,7 +574,6 @@
             };
             document.getElementById('page-title').textContent = titles[tabId];
 
-            // Toggle Header Actions
             const p2pActions = document.getElementById('p2p-actions');
             if (tabId === 'p2p') {
                 p2pActions.classList.remove('hidden');
@@ -455,7 +594,7 @@
             tg.HapticFeedback.selectionChanged();
             const buyBtn = document.getElementById('btn-p2p-buy');
             const sellBtn = document.getElementById('btn-p2p-sell');
-            
+
             if (type === 'buy') {
                 buyBtn.className = "flex-1 py-2 text-sm font-bold rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm transition-all";
                 sellBtn.className = "flex-1 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 transition-all";
@@ -508,12 +647,11 @@
                 tg.showConfirm('Need help?', (ok) => {
                     if (ok) tg.openTelegramLink('https://t.me/telegram');
                 });
-            } else if (type === 'security') {
-                tg.showAlert('Security settings are managed by your account administrator.');
             }
         }
 
         window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
+
 </html>
