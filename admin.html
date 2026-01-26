@@ -173,6 +173,80 @@
                     </div>
                 </div>
 
+                <!-- VIEW: SETTINGS -->
+                <div id="view-settings" class="view-section hidden">
+                    <div class="mb-8">
+                        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">App Settings</h1>
+                        <p class="text-sm text-slate-500">Configure payment methods and limits.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Payment Methods -->
+                        <div
+                            class="bg-white dark:bg-[#1a282f] p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+                                Payment Accounts
+                            </h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 mb-1">Bkash Number
+                                        (Personal)</label>
+                                    <input type="text" id="set-bkash-num" placeholder="01..."
+                                        class="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 mb-1">Nagad Number
+                                        (Personal)</label>
+                                    <input type="text" id="set-nagad-num" placeholder="01..."
+                                        class="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 mb-1">Binance Pay ID</label>
+                                    <input type="text" id="set-binance-id" placeholder="123..."
+                                        class="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-sm">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Limits -->
+                        <div
+                            class="bg-white dark:bg-[#1a282f] p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-orange-500">tune</span>
+                                Transaction Limits
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 mb-1">Bkash Min
+                                            (BDT)</label>
+                                        <input type="number" id="set-bkash-min" placeholder="10"
+                                            class="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-sm font-bold">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 mb-1">Nagad Min
+                                            (BDT)</label>
+                                        <input type="number" id="set-nagad-min" placeholder="10"
+                                            class="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-sm font-bold">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 mb-1">Binance Min (BDT)</label>
+                                    <input type="number" id="set-binance-min" placeholder="0"
+                                        class="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-sm font-bold">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex justify-end">
+                        <button onclick="saveSettings()"
+                            class="bg-primary text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform">Save
+                            All Changes</button>
+                    </div>
+                </div>
+
                 <!-- VIEW: USERS -->
                 <div id="view-users" class="view-section hidden">
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
