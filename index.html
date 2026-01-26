@@ -160,7 +160,7 @@
                                 class="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">
                                 Available Balance</p>
                             <h2 class="text-slate-900 dark:text-white text-xl font-bold">0.00 <span
-                                    class="text-primary text-sm">USDT</span></h2>
+                                    class="text-primary text-sm">BDT</span></h2>
                         </div>
                         <div
                             class="bg-white dark:bg-[#1a282f] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm text-center">
@@ -168,7 +168,7 @@
                                 class="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">
                                 Hold Balance</p>
                             <h2 class="text-slate-400 dark:text-slate-300 text-xl font-bold">0.00 <span
-                                    class="text-xs">USDT</span></h2>
+                                    class="text-xs">BDT</span></h2>
                         </div>
                     </div>
                 </div>
@@ -237,7 +237,7 @@
                     <div class="flex gap-2 px-4 py-3 overflow-x-auto no-scrollbar">
                         <button
                             class="flex h-9 shrink-0 items-center justify-center gap-x-1 rounded-full bg-primary/10 border border-primary/20 px-4">
-                            <p class="text-primary text-xs font-semibold">USDT/USD</p>
+                            <p class="text-primary text-xs font-semibold">BDT/USD</p>
                             <span class="material-symbols-outlined text-primary text-[16px]">expand_more</span>
                         </button>
                     </div>
@@ -946,10 +946,83 @@
             document.getElementById('deposit-modal').classList.remove('hidden');
         }
 
-        function copyText(text, msg) {
-            navigator.clipboard.writeText(text);
+        const TRX_STORAGE_KEY = 'wallet_transactions';
+
+        function previewFile() {
+            const preview = document.getElementById('dep-preview');
+            const file = document.getElementById('dep-photo').files[0];
+            const reader = new FileReader();
+
+            reader.addEventListener("load", function () {
+                preview.src = reader.result;
+                preview.classList.remove('hidden');
+            }, false);
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function submitDeposit() {
+            const amount = parseFloat(document.getElementById('dep-amount').value);
+            const number = document.getElementById('dep-number').value;
+            const method = document.getElementById('dep-method').value;
+            const photoInput = document.getElementById('dep-photo');
+
+            if (!amount || amount <= 0 || !number) {
+                tg.showAlert('Please fill in amount and sender number!');
+                return;
+            }
+
+            // Create Transaction Object
+            const trx = {
+                id: 'trx_' + Date.now().toString(36),
+                userId: tg.initDataUnsafe?.user?.id || '123456',
+                userName: tg.initDataUnsafe?.user?.first_name || 'Guest',
+                type: 'deposit',
+                amount: amount,
+                currency: 'BDT',
+                method: method,
+                sender: number,
+                status: 'pending',
+                photo: photoInput.files[0] ? document.getElementById('dep-preview').src : null, // Store Base64
+                timestamp: Date.now()
+            };
+
+            // Save to LocalStorage
+            let trxs = [];
+            try {
+                trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
+            } catch (e) { trxs = []; }
+            trxs.push(trx);
+            localStorage.setItem(TRX_STORAGE_KEY, JSON.stringify(trxs));
+
+            // Update User Hold Balance
+            updateUserHoldBalance(trx.userId, amount);
+
             tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert(msg || 'Copied to clipboard!');
+            tg.showAlert('Deposit Submitted! Pending Approval.');
+            document.getElementById('deposit-modal').classList.add('hidden');
+
+            // Reset Form
+            document.getElementById('dep-amount').value = '';
+            document.getElementById('dep-number').value = '';
+            document.getElementById('dep-preview').classList.add('hidden');
+        }
+
+        function updateUserHoldBalance(userId, amount) {
+            const USERS_KEY = 'wallet_users';
+            let users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+            const idx = users.findIndex(u => u.id == userId);
+
+            if (idx >= 0) {
+                if (!users[idx].balance_hold) users[idx].balance_hold = 0;
+                users[idx].balance_hold += amount;
+                localStorage.setItem(USERS_KEY, JSON.stringify(users));
+
+                // Update UI if current user
+                document.getElementById('bal-hold').textContent = users[idx].balance_hold.toFixed(2);
+            }
         }
 
         function handleWithdraw() {
