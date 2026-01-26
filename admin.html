@@ -139,13 +139,13 @@
                         <div
                             class="bg-white dark:bg-[#1a282f] p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
                             <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Total Revenue</h3>
+                                <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Total Collection</h3>
                                 <span
-                                    class="material-symbols-outlined text-green-500 bg-green-500/10 p-1.5 rounded-lg">attach_money</span>
+                                    class="material-symbols-outlined text-green-500 bg-green-500/10 p-1.5 rounded-lg">payments</span>
                             </div>
-                            <p class="text-2xl font-bold">$124,500.00</p>
-                            <p class="text-xs text-green-500 flex items-center gap-1 mt-1 font-medium">
-                                <span class="material-symbols-outlined text-[14px]">trending_up</span> +12.5% this month
+                            <p id="dash-total-collection" class="text-2xl font-bold">0.00 BDT</p>
+                            <p class="text-xs text-slate-500 flex items-center gap-1 mt-1 font-medium">
+                                Total approved deposits
                             </p>
                         </div>
                         <div
@@ -155,22 +155,21 @@
                                 <span
                                     class="material-symbols-outlined text-primary bg-primary/10 p-1.5 rounded-lg">group</span>
                             </div>
-                            <p class="text-2xl font-bold">8,240</p>
-                            <p class="text-xs text-primary flex items-center gap-1 mt-1 font-medium">
-                                <span class="material-symbols-outlined text-[14px]">arrow_upward</span> +140 this week
+                            <p id="dash-total-users" class="text-2xl font-bold">0</p>
+                            <p class="text-xs text-slate-500 flex items-center gap-1 mt-1 font-medium">
+                                Registered members
                             </p>
                         </div>
                         <div
                             class="bg-white dark:bg-[#1a282f] p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
                             <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Active P2P Orders
-                                </h3>
+                                <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Pending Requests</h3>
                                 <span
-                                    class="material-symbols-outlined text-orange-500 bg-orange-500/10 p-1.5 rounded-lg">swap_horiz</span>
+                                    class="material-symbols-outlined text-orange-500 bg-orange-500/10 p-1.5 rounded-lg">pending_actions</span>
                             </div>
-                            <p class="text-2xl font-bold">1,492</p>
+                            <p id="dash-pending-reqs" class="text-2xl font-bold">0</p>
                             <p class="text-xs text-slate-500 flex items-center gap-1 mt-1 font-medium">
-                                Volume: $450k
+                                Needs your attention
                             </p>
                         </div>
                     </div>
@@ -811,11 +810,7 @@
             }
 
             /* --- User Logic --- */
-            db.ref(USERS_NODE).on('value', snapshot => {
-                const usersObj = snapshot.val() || {};
-                const users = Object.values(usersObj);
-                renderUsers(users);
-            });
+
 
             function renderUsers(users) {
                 const tbody = document.querySelector('#view-users tbody');
@@ -858,7 +853,32 @@
                 const trxs = Object.values(trxsObj);
                 renderDeposits(trxs);
                 renderWithdrawals(trxs);
+                updateDashboard(trxs, null);
             });
+
+            db.ref(USERS_NODE).on('value', snapshot => {
+                const usersObj = snapshot.val() || {};
+                const users = Object.values(usersObj);
+                renderUsers(users);
+                updateDashboard(null, users);
+            });
+
+            function updateDashboard(trxs, users) {
+                if (trxs) {
+                    const approved = trxs.filter(t => t.status === 'approved' && (t.type === 'deposit' || t.type === 'p2p_trade'));
+                    const totalCollection = approved.reduce((acc, t) => acc + (t.type === 'p2p_trade' ? (t.reward || 0) : (t.amount || 0)), 0);
+                    const pending = trxs.filter(t => t.status === 'pending').length;
+
+                    const colEl = document.getElementById('dash-total-collection');
+                    const penEl = document.getElementById('dash-pending-reqs');
+                    if (colEl) colEl.textContent = `${totalCollection.toFixed(2)} BDT`;
+                    if (penEl) penEl.textContent = pending;
+                }
+                if (users) {
+                    const userEl = document.getElementById('dash-total-users');
+                    if (userEl) userEl.textContent = users.length;
+                }
+            }
 
             function renderDeposits(trxs) {
                 const pending = trxs.filter(t => (t.type === 'deposit' || t.type === 'p2p_trade') && t.status === 'pending');
