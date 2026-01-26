@@ -1117,12 +1117,16 @@
         const P2P_KEY = 'wallet_p2p_ads';
 
         function renderP2PAds() {
-            const currentType = document.getElementById('btn-p2p-buy').classList.contains('bg-white') ? 'buy' : 'sell';
+            const currentTab = document.getElementById('btn-p2p-buy').classList.contains('bg-white') ? 'buy' : 'sell';
+            // Logic: If user wants to BUY, they need to see ads where merchant is SELLING.
+            // If user wants to SELL, they need to see ads where merchant is BUYING.
+            const targetMerchantType = (currentTab === 'buy') ? 'sell' : 'buy';
+
             const ads = JSON.parse(localStorage.getItem(P2P_KEY) || '[]');
             const container = document.getElementById('p2p-list');
             if (!container) return;
 
-            const filtered = ads.filter(a => a.type === currentType);
+            const filtered = ads.filter(a => a.type === targetMerchantType);
 
             if (filtered.length === 0) {
                 container.innerHTML = `<div class="flex flex-col items-center justify-center py-12 text-slate-400">
