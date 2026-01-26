@@ -460,9 +460,15 @@
                                         </p>
                                     </div>
                                 </div>
-                                <button class="text-slate-400 hover:text-slate-600">
-                                    <span class="material-symbols-outlined">more_vert</span>
-                                </button>
+                                <div class="flex gap-2">
+                                    <button onclick="forceReloadChat()" title="Refresh Chat"
+                                        class="text-slate-400 hover:text-primary transition-colors p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+                                        <span class="material-symbols-outlined">refresh</span>
+                                    </button>
+                                    <button class="text-slate-400 hover:text-slate-600">
+                                        <span class="material-symbols-outlined">more_vert</span>
+                                    </button>
+                                </div>
                             </div>
 
                             <!-- Messages -->
@@ -537,13 +543,30 @@
         let adminChatInterval;
 
         function getChatHistory() {
-            const history = localStorage.getItem(CHAT_STORAGE_KEY);
-            return history ? JSON.parse(history) : [];
+            try {
+                const history = localStorage.getItem(CHAT_STORAGE_KEY);
+                return history ? JSON.parse(history) : [];
+            } catch (e) {
+                console.error("Chat sync error:", e);
+                return [];
+            }
         }
 
         function renderAdminChat() {
             const messages = getChatHistory();
             const container = document.getElementById('admin-chat-messages');
+
+            if (!container) return;
+
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center opacity-50">
+                        <span class="material-symbols-outlined text-[48px] mb-2">forum</span>
+                        <p class="text-sm">No messages yet</p>
+                    </div>
+                `;
+                return;
+            }
 
             let html = '';
             messages.forEach(msg => {
@@ -573,7 +596,7 @@
             });
 
             if (container.innerHTML !== html) {
-                const isAtBottom = container.scrollHeight - container.scrollTop === container.clientHeight;
+                const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 100;
                 container.innerHTML = html;
                 if (isAtBottom) container.scrollTop = container.scrollHeight;
             }
@@ -600,13 +623,22 @@
 
         function startChatPolling() {
             renderAdminChat();
-            if (!adminChatInterval) adminChatInterval = setInterval(renderAdminChat, 2000);
+            if (!adminChatInterval) adminChatInterval = setInterval(renderAdminChat, 1000);
         }
 
         function stopChatPolling() {
             if (adminChatInterval) {
                 clearInterval(adminChatInterval);
                 adminChatInterval = null;
+            }
+        }
+
+        function forceReloadChat() {
+            renderAdminChat();
+            const btn = document.querySelector('button[title="Refresh Chat"]');
+            if (btn) {
+                btn.classList.add('animate-spin');
+                setTimeout(() => btn.classList.remove('animate-spin'), 500);
             }
         }
 
