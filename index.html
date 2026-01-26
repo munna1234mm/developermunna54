@@ -1187,9 +1187,19 @@
         }
 
         function handleWithdraw() {
-            tg.HapticFeedback.impactOccurred('medium');
+            // alert('Debug: handleWithdraw called'); // Debug
+            if (window.Telegram?.WebApp?.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('medium');
+            }
+
             showWdStep1();
-            document.getElementById('withdraw-modal').classList.remove('hidden');
+            const modal = document.getElementById('withdraw-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            } else {
+                alert('Error: Modal not found!');
+                return;
+            }
 
             // Update Bal Display
             const userId = tg.initDataUnsafe?.user?.id || '123456';
