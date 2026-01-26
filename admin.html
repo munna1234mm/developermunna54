@@ -46,6 +46,9 @@
             border-right: 3px solid transparent;
         }
     </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white transition-colors duration-300">
@@ -614,13 +617,26 @@
         </div>
 
         <script>
-            /* --- Constants & State --- */
-            const TRX_STORAGE_KEY = 'wallet_transactions';
-            const USERS_STORAGE_KEY = 'wallet_users';
-            const P2P_KEY = 'wallet_p2p_ads';
-            const SETTINGS_KEY = 'wallet_settings';
-            const RULES_STORAGE_KEY = 'bot_rules';
-            const CHAT_STORAGE_KEY = 'chat_history'; // Assuming this is used
+            /* --- Firebase Config & Init --- */
+            const firebaseConfig = {
+                apiKey: "AIzaSyBYvecq_HYeylhwCXaLot2A1U_9pvXMWXA",
+                authDomain: "developerp2p.firebaseapp.com",
+                projectId: "developerp2p",
+                storageBucket: "developerp2p.firebasestorage.app",
+                messagingSenderId: "85381141511",
+                appId: "1:85381141511:web:76264b530079246e8246a2",
+                measurementId: "G-882R3H9WMY"
+            };
+
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.database();
+
+            /* --- Node Names --- */
+            const TRX_NODE = 'transactions';
+            const USERS_NODE = 'users';
+            const P2P_NODE = 'p2p_ads';
+            const SETTINGS_NODE = 'settings';
+            const RULES_NODE = 'bot_rules';
 
             let editingP2PId = null;
 
@@ -639,17 +655,6 @@
                 if (activeNav) {
                     activeNav.classList.add('active');
                     activeNav.classList.remove('text-slate-500');
-                }
-
-                // Render logic for specific views
-                if (viewId === 'users') renderUsers();
-                if (viewId === 'p2p') renderP2PAds();
-                if (viewId === 'deposits') renderDeposits();
-                if (viewId === 'withdrawals') renderWithdrawals();
-                if (viewId === 'settings') loadSettings();
-                if (viewId === 'support') {
-                    renderRules();
-                    // if (typeof startChatPolling === 'function') startChatPolling();
                 }
             }
 
@@ -680,57 +685,53 @@
                     return;
                 }
 
-                let ads = JSON.parse(localStorage.getItem(P2P_KEY) || '[]');
+                const adData = {
+                    type, asset, price, total, min, max,
+                    available: total,
+                    status: 'online',
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                };
 
                 if (editingP2PId) {
-                    const idx = ads.findIndex(a => a.id == editingP2PId);
-                    if (idx !== -1) {
-                        ads[idx] = { ...ads[idx], type, asset, price, total, min, max, available: total };
-                    }
+                    db.ref(`${P2P_NODE}/${editingP2PId}`).update(adData)
+                        .then(() => { alert('Ad Updated!'); toggleP2PForm(); });
                 } else {
-                    const ad = {
-                        id: Date.now(),
-                        type, asset, price, total, min, max,
-                        available: total,
-                        status: 'online'
-                    };
-                    ads.push(ad);
+                    const newRef = db.ref(P2P_NODE).push();
+                    adData.id = newRef.key;
+                    newRef.set(adData)
+                        .then(() => { alert('Ad Published!'); toggleP2PForm(); });
                 }
-
-                localStorage.setItem(P2P_KEY, JSON.stringify(ads));
-                alert(editingP2PId ? 'Ad Updated!' : 'Ad Published!');
-                toggleP2PForm();
-                renderP2PAds();
             }
 
             function editAd(id) {
-                const ads = JSON.parse(localStorage.getItem(P2P_KEY) || '[]');
-                const ad = ads.find(a => a.id == id);
-                if (!ad) return;
-
-                editingP2PId = id;
-                document.getElementById('p2p-type').value = ad.type;
-                document.getElementById('p2p-asset').value = ad.asset;
-                document.getElementById('p2p-price').value = ad.price;
-                document.getElementById('p2p-amount').value = ad.total;
-                document.getElementById('p2p-min').value = ad.min;
-                document.getElementById('p2p-max').value = ad.max;
-
-                const form = document.getElementById('p2p-form-container');
-                form.classList.remove('hidden');
-                form.scrollIntoView({ behavior: 'smooth' });
+                db.ref(`${P2P_NODE}/${id}`).once('value', snapshot => {
+                    const ad = snapshot.val();
+                    if (!ad) return;
+                    editingP2PId = id;
+                    document.getElementById('p2p-type').value = ad.type;
+                    document.getElementById('p2p-asset').value = ad.asset;
+                    document.getElementById('p2p-price').value = ad.price;
+                    document.getElementById('p2p-amount').value = ad.total;
+                    document.getElementById('p2p-min').value = ad.min;
+                    document.getElementById('p2p-max').value = ad.max;
+                    document.getElementById('p2p-form-container').classList.remove('hidden');
+                    document.getElementById('p2p-form-container').scrollIntoView({ behavior: 'smooth' });
+                });
             }
 
             function deleteAd(id) {
                 if (!confirm('Delete this ad?')) return;
-                let ads = JSON.parse(localStorage.getItem(P2P_KEY) || '[]');
-                ads = ads.filter(a => a.id != id);
-                localStorage.setItem(P2P_KEY, JSON.stringify(ads));
-                renderP2PAds();
+                db.ref(`${P2P_NODE}/${id}`).remove();
             }
 
-            function renderP2PAds() {
-                const ads = JSON.parse(localStorage.getItem(P2P_KEY) || '[]');
+            // Real-time P2P Ads Listener
+            db.ref(P2P_NODE).on('value', snapshot => {
+                const adsObj = snapshot.val() || {};
+                const ads = Object.values(adsObj);
+                renderP2PAds(ads);
+            });
+
+            function renderP2PAds(ads) {
                 const tbody = document.querySelector('#view-p2p tbody');
                 if (!tbody) return;
 
@@ -753,16 +754,21 @@
                             <span class="ml-2 text-xs">Online</span>
                         </td>
                         <td class="px-6 py-4 text-right space-x-2">
-                            <button onclick="editAd(${ad.id})" class="text-primary hover:bg-primary/10 p-1 rounded transition-colors"><span class="material-symbols-outlined text-[18px]">edit</span></button>
-                            <button onclick="deleteAd(${ad.id})" class="text-red-500 hover:bg-red-500/10 p-1 rounded transition-colors"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+                            <button onclick="editAd('${ad.id}')" class="text-primary hover:bg-primary/10 p-1 rounded transition-colors"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+                            <button onclick="deleteAd('${ad.id}')" class="text-red-500 hover:bg-red-500/10 p-1 rounded transition-colors"><span class="material-symbols-outlined text-[18px]">delete</span></button>
                         </td>
                     </tr>
                 `).join('');
             }
 
             /* --- User Logic --- */
-            function renderUsers() {
-                let users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+            db.ref(USERS_NODE).on('value', snapshot => {
+                const usersObj = snapshot.val() || {};
+                const users = Object.values(usersObj);
+                renderUsers(users);
+            });
+
+            function renderUsers(users) {
                 const tbody = document.querySelector('#view-users tbody');
                 if (!tbody) return;
 
@@ -782,7 +788,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4"><span class="px-2 py-1 text-[10px] font-bold uppercase rounded-full bg-green-100 text-green-600">${u.status}</span></td>
+                        <td class="px-6 py-4"><span class="px-2 py-1 text-[10px] font-bold uppercase rounded-full bg-green-100 text-green-600">${u.status || 'Active'}</span></td>
                         <td class="px-6 py-4 font-medium">${(u.balance || 0).toFixed(2)} BDT</td>
                         <td class="px-6 py-4">User</td>
                         <td class="px-6 py-4 text-right">
@@ -794,15 +800,18 @@
 
             function deleteUser(id) {
                 if (!confirm('Delete user?')) return;
-                let users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
-                users = users.filter(u => u.id != id);
-                localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-                renderUsers();
+                db.ref(`${USERS_NODE}/${id}`).remove();
             }
 
             /* --- Transaction Logic --- */
-            function renderDeposits() {
-                const trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
+            db.ref(TRX_NODE).on('value', snapshot => {
+                const trxsObj = snapshot.val() || {};
+                const trxs = Object.values(trxsObj);
+                renderDeposits(trxs);
+                renderWithdrawals(trxs);
+            });
+
+            function renderDeposits(trxs) {
                 const pending = trxs.filter(t => t.type === 'deposit' && t.status === 'pending');
                 const tbody = document.getElementById('deposits-table-body');
                 if (!tbody) return;
@@ -829,8 +838,7 @@
                 `).join('');
             }
 
-            function renderWithdrawals() {
-                const trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
+            function renderWithdrawals(trxs) {
                 const pending = trxs.filter(t => t.type === 'withdrawal' && t.status === 'pending');
                 const tbody = document.getElementById('withdrawals-table-body');
                 if (!tbody) return;
@@ -856,74 +864,67 @@
 
             function approveDeposit(trxId) {
                 if (!confirm('Approve?')) return;
-                let trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
-                const idx = trxs.findIndex(t => t.id === trxId);
-                if (idx === -1) return;
+                db.ref(`${TRX_NODE}/${trxId}`).once('value', snapshot => {
+                    const trx = snapshot.val();
+                    if (!trx) return;
 
-                trxs[idx].status = 'approved';
-                localStorage.setItem(TRX_STORAGE_KEY, JSON.stringify(trxs));
-
-                let users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
-                const uIdx = users.findIndex(u => u.id == trxs[idx].userId);
-                if (uIdx >= 0) {
-                    users[uIdx].balance = (users[uIdx].balance || 0) + trxs[idx].amount;
-                    users[uIdx].balance_hold = Math.max(0, (users[uIdx].balance_hold || 0) - trxs[idx].amount);
-                    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-                }
-                renderDeposits();
-                alert('Approved!');
+                    db.ref(`${TRX_NODE}/${trxId}`).update({ status: 'approved' });
+                    db.ref(`${USERS_NODE}/${trx.userId}`).once('value', uSnap => {
+                        const user = uSnap.val() || {};
+                        const newBal = (user.balance || 0) + trx.amount;
+                        const newHold = Math.max(0, (user.balance_hold || 0) - trx.amount);
+                        db.ref(`${USERS_NODE}/${trx.userId}`).update({ balance: newBal, balance_hold: newHold });
+                    });
+                    alert('Approved!');
+                });
             }
 
             function rejectDeposit(trxId) {
                 if (!confirm('Reject?')) return;
-                let trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
-                const idx = trxs.findIndex(t => t.id === trxId);
-                if (idx === -1) return;
+                db.ref(`${TRX_NODE}/${trxId}`).once('value', snapshot => {
+                    const trx = snapshot.val();
+                    if (!trx) return;
 
-                trxs[idx].status = 'rejected';
-                localStorage.setItem(TRX_STORAGE_KEY, JSON.stringify(trxs));
-
-                let users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
-                const uIdx = users.findIndex(u => u.id == trxs[idx].userId);
-                if (uIdx >= 0) {
-                    users[uIdx].balance_hold = Math.max(0, (users[uIdx].balance_hold || 0) - trxs[idx].amount);
-                    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-                }
-                renderDeposits();
+                    db.ref(`${TRX_NODE}/${trxId}`).update({ status: 'rejected' });
+                    db.ref(`${USERS_NODE}/${trx.userId}`).once('value', uSnap => {
+                        const user = uSnap.val() || {};
+                        const newHold = Math.max(0, (user.balance_hold || 0) - trx.amount);
+                        db.ref(`${USERS_NODE}/${trx.userId}`).update({ balance_hold: newHold });
+                    });
+                });
             }
 
             function updateWithdrawStatus(id, status) {
                 if (!confirm(`${status}?`)) return;
-                let trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
-                const idx = trxs.findIndex(t => t.id === id);
-                if (idx === -1) return;
+                db.ref(`${TRX_NODE}/${id}`).once('value', snapshot => {
+                    const trx = snapshot.val();
+                    if (!trx) return;
 
-                trxs[idx].status = status;
-                localStorage.setItem(TRX_STORAGE_KEY, JSON.stringify(trxs));
-
-                if (status === 'rejected') {
-                    let users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
-                    const uIdx = users.findIndex(u => u.id == trxs[idx].userId);
-                    if (uIdx >= 0) {
-                        users[uIdx].balance = (users[uIdx].balance || 0) + trxs[idx].amount;
-                        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+                    db.ref(`${TRX_NODE}/${id}`).update({ status: status });
+                    if (status === 'rejected') {
+                        db.ref(`${USERS_NODE}/${trx.userId}`).once('value', uSnap => {
+                            const user = uSnap.val() || {};
+                            const newBal = (user.balance || 0) + trx.amount;
+                            db.ref(`${USERS_NODE}/${trx.userId}`).update({ balance: newBal });
+                        });
                     }
-                }
-                renderWithdrawals();
-                alert(`Withdrawal ${status}!`);
+                    alert(`Withdrawal ${status}!`);
+                });
             }
 
             /* --- Settings Logic --- */
-            function loadSettings() {
-                const defaults = { bkashNum: '01609434652', nagadNum: '01625199589', binanceId: '763666850', bkashMin: 10, nagadMin: 10, binanceMin: 0 };
-                const settings = JSON.parse(localStorage.getItem(SETTINGS_KEY)) || defaults;
+            db.ref(SETTINGS_NODE).on('value', snapshot => {
+                const settings = snapshot.val();
+                if (settings) loadSettings(settings);
+            });
 
+            function loadSettings(settings) {
                 document.getElementById('set-bkash-num').value = settings.bkashNum || '';
                 document.getElementById('set-nagad-num').value = settings.nagadNum || '';
                 document.getElementById('set-binance-id').value = settings.binanceId || '';
-                document.getElementById('set-bkash-min').value = settings.bkashMin;
-                document.getElementById('set-nagad-min').value = settings.nagadMin;
-                document.getElementById('set-binance-min').value = settings.binanceMin;
+                document.getElementById('set-bkash-min').value = settings.bkashMin || 10;
+                document.getElementById('set-nagad-min').value = settings.nagadMin || 10;
+                document.getElementById('set-binance-min').value = settings.binanceMin || 0;
             }
 
             function saveSettings() {
@@ -935,34 +936,33 @@
                     nagadMin: parseFloat(document.getElementById('set-nagad-min').value) || 0,
                     binanceMin: parseFloat(document.getElementById('set-binance-min').value) || 0
                 };
-                localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-                alert('Saved!');
+                db.ref(SETTINGS_NODE).set(settings).then(() => alert('Settings Saved!'));
             }
 
             /* --- Bot Rules --- */
-            function getRules() { return JSON.parse(localStorage.getItem(RULES_STORAGE_KEY) || '[]'); }
-            function renderRules() {
-                const rules = getRules();
+            db.ref(RULES_NODE).on('value', snapshot => {
+                const rulesObj = snapshot.val() || {};
+                const rules = Object.entries(rulesObj).map(([id, data]) => ({ id, ...data }));
+                renderRules(rules);
+            });
+
+            function renderRules(rules) {
                 const tbody = document.getElementById('rules-table-body');
                 if (!tbody) return;
                 tbody.innerHTML = rules.length === 0 ? `<tr><td colspan="3" class="px-6 py-8 text-center">No rules.</td></tr>` :
-                    rules.map((r, i) => `<tr class="border-b last:border-0 hover:bg-slate-50"><td class="px-6 py-4 font-mono text-primary">${r.keyword}</td><td class="px-6 py-4 text-slate-600">${r.reply}</td><td class="px-6 py-4 text-right"><button onclick="deleteRule(${i})" class="text-red-500 font-bold uppercase text-xs">Delete</button></td></tr>`).join('');
+                    rules.map(r => `<tr class="border-b last:border-0 hover:bg-slate-50"><td class="px-6 py-4 font-mono text-primary">${r.keyword}</td><td class="px-6 py-4 text-slate-600">${r.reply}</td><td class="px-6 py-4 text-right"><button onclick="deleteRule('${r.id}')" class="text-red-500 font-bold uppercase text-xs">Delete</button></td></tr>`).join('');
             }
+
             function addBotRule() {
                 const k = document.getElementById('rule-keyword');
                 const r = document.getElementById('rule-reply');
                 if (!k.value || !r.value) return;
-                const rules = getRules();
-                rules.push({ keyword: k.value.trim().toLowerCase(), reply: r.value.trim() });
-                localStorage.setItem(RULES_STORAGE_KEY, JSON.stringify(rules));
+                db.ref(RULES_NODE).push({ keyword: k.value.trim().toLowerCase(), reply: r.value.trim() });
                 k.value = ''; r.value = '';
-                renderRules();
             }
-            function deleteRule(i) {
-                const rules = getRules();
-                rules.splice(i, 1);
-                localStorage.setItem(RULES_STORAGE_KEY, JSON.stringify(rules));
-                renderRules();
+
+            function deleteRule(id) {
+                db.ref(`${RULES_NODE}/${id}`).remove();
             }
 
             /* --- Init --- */

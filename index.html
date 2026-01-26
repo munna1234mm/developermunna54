@@ -108,6 +108,9 @@
             animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
     </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 
 <body class="bg-background-light dark:bg-background-dark font-display text-white transition-colors duration-300">
@@ -950,21 +953,102 @@
             localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
         }
 
-        function renderHistory() {
-            const trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
-            const container = document.getElementById('recent-activity-list');
+        /* --- Firebase Config & Init --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyBYvecq_HYeylhwCXaLot2A1U_9pvXMWXA",
+            authDomain: "developerp2p.firebaseapp.com",
+            projectId: "developerp2p",
+            storageBucket: "developerp2p.firebasestorage.app",
+            messagingSenderId: "85381141511",
+            appId: "1:85381141511:web:76264b530079246e8246a2",
+            measurementId: "G-882R3H9WMY"
+        };
 
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Constants
+        const TRX_NODE = 'transactions';
+        const USERS_NODE = 'users';
+        const P2P_NODE = 'p2p_ads';
+        const SETTINGS_NODE = 'settings';
+        const RULES_NODE = 'bot_rules';
+
+        let currentUser = null;
+        let globalSettings = {};
+
+        /* --- App Initialization --- */
+        async function initApp() {
+            const tgUser = tg.initDataUnsafe?.user || { id: '123456', first_name: 'Guest' };
+            initTheme();
+
+            // 1. Listen for Settings
+            db.ref(SETTINGS_NODE).on('value', snapshot => {
+                globalSettings = snapshot.val() || {
+                    bkashNum: '01609434652', nagadNum: '01625199589', binanceId: '763666850',
+                    bkashMin: 10, nagadMin: 10, binanceMin: 0
+                };
+            });
+
+            // 2. Listen for User Profile
+            db.ref(`${USERS_NODE}/${tgUser.id}`).on('value', snapshot => {
+                let userData = snapshot.val();
+                if (!userData) {
+                    userData = {
+                        id: tgUser.id,
+                        name: tgUser.first_name,
+                        balance: 0,
+                        balance_hold: 0,
+                        status: 'Active',
+                        photo: tgUser.photo_url || `https://ui-avatars.com/api/?name=${tgUser.first_name}&background=13abec&color=fff`
+                    };
+                    db.ref(`${USERS_NODE}/${tgUser.id}`).set(userData);
+                }
+                currentUser = userData;
+                updateUI();
+            });
+
+            // 3. Listen for My Transactions
+            db.ref(TRX_NODE).on('value', snapshot => {
+                const trxsObj = snapshot.val() || {};
+                const myTrxs = Object.values(trxsObj)
+                    .filter(t => t.userId == tgUser.id)
+                    .sort((a, b) => b.timestamp - a.timestamp);
+                renderHistory(myTrxs);
+            });
+
+            // 4. Listen for P2P Ads
+            db.ref(P2P_NODE).on('value', () => {
+                if (!document.getElementById('tab-p2p').classList.contains('hidden')) {
+                    renderP2PAds();
+                }
+            });
+
+            tg.expand();
+            tg.ready();
+        }
+
+        function updateUI() {
+            if (!currentUser) return;
+            document.getElementById('profile-name').innerHTML = currentUser.name;
+            document.getElementById('profile-username').innerHTML = '@' + (tg.initDataUnsafe?.user?.username || 'user');
+            document.getElementById('bal-main').innerHTML = (currentUser.balance || 0).toFixed(2);
+            document.getElementById('bal-hold').innerHTML = (currentUser.balance_hold || 0).toFixed(2);
+            document.getElementById('profile-pic-large').style.backgroundImage = `url('${currentUser.photo}')`;
+            document.getElementById('user-avatar').style.backgroundImage = `url('${currentUser.photo}')`;
+            document.getElementById('ref-link').textContent = `t.me/WalletBot?start=ref_${currentUser.id}`;
+        }
+
+        /* --- Rendering --- */
+        function renderHistory(history) {
+            const container = document.getElementById('recent-activity-list');
             if (!container) return;
 
-            // Filter & Sort
-            const history = trxs.sort((a, b) => b.timestamp - a.timestamp);
-
             if (history.length === 0) {
-                container.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-8 text-slate-400">
-                        <span class="material-symbols-outlined text-[32px] mb-2 opacity-50">history_toggle_off</span>
-                        <p class="text-sm">No recent transactions</p>
-                    </div>`;
+                container.innerHTML = `<div class="flex flex-col items-center justify-center py-8 text-slate-400">
+                    <span class="material-symbols-outlined text-[32px] mb-2 opacity-50">history_toggle_off</span>
+                    <p class="text-sm">No recent transactions</p>
+                </div>`;
                 return;
             }
 
@@ -972,221 +1056,179 @@
                 const isDeposit = t.type === 'deposit';
                 const isApproved = t.status === 'approved';
                 const isRejected = t.status === 'rejected';
-
-                let icon = 'add_circle';
-                let colorClass = 'text-green-500 bg-green-500/10';
-
-                if (isDeposit) {
-                    if (!isApproved) {
-                        colorClass = 'text-yellow-500 bg-yellow-500/10';
-                        if (isRejected) colorClass = 'text-red-500 bg-red-500/10';
-                    }
-                }
+                let colorClass = isDeposit ? (isApproved ? 'text-green-500 bg-green-500/10' : 'text-yellow-500 bg-yellow-500/10') : 'text-red-500 bg-red-500/10';
+                if (isRejected) colorClass = 'text-red-500 bg-red-500/10';
 
                 return `
-                <div class="flex items-center justify-between p-3 bg-white dark:bg-[#1a282f] rounded-xl border border-slate-100 dark:border-slate-800/50 shadow-sm">
+                <div class="flex items-center justify-between p-3 bg-white dark:bg-[#1a282f] rounded-xl border border-slate-100 dark:border-slate-800/50 shadow-sm animate-slide-up">
                     <div class="flex items-center gap-3">
                         <div class="size-10 rounded-full ${colorClass} flex items-center justify-center">
-                            <span class="material-symbols-outlined">${icon}</span>
+                            <span class="material-symbols-outlined">${isDeposit ? 'add_circle' : 'remove_circle'}</span>
                         </div>
                         <div>
-                            <p class="text-sm font-bold text-slate-900 dark:text-white capitalize">${t.type} (${t.method || 'Manual'})</p>
+                            <p class="text-sm font-bold text-slate-900 dark:text-white capitalize">${t.type} (${t.method || 'P2P'})</p>
                             <p class="text-[10px] text-slate-500 font-mono">${formatTime(t.timestamp)} • ${t.status}</p>
                         </div>
                     </div>
                     <div class="text-right">
                         <p class="text-sm font-bold ${isApproved ? 'text-green-500' : (isRejected ? 'text-slate-400 line-through' : 'text-slate-900 dark:text-white')}">
-                            ${isDeposit ? '+' : '-'}${parseFloat(t.amount || 0).toFixed(2)} BDT
+                            ${isDeposit ? '+' : '-'}${parseFloat(t.amount).toFixed(2)} BDT
                         </p>
-                        ${!isApproved && !isRejected ? '<p class="text-[10px] text-yellow-500 font-bold">Pending</p>' : ''}
+                        ${t.status === 'pending' ? '<p class="text-[10px] text-yellow-500 font-bold">Pending</p>' : ''}
                     </div>
-                </div>
-                `;
+                </div>`;
             }).join('');
         }
 
-        function initApp() {
-            tg.ready();
-            tg.expand();
-            initTheme();
-            renderHistory();
-            // registerUser(); // Disabled to fix startup crash
-
-            const user = tg.initDataUnsafe?.user;
-            if (user) {
-                const name = `${user.first_name || ''} ${user.last_name || ''}`.trim();
-                const username = user.username ? `@${user.username}` : 'Anonymous';
-                const avatarUrl = user.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=13abec&color=fff`;
-
-                document.getElementById('user-avatar').style.backgroundImage = `url("${avatarUrl}")`;
-                document.getElementById('profile-pic-large').style.backgroundImage = `url("${avatarUrl}")`;
-                document.getElementById('profile-name').textContent = name || 'User';
-                document.getElementById('profile-username').textContent = username;
-                document.getElementById('ref-link').textContent = `t.me/WalletBot?start=ref_${user.id || '12345'}`;
-            }
-
-            tg.BackButton.onClick(() => {
-                switchTab('balance');
-            });
-        }
-
-        // Polling for fast sync
-        setInterval(() => {
-            // Optional: Check connection
-        }, 500);
-
-        window.addEventListener('DOMContentLoaded', initApp);
-
-        // Setup Chat Input Listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            const chatInput = document.getElementById('chat-input');
-            if (chatInput) {
-                // Enter to send
-                chatInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        sendUserMessage();
-                    }
-                });
-
-                // Auto-resize
-                chatInput.addEventListener('input', function () {
-                    this.style.height = 'auto';
-                    this.style.height = (this.scrollHeight) + 'px';
-                });
-            }
-        });
-
-
-        function switchTab(tabId) {
-            if (window.Telegram?.WebApp?.HapticFeedback) {
-                tg.HapticFeedback.impactOccurred('light');
-            }
-
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.nav-btn').forEach(el => {
-                el.classList.remove('text-primary');
-                el.classList.add('text-slate-400');
-                el.querySelector('span:last-child').classList.remove('font-bold');
-                el.querySelector('span:first-child').style.fontVariationSettings = "'FILL' 0";
-            });
-
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-
-            const activeNav = document.getElementById(`nav-${tabId}`);
-            activeNav.classList.add('text-primary');
-            activeNav.classList.remove('text-slate-400');
-            activeNav.querySelector('span:last-child').classList.add('font-bold');
-            activeNav.querySelector('span:first-child').style.fontVariationSettings = "'FILL' 1";
-
-            const titles = {
-                balance: 'Wallet',
-                p2p: 'P2P Trading',
-                referral: 'Refer & Earn',
-                profile: 'My Profile'
-            };
-            document.getElementById('page-title').textContent = titles[tabId];
-
-            if (tabId === 'p2p') {
-                renderP2PAds();
-            }
-
-            if (tabId === 'balance') {
-                tg.BackButton.hide();
-            } else {
-                tg.BackButton.show();
-            }
-
-            if (tabId === 'p2p') {
-                renderP2PAds();
-            }
-            document.getElementById('main-scroll').scrollTop = 0;
-        }
-
-        function getWalletSettings() {
-            const defaults = {
-                bkashNum: '01609434652',
-                nagadNum: '01625199589',
-                binanceId: '763666850',
-                bkashMin: 10,
-                nagadMin: 10,
-                binanceMin: 0
-            };
-            try {
-                return JSON.parse(localStorage.getItem('wallet_settings')) || defaults;
-            } catch (e) { return defaults; }
-        }
-
-        const P2P_KEY = 'wallet_p2p_ads';
-
-        function renderP2PAds() {
+        async function renderP2PAds() {
             const currentTab = document.getElementById('btn-p2p-buy').classList.contains('bg-white') ? 'buy' : 'sell';
-            // Logic: If user wants to BUY, they need to see ads where merchant is SELLING.
-            // If user wants to SELL, they need to see ads where merchant is BUYING.
             const targetMerchantType = (currentTab === 'buy') ? 'sell' : 'buy';
-
-            const ads = JSON.parse(localStorage.getItem(P2P_KEY) || '[]');
             const container = document.getElementById('p2p-list');
             if (!container) return;
 
-            const filtered = ads.filter(a => a.type === targetMerchantType);
+            const snapshot = await db.ref(P2P_NODE).once('value');
+            const adsObj = snapshot.val() || {};
+            const filtered = Object.values(adsObj).filter(a => a.type === targetMerchantType);
 
             if (filtered.length === 0) {
                 container.innerHTML = `<div class="flex flex-col items-center justify-center py-12 text-slate-400">
                     <span class="material-symbols-outlined text-4xl mb-2 opacity-30">ads_click</span>
-                    <p class="text-sm">No active advertisements for ${currentType}ing</p>
+                    <p class="text-sm">No advertisements found</p>
                 </div>`;
                 return;
             }
 
             container.innerHTML = filtered.map(ad => {
-                // Determine Label from User perspective
-                // User is in 'Buy' tab -> Wants to see 'Buy' button
                 const actionLabel = currentTab === 'buy' ? 'Buy' : 'Sell';
                 const buttonClass = currentTab === 'buy' ? 'bg-success-green' : 'bg-red-500';
-
                 return `
-                    <div class="flex flex-col bg-white dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800 animate-slide-up">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-center gap-3">
-                                <div class="size-10 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold">
-                                    ${ad.asset.charAt(0).toUpperCase()}
-                                </div>
-                                <div>
-                                    <div class="flex items-center gap-1 text-slate-900 dark:text-white">
-                                        <p class="text-sm font-bold">Merchant #${~~(Math.random() * 1000)}</p>
-                                        <span class="material-symbols-outlined text-primary text-[14px] fill-current">verified</span>
-                                    </div>
-                                    <p class="text-[11px] text-slate-500 dark:text-slate-400">${Math.floor(Math.random() * 2000)} orders | 99%</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-xs text-slate-400 mb-0.5">Price</p>
-                                <p class="text-lg font-bold text-slate-900 dark:text-white">$${ad.price}</p>
+                <div class="flex flex-col bg-white dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800 animate-slide-up shadow-sm">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="size-10 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold">${ad.asset.charAt(0)}</div>
+                            <div>
+                                <div class="flex items-center gap-1 text-slate-900 dark:text-white"><p class="text-sm font-bold">Merchant #${~~(Math.random() * 1000)}</p><span class="material-symbols-outlined text-primary text-[14px] fill-current">verified</span></div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400">99% Success • 1k+ Orders</p>
                             </div>
                         </div>
-                        <div class="flex justify-between items-end">
-                            <div class="space-y-1">
-                                <div class="flex items-center gap-2 text-xs">
-                                    <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 rounded text-slate-600 dark:text-slate-300">P2P Asset: ${ad.asset}</span>
-                                </div>
-                                <p class="text-xs text-slate-500 dark:text-slate-400">Limit: $${ad.min} - $${ad.max}</p>
-                            </div>
-                            <button onclick="handleP2PAction('${actionLabel.toLowerCase()}')" 
-                                class="${buttonClass} hover:opacity-90 text-white px-6 py-2 rounded-lg text-sm font-bold transition-colors">
-                                ${actionLabel}
-                            </button>
+                        <div class="text-right">
+                            <p class="text-xs text-slate-400 mb-0.5">Price</p>
+                            <p class="text-lg font-bold text-slate-900 dark:text-white">$${ad.price}</p>
                         </div>
                     </div>
-                `;
+                    <div class="flex justify-between items-end">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2 text-xs"><span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 rounded text-slate-600 dark:text-slate-300">P2P: ${ad.asset}</span></div>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Limit: $${ad.min} - $${ad.max}</p>
+                        </div>
+                        <button onclick="handleP2PAction('${actionLabel.toLowerCase()}')" class="${buttonClass} hover:opacity-90 text-white px-6 py-2 rounded-lg text-sm font-bold transition-all shadow-lg active:scale-95">${actionLabel}</button>
+                    </div>
+                </div>`;
             }).join('');
+        }
+
+        /* --- Actions --- */
+        function submitDeposit() {
+            const amount = parseFloat(document.getElementById('dep-amount').value);
+            const number = document.getElementById('dep-number').value;
+            const method = document.getElementById('dep-method').value;
+            const photoInput = document.getElementById('dep-photo');
+
+            if (!amount || amount <= 0 || !number || !currentUser) {
+                tg.showAlert('Please fill all fields!');
+                return;
+            }
+
+            const min = globalSettings[`${method}Min`] || 0;
+            if (amount < min) {
+                tg.showAlert(`Minimum deposit for ${method} is ${min} BDT`);
+                return;
+            }
+
+            const trxRef = db.ref(TRX_NODE).push();
+            const trxData = {
+                id: trxRef.key,
+                userId: currentUser.id,
+                userName: currentUser.name,
+                type: 'deposit',
+                amount: amount,
+                currency: 'BDT',
+                method: method,
+                sender: number,
+                status: 'pending',
+                photo: document.getElementById('dep-preview').src || null,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            trxRef.set(trxData).then(() => {
+                const newHold = (currentUser.balance_hold || 0) + amount;
+                db.ref(`${USERS_NODE}/${currentUser.id}`).update({ balance_hold: newHold });
+                tg.showAlert('Deposit Submitted! Waiting for approval.');
+                closeDepositModal();
+            });
+        }
+
+        function submitWithdraw() {
+            const amount = parseFloat(document.getElementById('wd-amount').value);
+            const number = document.getElementById('wd-number').value;
+            const method = document.getElementById('wd-method').value;
+
+            if (!amount || amount <= 0 || !number || !currentUser) {
+                tg.showAlert('Please fill all fields!');
+                return;
+            }
+
+            if (currentUser.balance < amount) {
+                tg.showAlert('Insufficient Balance!');
+                return;
+            }
+
+            const trxRef = db.ref(TRX_NODE).push();
+            const trxData = {
+                id: trxRef.key,
+                userId: currentUser.id,
+                userName: currentUser.name,
+                type: 'withdrawal',
+                amount: amount,
+                currency: 'BDT',
+                method: method,
+                sender: number,
+                status: 'pending',
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            trxRef.set(trxData).then(() => {
+                const newBal = (currentUser.balance || 0) - amount;
+                db.ref(`${USERS_NODE}/${currentUser.id}`).update({ balance: newBal });
+                tg.showAlert('Withdrawal Requested!');
+                closeWithdrawModal();
+            });
+        }
+
+        /* --- UI Helpers --- */
+        function switchTab(tabId) {
+            tg.HapticFeedback.impactOccurred('light');
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('text-primary'); el.classList.add('text-slate-400');
+                el.querySelector('span:last-child').classList.remove('font-bold');
+                el.querySelector('span:first-child').style.fontVariationSettings = "'FILL' 0";
+            });
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const nav = document.getElementById(`nav-${tabId}`);
+            nav.classList.add('text-primary'); nav.classList.remove('text-slate-400');
+            nav.querySelector('span:last-child').classList.add('font-bold');
+            nav.querySelector('span:first-child').style.fontVariationSettings = "'FILL' 1";
+            document.getElementById('page-title').textContent = { balance: 'Wallet', p2p: 'P2P Trading', referral: 'Refer & Earn', profile: 'My Profile' }[tabId];
+            if (tabId === 'p2p') renderP2PAds();
+            if (tabId === 'balance') tg.BackButton.hide(); else tg.BackButton.show();
+            document.getElementById('main-scroll').scrollTop = 0;
         }
 
         function toggleP2PType(type) {
             tg.HapticFeedback.selectionChanged();
             const buyBtn = document.getElementById('btn-p2p-buy');
             const sellBtn = document.getElementById('btn-p2p-sell');
-
             if (type === 'buy') {
                 buyBtn.className = "flex-1 py-2 text-sm font-bold rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm transition-all";
                 sellBtn.className = "flex-1 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 transition-all";
@@ -1202,319 +1244,44 @@
             tg.showAlert(`${action.toUpperCase()} order interface would open here.`);
         }
 
-        function copyRefLink() {
-            tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert('Referral link copied to clipboard!');
-        }
-
-        function inviteFriends() {
-            tg.HapticFeedback.impactOccurred('medium');
-            const link = document.getElementById('ref-link').innerText;
-            const text = "Join me on this Wallet and get 10% commission on trades!";
-            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
-        }
-
         function copyText(text, msg) {
             navigator.clipboard.writeText(text);
             tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert(msg || 'Copied to clipboard!');
+            tg.showAlert(msg || 'Copied!');
         }
 
-        function handleDeposit() {
-            tg.HapticFeedback.impactOccurred('medium');
-            showStep1();
-            document.getElementById('deposit-modal').classList.remove('hidden');
-        }
-
-        /* --- Deposit Wizard Logic --- */
-        const TRX_STORAGE_KEY = 'wallet_transactions';
-
-        function showStep1() {
-            document.getElementById('dep-step-1').classList.remove('hidden');
-            document.getElementById('dep-step-2').classList.add('hidden');
-            document.getElementById('dep-title').textContent = 'Select Method';
-        }
-
-        function closeDepositModal() {
-            document.getElementById('deposit-modal').classList.add('hidden');
-            setTimeout(showStep1, 300); // Reset after close
-        }
-
-        function selectDepositMethod(id, unusedNumber, name) {
-            const settings = getWalletSettings();
-
-            // Limit Map
-            const limits = {
-                'bkash': settings.bkashMin,
-                'nagad': settings.nagadMin,
-                'binance': settings.binanceMin
-            };
-
-            // Number Map
-            const numbers = {
-                'bkash': settings.bkashNum,
-                'nagad': settings.nagadNum,
-                'binance': settings.binanceId
-            };
-
-            const number = numbers[id] || unusedNumber;
-
-            // 1. Copy Number
-            copyText(number, `${name} Number Copied!`);
-
-            // 2. Setup Step 2
+        function selectDepositMethod(id, unused, name) {
+            const num = globalSettings[`${id}Num`] || '';
+            const min = globalSettings[`${id}Min`] || 0;
+            copyText(num, `${name} Number Copied!`);
             document.getElementById('dep-method').value = id;
             document.getElementById('dep-selected-name').textContent = name;
-            document.getElementById('dep-selected-number').textContent = number;
-
-            // Update Limit Text
-            const min = limits[id] || 0;
-            const text = min === 0 ? 'No Limit' : `Min: ${min} BDT`;
-            document.getElementById('dep-limit-text').textContent = text;
-
-            // 3. Switch View
+            document.getElementById('dep-selected-number').textContent = num;
+            document.getElementById('dep-limit-text').textContent = min === 0 ? 'No Limit' : `Min: ${min} BDT`;
             document.getElementById('dep-step-1').classList.add('hidden');
             document.getElementById('dep-step-2').classList.remove('hidden');
             document.getElementById('dep-title').textContent = 'Submit Details';
         }
 
-        function previewFile() {
-            const preview = document.getElementById('dep-preview');
-            const file = document.getElementById('dep-photo').files[0];
-            const reader = new FileReader();
-
-            reader.addEventListener("load", function () {
-                preview.src = reader.result;
-                preview.classList.remove('hidden');
-            }, false);
-
-            if (file) {
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function submitDeposit() {
-            const amount = parseFloat(document.getElementById('dep-amount').value);
-            const number = document.getElementById('dep-number').value;
-            const method = document.getElementById('dep-method').value;
-            const photoInput = document.getElementById('dep-photo');
-
-            if (!amount || amount <= 0 || !number) {
-                tg.showAlert('Please fill in amount and sender number!');
-                return;
-            }
-
-            // Check Limits
-            const settings = getWalletSettings();
-            const limits = {
-                'bkash': settings.bkashMin,
-                'nagad': settings.nagadMin,
-                'binance': settings.binanceMin
-            };
-            const minLimit = limits[method] || 0;
-
-            if (amount < minLimit) {
-                tg.showAlert(`Minimum deposit for ${method} is ${minLimit} BDT`);
-                return;
-            }
-
-            // Create Transaction Object
-            const trx = {
-                id: 'trx_' + Date.now().toString(36),
-                userId: tg.initDataUnsafe?.user?.id || '123456',
-                userName: tg.initDataUnsafe?.user?.first_name || 'Guest',
-                type: 'deposit',
-                amount: amount,
-                currency: 'BDT',
-                method: method,
-                sender: number,
-                status: 'pending',
-                photo: photoInput.files[0] ? document.getElementById('dep-preview').src : null, // Store Base64
-                timestamp: Date.now()
-            };
-
-            // Save to LocalStorage
-            let trxs = [];
-            try {
-                trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
-            } catch (e) { trxs = []; }
-            trxs.push(trx);
-            localStorage.setItem(TRX_STORAGE_KEY, JSON.stringify(trxs));
-
-            // Update User Hold Balance
-            updateUserHoldBalance(trx.userId, amount);
-
-            tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert('Deposit Submitted! Pending Approval.');
-            closeDepositModal();
-            renderHistory();
-
-            // Reset Form (Wait for anim)
-            setTimeout(() => {
-                document.getElementById('dep-amount').value = '';
-                document.getElementById('dep-number').value = '';
-                document.getElementById('dep-preview').classList.add('hidden');
-                document.getElementById('dep-photo').value = '';
-            }, 500);
-        }
-
-
-
-        function updateUserHoldBalance(userId, amount) {
-            const USERS_KEY = 'wallet_users';
-            let users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
-            const idx = users.findIndex(u => u.id == userId);
-
-            if (idx >= 0) {
-                if (!users[idx].balance_hold) users[idx].balance_hold = 0;
-                users[idx].balance_hold += amount;
-                localStorage.setItem(USERS_KEY, JSON.stringify(users));
-
-                // Update UI if current user
-                document.getElementById('bal-hold').textContent = users[idx].balance_hold.toFixed(2);
-            }
-        }
-
-        function handleWithdraw() {
-            if (window.Telegram?.WebApp?.HapticFeedback) {
-                tg.HapticFeedback.impactOccurred('medium');
-            }
-
-            showWdStep1();
-            const modal = document.getElementById('withdraw-modal');
-            if (modal) {
-                modal.classList.remove('hidden');
-            } else {
-                alert('Error: Modal not found!');
-                return;
-            }
-
-            // Update Bal Display
-            const userId = tg.initDataUnsafe?.user?.id || '123456';
-            let users = [];
-            try {
-                users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
-            } catch (e) { users = []; }
-
-            const u = users.find(u => u.id == userId);
-            const bal = u ? u.balance : 0;
-            const balEl = document.getElementById('wd-avail-bal');
-            if (balEl) balEl.textContent = bal.toFixed(2);
-        }
-
-        /* --- Withdrawal Wizard Logic --- */
-        function showWdStep1() {
-            document.getElementById('wd-step-1').classList.remove('hidden');
-            document.getElementById('wd-step-2').classList.add('hidden');
-            document.getElementById('wd-title').textContent = 'Withdraw Funds';
-        }
-
-        function closeWithdrawModal() {
-            document.getElementById('withdraw-modal').classList.add('hidden');
-            setTimeout(showWdStep1, 300);
-        }
-
         function selectWithdrawMethod(id, name) {
             document.getElementById('wd-method').value = id;
             document.getElementById('wd-selected-name').textContent = name;
-
-            // Update Placeholder
-            const limits = {
-                'bkash': 10,
-                'nagad': 10,
-                'binance': 0
-            };
-            const min = limits[id] || 0;
-            const placeholder = min === 0 ? 'Min 0.0' : `Min ${min}`;
-            document.getElementById('wd-amount').placeholder = placeholder;
-
+            document.getElementById('wd-amount').placeholder = `Min 10 BDT`;
             document.getElementById('wd-step-1').classList.add('hidden');
             document.getElementById('wd-step-2').classList.remove('hidden');
             document.getElementById('wd-title').textContent = 'Withdraw Details';
         }
 
-        function submitWithdraw() {
-            const amount = parseFloat(document.getElementById('wd-amount').value);
-            const number = document.getElementById('wd-number').value;
-            const method = document.getElementById('wd-method').value;
-
-            if (!amount || amount <= 0 || !number) {
-                tg.showAlert('Please fill in all fields!');
-                return;
-            }
-
-            // 1. Check Limits
-            const limits = {
-                'bkash': 10,
-                'nagad': 10,
-                'binance': 0
-            };
-            const minLimit = limits[method] || 0;
-
-            if (amount < minLimit) {
-                tg.showAlert(`Minimum withdrawal for ${method} is ${minLimit} BDT`);
-                return;
-            }
-
-            // 2. Check Balance
-            const userId = tg.initDataUnsafe?.user?.id || '123456';
-            let users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
-            const idx = users.findIndex(u => u.id == userId);
-
-            if (idx === -1 || users[idx].balance < amount) {
-                tg.showAlert('Insufficient Balance!');
-                return;
-            }
-
-            if (!confirm(`Confirm withdraw ${amount} BDT via ${method}?`)) return;
-
-            // 3. Deduct Balance
-            users[idx].balance -= amount;
-            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-
-            // Update UI
-            document.getElementById('bal-main').textContent = users[idx].balance.toFixed(2);
-            document.getElementById('wd-avail-bal').textContent = users[idx].balance.toFixed(2);
-
-
-            // 4. Create Transaction
-            const trx = {
-                id: 'trx_' + Date.now().toString(36),
-                userId: userId,
-                userName: tg.initDataUnsafe?.user?.first_name || 'Guest',
-                type: 'withdrawal',
-                amount: amount,
-                currency: 'BDT',
-                method: method,
-                sender: number, // Destination number
-                status: 'pending',
-                photo: null,
-                timestamp: Date.now()
-            };
-
-            let trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
-            trxs.push(trx);
-            localStorage.setItem(TRX_STORAGE_KEY, JSON.stringify(trxs));
-
-            tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert('Withdrawal Requested!');
-            closeWithdrawModal();
-            renderHistory();
-
-            // Reset
-            document.getElementById('wd-amount').value = '';
-            document.getElementById('wd-number').value = '';
-        }
-
-        window.addEventListener('storage', (e) => {
-            if (e.key === P2P_KEY) {
-                renderP2PAds();
-            }
-        });
+        function handleDeposit() { tg.HapticFeedback.impactOccurred('medium'); document.getElementById('deposit-modal').classList.remove('hidden'); showStep1(); }
+        function handleWithdraw() { tg.HapticFeedback.impactOccurred('medium'); document.getElementById('withdraw-modal').classList.remove('hidden'); showWdStep1(); }
+        function closeDepositModal() { document.getElementById('deposit-modal').classList.add('hidden'); }
+        function closeWithdrawModal() { document.getElementById('withdraw-modal').classList.add('hidden'); }
+        function showStep1() { document.getElementById('dep-step-1').classList.remove('hidden'); document.getElementById('dep-step-2').classList.add('hidden'); document.getElementById('dep-title').textContent = 'Select Method'; }
+        function showWdStep1() { document.getElementById('wd-step-1').classList.remove('hidden'); document.getElementById('wd-step-2').classList.add('hidden'); document.getElementById('wd-title').textContent = 'Withdraw Funds'; }
+        function previewFile() { const file = document.getElementById('dep-photo').files[0]; const reader = new FileReader(); reader.onload = () => { document.getElementById('dep-preview').src = reader.result; document.getElementById('dep-preview').classList.remove('hidden'); }; if (file) reader.readAsDataURL(file); }
 
         window.addEventListener('DOMContentLoaded', initApp);
-
-
+        tg.BackButton.onClick(() => switchTab('balance'));
     </script>
 </body>
 
