@@ -879,6 +879,66 @@
 
                 function rejectDeposit(trxId) {
                     if (!confirm('Reject this deposit?')) return;
+                    let trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
+                    const idx = trxs.findIndex(t => t.id === trxId);
+                    if (idx === -1) return;
+
+                    trxs[idx].status = 'rejected';
+                    localStorage.setItem(TRX_STORAGE_KEY, JSON.stringify(trxs));
+                    renderDeposits();
+                }
+
+
+                /* --- Settings Logic --- */
+                const SETTINGS_KEY = 'wallet_settings';
+
+                function loadSettings() {
+                    const defaults = {
+                        bkashNum: '01609434652',
+                        nagadNum: '01625199589',
+                        binanceId: '763666850',
+                        bkashMin: 10,
+                        nagadMin: 10,
+                        binanceMin: 0
+                    };
+                    const settings = JSON.parse(localStorage.getItem(SETTINGS_KEY)) || defaults;
+
+                    document.getElementById('set-bkash-num').value = settings.bkashNum || '';
+                    document.getElementById('set-nagad-num').value = settings.nagadNum || '';
+                    document.getElementById('set-binance-id').value = settings.binanceId || '';
+
+                    document.getElementById('set-bkash-min').value = settings.bkashMin;
+                    document.getElementById('set-nagad-min').value = settings.nagadMin;
+                    document.getElementById('set-binance-min').value = settings.binanceMin;
+                }
+
+                function saveSettings() {
+                    const settings = {
+                        bkashNum: document.getElementById('set-bkash-num').value,
+                        nagadNum: document.getElementById('set-nagad-num').value,
+                        binanceId: document.getElementById('set-binance-id').value,
+                        bkashMin: parseFloat(document.getElementById('set-bkash-min').value) || 0,
+                        nagadMin: parseFloat(document.getElementById('set-nagad-min').value) || 0,
+                        binanceMin: parseFloat(document.getElementById('set-binance-min').value) || 0
+                    };
+
+                    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+                    alert('Settings Saved Successfully!');
+                }
+
+                /* --- P2P Logic --- */
+                const P2P_KEY = 'wallet_p2p_ads';
+
+                function renderP2PAds() {
+                    // In a real app, this would fetch from server/storage
+                    // For now, we keep the static demo table or implement simple storage
+                }
+
+                // Initialize Settings on Load
+                window.addEventListener('DOMContentLoaded', loadSettings);
+
+                function rejectDeposit(trxId) {
+                    if (!confirm('Reject this deposit?')) return;
 
                     let trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
                     const idx = trxs.findIndex(t => t.id === trxId);
