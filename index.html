@@ -1357,7 +1357,7 @@
                 'binance': 0
             };
             const min = limits[id] || 0;
-            const placeholder = min === 0 ? 'Min 0.1' : `Min ${min}`;
+            const placeholder = min === 0 ? 'Min 0.0' : `Min ${min}`;
             document.getElementById('wd-amount').placeholder = placeholder;
 
             document.getElementById('wd-step-1').classList.add('hidden');
