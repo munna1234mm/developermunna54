@@ -751,7 +751,7 @@
             tg.ready();
             tg.expand();
             initTheme();
-            registerUser(); // Register on startup
+            // registerUser(); // Disabled to fix startup crash
 
             const user = tg.initDataUnsafe?.user;
             if (user) {
