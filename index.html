@@ -1193,10 +1193,15 @@
 
             // Update Bal Display
             const userId = tg.initDataUnsafe?.user?.id || '123456';
-            const users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+            let users = [];
+            try {
+                users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+            } catch (e) { users = []; }
+
             const u = users.find(u => u.id == userId);
             const bal = u ? u.balance : 0;
-            document.getElementById('wd-avail-bal').textContent = bal.toFixed(2);
+            const balEl = document.getElementById('wd-avail-bal');
+            if (balEl) balEl.textContent = bal.toFixed(2);
         }
 
         /* --- Withdrawal Wizard Logic --- */
