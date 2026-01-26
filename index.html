@@ -1005,6 +1005,12 @@
             tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
         }
 
+        function copyText(text, msg) {
+            navigator.clipboard.writeText(text);
+            tg.HapticFeedback.notificationOccurred('success');
+            tg.showAlert(msg || 'Copied to clipboard!');
+        }
+
         function handleDeposit() {
             tg.HapticFeedback.impactOccurred('medium');
             showStep1();
