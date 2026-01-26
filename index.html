@@ -90,6 +90,23 @@
             ring-offset-width: 2px;
             ring-offset-color: #101c22;
         }
+
+        /* Chat Animations */
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .chat-open {
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
     </style>
 </head>
 
@@ -119,9 +136,12 @@
                         <span class="material-symbols-outlined text-[20px]">add_box</span>
                     </button>
                 </div>
-                <button onclick="tgAction('help')"
-                    class="flex size-10 cursor-pointer items-center justify-center rounded-full bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white transition-colors">
-                    <span class="material-symbols-outlined text-[24px]">help</span>
+                <!-- Changed Help to Chat -->
+                <button onclick="toggleChat()"
+                    class="flex size-10 cursor-pointer items-center justify-center rounded-full bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white transition-colors relative">
+                    <span class="material-symbols-outlined text-[24px]">chat</span>
+                    <span id="chat-badge"
+                        class="absolute top-0 right-0 size-3 bg-red-500 rounded-full border-2 border-slate-200 dark:border-slate-800 hidden"></span>
                 </button>
             </div>
         </header>
@@ -373,7 +393,6 @@
                                 <span class="material-symbols-outlined text-slate-400">chevron_right</span>
                             </div>
 
-                            <!-- Hidden Theme Selector Section inside the menu item for animation effect later, or use modal. Let's use simple hidden toggle for now -->
                             <div id="theme-selector-area"
                                 class="hidden bg-slate-50 dark:bg-black/20 p-4 border-b border-slate-100 dark:border-slate-800/50">
                                 <p class="text-xs text-slate-500 mb-3 ml-1">Select Accent Day</p>
@@ -441,6 +460,66 @@
 
         </main>
 
+        <!-- Live Chat Modal -->
+        <div id="chat-modal"
+            class="fixed inset-0 z-[100] hidden flex-col bg-background-light dark:bg-background-dark safe-area-top">
+            <!-- Chat Header -->
+            <div
+                class="flex items-center justify-between p-4 bg-white dark:bg-[#1a282f] border-b border-slate-200 dark:border-slate-800 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="size-10 rounded-full bg-primary flex items-center justify-center text-white">
+                        <span class="material-symbols-outlined">support_agent</span>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 dark:text-white">Live Support</h3>
+                        <p class="text-xs text-green-500 flex items-center gap-1">
+                            <span class="size-2 bg-green-500 rounded-full"></span> Online
+                        </p>
+                    </div>
+                </div>
+                <button onclick="toggleChat()"
+                    class="size-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <!-- Chat Messages -->
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-[#eefeef] dark:bg-[#0b1419]">
+                <!-- Messages will be injected here -->
+                <div class="flex justify-center my-4">
+                    <span
+                        class="text-[10px] bg-black/10 dark:bg-white/10 text-slate-500 dark:text-slate-400 px-2 py-1 rounded-full">Today</span>
+                </div>
+                <div class="flex items-start gap-2">
+                    <div class="size-8 rounded-full bg-primary flex items-center justify-center text-white shrink-0">
+                        <span class="material-symbols-outlined text-[16px]">support_agent</span>
+                    </div>
+                    <div
+                        class="bg-white dark:bg-[#1a282f] p-3 rounded-2xl rounded-tl-none max-w-[80%] shadow-sm text-sm text-slate-900 dark:text-white border border-slate-100 dark:border-slate-800">
+                        <p>Hello! How can we help you directly?</p>
+                        <span class="text-[9px] text-slate-400 mt-1 block tracking-wider">Automated</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div
+                class="p-4 bg-white dark:bg-[#1a282f] border-t border-slate-200 dark:border-slate-800 safe-area-bottom">
+                <div class="flex items-end gap-2 bg-slate-100 dark:bg-black/20 p-2 rounded-2xl">
+                    <button
+                        class="size-10 flex items-center justify-center text-slate-400 hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined">add_circle</span>
+                    </button>
+                    <textarea id="chat-input" rows="1" placeholder="Type a message..."
+                        class="flex-1 bg-transparent border-0 focus:ring-0 text-slate-900 dark:text-white p-2.5 resize-none max-h-24"></textarea>
+                    <button onclick="sendUserMessage()"
+                        class="size-10 flex items-center justify-center bg-primary text-white rounded-xl shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+                        <span class="material-symbols-outlined">send</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Bottom Navigation Bar -->
         <nav
             class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 safe-area-bottom z-50">
@@ -500,8 +579,6 @@
             if (window.Telegram?.WebApp?.HapticFeedback) {
                 window.Telegram.WebApp.HapticFeedback.selectionChanged();
             }
-
-            // Update Toggle UI visually handled by CSS class 'dark' on parent
         }
 
         function toggleThemeMenu() {
@@ -511,7 +588,6 @@
 
         function setTheme(colorRgb, save = true) {
             document.documentElement.style.setProperty('--color-primary', colorRgb);
-
             if (save) {
                 localStorage.setItem('themeColor', colorRgb);
                 if (window.Telegram?.WebApp?.HapticFeedback) {
@@ -520,14 +596,127 @@
             }
         }
 
+        /* --- Chat System Logic --- */
+        let chatPollInterval;
+        const CHAT_STORAGE_KEY = 'wallet_chat_history';
+
+        function toggleChat() {
+            const modal = document.getElementById('chat-modal');
+            const isHidden = modal.classList.contains('hidden');
+
+            if (isHidden) {
+                modal.classList.remove('hidden');
+                modal.classList.add('chat-open');
+                scrollToBottom();
+                renderChatMessages();
+                // Start polling
+                chatPollInterval = setInterval(renderChatMessages, 1000);
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('chat-open');
+                clearInterval(chatPollInterval);
+            }
+        }
+
+        function getChatHistory() {
+            const history = localStorage.getItem(CHAT_STORAGE_KEY);
+            return history ? JSON.parse(history) : [];
+        }
+
+        function renderChatMessages() {
+            const messages = getChatHistory();
+            const container = document.getElementById('chat-messages');
+            // Keep the 'Today' divider and Welcome msg if empty, otherwise rebuild
+            // For simplicity in this demo, we'll clear and rebuild except the static welcome
+            // But to avoid flicker, only append new? No, full re-render is safer for sync demo
+
+            let html = `
+                <div class="flex justify-center my-4">
+                    <span class="text-[10px] bg-black/10 dark:bg-white/10 text-slate-500 dark:text-slate-400 px-2 py-1 rounded-full">Today</span>
+                </div>
+                <div class="flex items-start gap-2">
+                    <div class="size-8 rounded-full bg-primary flex items-center justify-center text-white shrink-0">
+                        <span class="material-symbols-outlined text-[16px]">support_agent</span>
+                    </div>
+                    <div class="bg-white dark:bg-[#1a282f] p-3 rounded-2xl rounded-tl-none max-w-[80%] shadow-sm text-sm text-slate-900 dark:text-white border border-slate-100 dark:border-slate-800">
+                        <p>Hello! How can we help you directly?</p>
+                    </div>
+                </div>
+            `;
+
+            messages.forEach(msg => {
+                const isUser = msg.sender === 'user';
+                if (isUser) {
+                    html += `
+                        <div class="flex justify-end gap-2">
+                            <div class="bg-primary p-3 rounded-2xl rounded-tr-none max-w-[80%] shadow-sm text-sm text-white">
+                                <p>${msg.text}</p>
+                                <span class="text-[9px] text-white/70 mt-1 block text-right">${formatTime(msg.timestamp)}</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="flex items-start gap-2">
+                            <div class="size-8 rounded-full bg-primary flex items-center justify-center text-white shrink-0">
+                                <span class="material-symbols-outlined text-[16px]">support_agent</span>
+                            </div>
+                            <div class="bg-white dark:bg-[#1a282f] p-3 rounded-2xl rounded-tl-none max-w-[80%] shadow-sm text-sm text-slate-900 dark:text-white border border-slate-100 dark:border-slate-800">
+                                <p>${msg.text}</p>
+                                <span class="text-[9px] text-slate-400 mt-1 block tracking-wider">${formatTime(msg.timestamp)}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            // Only update if changed to avoid scroll jumping? 
+            // Better: update innerHTML
+            if (container.innerHTML !== html) {
+                // Basic check, might be too sensitive. 
+                // Let's just update content for now.
+                // To prevent scroll jump, check if we are at bottom
+                const isAtBottom = container.scrollHeight - container.scrollTop === container.clientHeight;
+                container.innerHTML = html;
+                if (isAtBottom) scrollToBottom();
+            }
+        }
+
+        function sendUserMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const msg = {
+                sender: 'user',
+                text: text,
+                timestamp: Date.now()
+            };
+
+            const history = getChatHistory();
+            history.push(msg);
+            localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(history));
+
+            input.value = '';
+            renderChatMessages();
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            const container = document.getElementById('chat-messages');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function formatTime(ms) {
+            const date = new Date(ms);
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        /* --- End Chat System --- */
+
         function initApp() {
             tg.ready();
             tg.expand();
             initTheme();
-
-            if (tg.themeParams.bg_color) {
-                // document.body.style.backgroundColor = tg.themeParams.bg_color; // Optional: Override with standard colors for consistency
-            }
 
             const user = tg.initDataUnsafe?.user;
             if (user) {
@@ -639,15 +828,6 @@
             }, (btnId) => {
                 if (btnId === 'copy') tg.showAlert('Address copied!');
             });
-        }
-
-        function tgAction(type) {
-            tg.HapticFeedback.selectionChanged();
-            if (type === 'help') {
-                tg.showConfirm('Need help?', (ok) => {
-                    if (ok) tg.openTelegramLink('https://t.me/telegram');
-                });
-            }
         }
 
         window.addEventListener('DOMContentLoaded', initApp);

@@ -78,6 +78,12 @@
                     <span class="material-symbols-outlined mr-3">currency_exchange</span>
                     P2P System
                 </button>
+                <!-- New Support Tab -->
+                <button onclick="switchView('support')" id="nav-support"
+                    class="nav-item w-full flex items-center px-6 py-3 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-colors text-left">
+                    <span class="material-symbols-outlined mr-3">support_agent</span>
+                    Live Support
+                </button>
             </nav>
 
             <div class="p-4 border-t border-slate-200 dark:border-slate-800">
@@ -399,6 +405,86 @@
                     </div>
                 </div>
 
+                <!-- VIEW: LIVE SUPPORT -->
+                <div id="view-support" class="view-section hidden h-full flex flex-col">
+                    <div class="mb-4">
+                        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Live Support</h1>
+                        <p class="text-sm text-slate-500">Respond to user inquiries in real-time.</p>
+                    </div>
+
+                    <div
+                        class="flex-1 bg-white dark:bg-[#1a282f] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex">
+                        <!-- Chat List -->
+                        <div class="w-80 border-r border-slate-200 dark:border-slate-800 flex flex-col">
+                            <div class="p-4 border-b border-slate-200 dark:border-slate-800">
+                                <input type="text" placeholder="Search chats..."
+                                    class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-lg text-sm">
+                            </div>
+                            <div class="flex-1 overflow-y-auto">
+                                <!-- Chat Item (Active) -->
+                                <div
+                                    class="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer bg-slate-50 dark:bg-slate-800/50 border-l-4 border-primary">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <h4 class="font-bold text-sm text-slate-900 dark:text-white">Munna Developer
+                                        </h4>
+                                        <span class="text-[10px] text-slate-500">Just now</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500 truncate">I have a question about my withdrawal.
+                                    </p>
+                                </div>
+                                <!-- Chat Item -->
+                                <div
+                                    class="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer text-slate-500">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <h4 class="font-bold text-sm text-slate-900 dark:text-white">John Doe</h4>
+                                        <span class="text-[10px] text-slate-500">2h ago</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500 truncate">Thanks for the help!</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chat Area -->
+                        <div class="flex-1 flex flex-col bg-[#eefeef] dark:bg-[#0b1419]">
+                            <!-- Header -->
+                            <div
+                                class="p-4 bg-white dark:bg-[#1a282f] border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="size-10 rounded-full bg-slate-200 bg-cover"
+                                        style="background-image: url('https://ui-avatars.com/api/?name=Munna+Dev&background=13abec&color=fff');">
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-slate-900 dark:text-white">Munna Developer</h4>
+                                        <p class="text-xs text-green-500 flex items-center gap-1">
+                                            <span class="size-2 bg-green-500 rounded-full"></span> Online
+                                        </p>
+                                    </div>
+                                </div>
+                                <button class="text-slate-400 hover:text-slate-600">
+                                    <span class="material-symbols-outlined">more_vert</span>
+                                </button>
+                            </div>
+
+                            <!-- Messages -->
+                            <div id="admin-chat-messages" class="flex-1 overflow-y-auto p-6 space-y-4">
+                                <!-- Messages injected via JS -->
+                            </div>
+
+                            <!-- Input -->
+                            <div class="p-4 bg-white dark:bg-[#1a282f] border-t border-slate-200 dark:border-slate-800">
+                                <div class="flex items-end gap-2 bg-slate-100 dark:bg-black/20 p-2 rounded-2xl">
+                                    <textarea id="admin-chat-input" rows="1" placeholder="Type a reply..."
+                                        class="flex-1 bg-transparent border-0 focus:ring-0 text-slate-900 dark:text-white p-2.5 resize-none max-h-32"></textarea>
+                                    <button onclick="sendAdminReply()"
+                                        class="size-10 flex items-center justify-center bg-primary text-white rounded-xl shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+                                        <span class="material-symbols-outlined">send</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </main>
         </div>
     </div>
@@ -409,7 +495,8 @@
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
 
             // Show selected view
-            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            const view = document.getElementById(`view-${viewId}`);
+            if (view) view.classList.remove('hidden');
 
             // Update Navigation State
             document.querySelectorAll('.nav-item').forEach(el => {
@@ -422,6 +509,12 @@
             if (activeNav) {
                 activeNav.classList.add('active');
                 activeNav.classList.remove('text-slate-500');
+            }
+
+            if (viewId === 'support') {
+                startChatPolling();
+            } else {
+                stopChatPolling();
             }
         }
 
@@ -439,11 +532,93 @@
             toggleP2PForm();
         }
 
+        /* --- Admin Chat Logic --- */
+        const CHAT_STORAGE_KEY = 'wallet_chat_history';
+        let adminChatInterval;
+
+        function getChatHistory() {
+            const history = localStorage.getItem(CHAT_STORAGE_KEY);
+            return history ? JSON.parse(history) : [];
+        }
+
+        function renderAdminChat() {
+            const messages = getChatHistory();
+            const container = document.getElementById('admin-chat-messages');
+
+            let html = '';
+            messages.forEach(msg => {
+                const isAdmin = msg.sender === 'admin';
+                if (isAdmin) {
+                    html += `
+                        <div class="flex justify-end gap-2">
+                            <div class="bg-primary p-3 rounded-2xl rounded-tr-none max-w-[80%] shadow-sm text-sm text-white">
+                                <p>${msg.text}</p>
+                                <span class="text-[9px] text-white/70 mt-1 block text-right">${formatTime(msg.timestamp)}</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="flex items-start gap-2">
+                            <div class="size-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 shrink-0">
+                                <span class="material-symbols-outlined text-[16px]">person</span>
+                            </div>
+                            <div class="bg-white dark:bg-[#1a282f] p-3 rounded-2xl rounded-tl-none max-w-[80%] shadow-sm text-sm text-slate-900 dark:text-white border border-slate-100 dark:border-slate-800">
+                                <p>${msg.text}</p>
+                                <span class="text-[9px] text-slate-400 mt-1 block tracking-wider">${formatTime(msg.timestamp)}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            if (container.innerHTML !== html) {
+                const isAtBottom = container.scrollHeight - container.scrollTop === container.clientHeight;
+                container.innerHTML = html;
+                if (isAtBottom) container.scrollTop = container.scrollHeight;
+            }
+        }
+
+        function sendAdminReply() {
+            const input = document.getElementById('admin-chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const msg = {
+                sender: 'admin',
+                text: text,
+                timestamp: Date.now()
+            };
+
+            const history = getChatHistory();
+            history.push(msg);
+            localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(history));
+
+            input.value = '';
+            renderAdminChat();
+        }
+
+        function startChatPolling() {
+            renderAdminChat();
+            if (!adminChatInterval) adminChatInterval = setInterval(renderAdminChat, 1000);
+        }
+
+        function stopChatPolling() {
+            if (adminChatInterval) {
+                clearInterval(adminChatInterval);
+                adminChatInterval = null;
+            }
+        }
+
+        function formatTime(ms) {
+            const date = new Date(ms);
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            // Check if URL has hash (e.g. #p2p) to open specific tab
             const hash = window.location.hash.replace('#', '');
-            if (['dashboard', 'users', 'p2p'].includes(hash)) {
+            if (['dashboard', 'users', 'p2p', 'support'].includes(hash)) {
                 switchView(hash);
             }
         });
