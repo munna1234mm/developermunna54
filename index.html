@@ -797,46 +797,51 @@
                 });
             }
         });
-        tg.HapticFeedback.impactOccurred('light');
-
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-        document.querySelectorAll('.nav-btn').forEach(el => {
-            el.classList.remove('text-primary');
-            el.classList.add('text-slate-400');
-            el.querySelector('span:last-child').classList.remove('font-bold');
-            el.querySelector('span:first-child').style.fontVariationSettings = "'FILL' 0";
-        });
-
-        document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-
-        const activeNav = document.getElementById(`nav-${tabId}`);
-        activeNav.classList.add('text-primary');
-        activeNav.classList.remove('text-slate-400');
-        activeNav.querySelector('span:last-child').classList.add('font-bold');
-        activeNav.querySelector('span:first-child').style.fontVariationSettings = "'FILL' 1";
-
-        const titles = {
-            balance: 'Wallet',
-            p2p: 'P2P Trading',
-            referral: 'Refer & Earn',
-            profile: 'My Profile'
-        };
-        document.getElementById('page-title').textContent = titles[tabId];
-
-        const p2pActions = document.getElementById('p2p-actions');
-        if (tabId === 'p2p') {
-            p2pActions.classList.remove('hidden');
-        } else {
-            p2pActions.classList.add('hidden');
         }
 
-        if (tabId === 'balance') {
-            tg.BackButton.hide();
-        } else {
-            tg.BackButton.show();
-        }
+        function switchTab(tabId) {
+            if (window.Telegram?.WebApp?.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
+            }
 
-        document.getElementById('main-scroll').scrollTop = 0;
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('text-primary');
+                el.classList.add('text-slate-400');
+                el.querySelector('span:last-child').classList.remove('font-bold');
+                el.querySelector('span:first-child').style.fontVariationSettings = "'FILL' 0";
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            activeNav.classList.add('text-primary');
+            activeNav.classList.remove('text-slate-400');
+            activeNav.querySelector('span:last-child').classList.add('font-bold');
+            activeNav.querySelector('span:first-child').style.fontVariationSettings = "'FILL' 1";
+
+            const titles = {
+                balance: 'Wallet',
+                p2p: 'P2P Trading',
+                referral: 'Refer & Earn',
+                profile: 'My Profile'
+            };
+            document.getElementById('page-title').textContent = titles[tabId];
+
+            const p2pActions = document.getElementById('p2p-actions');
+            if (tabId === 'p2p') {
+                p2pActions.classList.remove('hidden');
+            } else {
+                p2pActions.classList.add('hidden');
+            }
+
+            if (tabId === 'balance') {
+                tg.BackButton.hide();
+            } else {
+                tg.BackButton.show();
+            }
+
+            document.getElementById('main-scroll').scrollTop = 0;
         }
 
         function toggleP2PType(type) {
