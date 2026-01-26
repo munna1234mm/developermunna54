@@ -1,7 +1,4 @@
-services:
-  - type: web
-    name: wallet-app
-    env: static
+staticSites:
+  - name: wallet-app
     plan: free
-    buildCommand: ""
-    staticPublishPath: .
+    publishPath: .
