@@ -1129,6 +1129,20 @@
             document.getElementById('main-scroll').scrollTop = 0;
         }
 
+        function getWalletSettings() {
+            const defaults = {
+                bkashNum: '01609434652',
+                nagadNum: '01625199589',
+                binanceId: '763666850',
+                bkashMin: 10,
+                nagadMin: 10,
+                binanceMin: 0
+            };
+            try {
+                return JSON.parse(localStorage.getItem('wallet_settings')) || defaults;
+            } catch (e) { return defaults; }
+        }
+
         function toggleP2PType(type) {
             tg.HapticFeedback.selectionChanged();
             const buyBtn = document.getElementById('btn-p2p-buy');
@@ -1186,7 +1200,25 @@
             setTimeout(showStep1, 300); // Reset after close
         }
 
-        function selectDepositMethod(id, number, name) {
+        function selectDepositMethod(id, unusedNumber, name) {
+            const settings = getWalletSettings();
+
+            // Limit Map
+            const limits = {
+                'bkash': settings.bkashMin,
+                'nagad': settings.nagadMin,
+                'binance': settings.binanceMin
+            };
+
+            // Number Map
+            const numbers = {
+                'bkash': settings.bkashNum,
+                'nagad': settings.nagadNum,
+                'binance': settings.binanceId
+            };
+
+            const number = numbers[id] || unusedNumber;
+
             // 1. Copy Number
             copyText(number, `${name} Number Copied!`);
 
@@ -1196,11 +1228,6 @@
             document.getElementById('dep-selected-number').textContent = number;
 
             // Update Limit Text
-            const limits = {
-                'bkash': 10,
-                'nagad': 10,
-                'binance': 0
-            };
             const min = limits[id] || 0;
             const text = min === 0 ? 'No Limit' : `Min: ${min} BDT`;
             document.getElementById('dep-limit-text').textContent = text;
@@ -1238,10 +1265,11 @@
             }
 
             // Check Limits
+            const settings = getWalletSettings();
             const limits = {
-                'bkash': 10,
-                'nagad': 10,
-                'binance': 0
+                'bkash': settings.bkashMin,
+                'nagad': settings.nagadMin,
+                'binance': settings.binanceMin
             };
             const minLimit = limits[method] || 0;
 
