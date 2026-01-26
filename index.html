@@ -1350,6 +1350,16 @@
             document.getElementById('wd-method').value = id;
             document.getElementById('wd-selected-name').textContent = name;
 
+            // Update Placeholder
+            const limits = {
+                'bkash': 10,
+                'nagad': 10,
+                'binance': 0
+            };
+            const min = limits[id] || 0;
+            const placeholder = min === 0 ? 'Min 0.1' : `Min ${min}`;
+            document.getElementById('wd-amount').placeholder = placeholder;
+
             document.getElementById('wd-step-1').classList.add('hidden');
             document.getElementById('wd-step-2').classList.remove('hidden');
             document.getElementById('wd-title').textContent = 'Withdraw Details';
