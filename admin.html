@@ -701,8 +701,40 @@
                 }
 
                 function saveAd() {
-                    alert("This is a demo. In a real app, this would save the advertisement to the database.");
+                    const type = document.querySelector('#p2p-form-container select:nth-of-type(1)').value;
+                    const asset = document.querySelector('#p2p-form-container select:nth-of-type(2)').value;
+                    const price = document.querySelector('#p2p-form-container input:nth-of-type(1)').value;
+                    const total = document.querySelector('#p2p-form-container input:nth-of-type(2)').value;
+                    const min = document.querySelector('#p2p-form-container input:nth-of-type(3)').value;
+                    const max = document.querySelector('#p2p-form-container input:nth-of-type(4)').value;
+
+                    if (!price || !total || !min || !max) {
+                        alert('Please fill all fields');
+                        return;
+                    }
+
+                    const ad = {
+                        id: Date.now(),
+                        type, asset, price, total, min, max,
+                        available: total,
+                        status: 'online'
+                    };
+
+                    const ads = JSON.parse(localStorage.getItem(P2P_KEY) || '[]');
+                    ads.push(ad);
+                    localStorage.setItem(P2P_KEY, JSON.stringify(ads));
+
+                    alert('Ad Published!');
                     toggleP2PForm();
+                    renderP2PAds();
+                }
+
+                function deleteAd(id) {
+                    if (!confirm('Delete this ad?')) return;
+                    let ads = JSON.parse(localStorage.getItem(P2P_KEY) || '[]');
+                    ads = ads.filter(a => a.id != id);
+                    localStorage.setItem(P2P_KEY, JSON.stringify(ads));
+                    renderP2PAds();
                 }
 
                 /* --- User Management Logic --- */
@@ -930,8 +962,33 @@
                 const P2P_KEY = 'wallet_p2p_ads';
 
                 function renderP2PAds() {
-                    // In a real app, this would fetch from server/storage
-                    // For now, we keep the static demo table or implement simple storage
+                    const ads = JSON.parse(localStorage.getItem(P2P_KEY) || '[]');
+                    const tbody = document.querySelector('#view-p2p tbody');
+                    if (!tbody) return;
+
+                    if (ads.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-slate-500">No active advertisements.</td></tr>`;
+                        return;
+                    }
+
+                    tbody.innerHTML = ads.map(ad => `
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                            <td class="px-6 py-4">
+                                <span class="${ad.type === 'buy' ? 'text-green-500 bg-green-500/10' : 'text-red-500 bg-red-500/10'} font-bold px-2 py-0.5 rounded text-xs uppercase">${ad.type}</span>
+                                <span class="ml-2 font-medium">${ad.asset}</span>
+                            </td>
+                            <td class="px-6 py-4 font-bold">$${ad.price}</td>
+                            <td class="px-6 py-4 text-slate-500">$${ad.min} - $${ad.max}</td>
+                            <td class="px-6 py-4">${ad.available} ${ad.asset}</td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex size-2 rounded-full bg-green-500"></span>
+                                <span class="ml-2 text-xs">Online</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <button onclick="deleteAd(${ad.id})" class="text-slate-400 hover:text-red-500 transition-colors"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+                            </td>
+                        </tr>
+                    `).join('');
                 }
 
                 // Initialize Settings on Load
