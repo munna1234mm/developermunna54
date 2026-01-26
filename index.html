@@ -458,70 +458,134 @@
         <!-- Deposit Modal -->
         <div id="deposit-modal"
             class="fixed inset-0 z-[9999] hidden flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
-            <div
-                class="bg-white dark:bg-[#1a282f] w-full max-w-sm rounded-2xl p-6 shadow-xl animate-slide-up space-y-4">
+            <div class="bg-white dark:bg-[#1a282f] w-full max-w-sm rounded-2xl p-6 shadow-xl animate-slide-up space-y-4 max-h-[90vh] overflow-y-auto transition-all duration-300"
+                style="min-height: 400px">
+
+                <!-- Header -->
                 <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">Deposit Methods</h3>
-                    <button onclick="document.getElementById('deposit-modal').classList.add('hidden')"
+                    <h3 id="dep-title" class="text-lg font-bold text-slate-900 dark:text-white">Select Method</h3>
+                    <button onclick="closeDepositModal()"
                         class="text-slate-500 hover:text-slate-700 dark:hover:text-white">
                         <span class="material-symbols-outlined">close</span>
                     </button>
                 </div>
 
-                <div class="space-y-3">
-                    <!-- Binance Pay -->
-                    <div onclick="copyText('763666850', 'Binance ID Copied!')"
-                        class="p-4 bg-slate-50 dark:bg-black/20 rounded-xl border border-slate-100 dark:border-slate-800 flex items-center justify-between active:scale-95 transition-transform cursor-pointer group">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="size-10 rounded-full bg-[#F3BA2F]/10 flex items-center justify-center text-[#F3BA2F]">
-                                <span class="material-symbols-outlined">currency_bitcoin</span>
-                            </div>
-                            <div>
-                                <p class="font-bold text-sm text-slate-900 dark:text-white">Binance Pay</p>
-                                <p class="text-xs font-mono text-slate-500">763666850</p>
-                            </div>
-                        </div>
-                        <span
-                            class="material-symbols-outlined text-slate-400 group-hover:text-primary">content_copy</span>
-                    </div>
+                <!-- Step 1: Selection -->
+                <div id="dep-step-1" class="space-y-4 animate-fade-in">
+                    <p class="text-sm text-slate-500">Tap a payment method to copy the number and proceed.</p>
 
-                    <!-- Bkash -->
-                    <div onclick="copyText('01609434652', 'Bkash Number Copied!')"
-                        class="p-4 bg-slate-50 dark:bg-black/20 rounded-xl border border-slate-100 dark:border-slate-800 flex items-center justify-between active:scale-95 transition-transform cursor-pointer group">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="size-10 rounded-full bg-[#e2136e]/10 flex items-center justify-center text-[#e2136e]">
-                                <span class="material-symbols-outlined">payments</span>
+                    <div class="grid grid-cols-1 gap-3">
+                        <!-- Binance -->
+                        <div onclick="selectDepositMethod('binance', '763666850', 'Binance')"
+                            class="p-4 bg-slate-50 dark:bg-black/20 rounded-xl border border-slate-100 dark:border-slate-800 flex items-center justify-between cursor-pointer hover:border-primary/50 transition-all active:scale-95 group">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="size-12 rounded-full bg-[#F3BA2F]/10 flex items-center justify-center text-[#F3BA2F]">
+                                    <span class="material-symbols-outlined text-xl">currency_bitcoin</span>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-slate-900 dark:text-white">Binance Pay</p>
+                                    <p class="text-xs font-mono text-slate-500">763666850</p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="font-bold text-sm text-slate-900 dark:text-white">Bkash Personal</p>
-                                <p class="text-xs font-mono text-slate-500">01609434652</p>
-                            </div>
+                            <span
+                                class="material-symbols-outlined text-slate-400 group-hover:text-primary">arrow_forward_ios</span>
                         </div>
-                        <span
-                            class="material-symbols-outlined text-slate-400 group-hover:text-primary">content_copy</span>
-                    </div>
 
-                    <!-- Nagad -->
-                    <div onclick="copyText('01625199589', 'Nagad Number Copied!')"
-                        class="p-4 bg-slate-50 dark:bg-black/20 rounded-xl border border-slate-100 dark:border-slate-800 flex items-center justify-between active:scale-95 transition-transform cursor-pointer group">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="size-10 rounded-full bg-[#f7941d]/10 flex items-center justify-center text-[#f7941d]">
-                                <span class="material-symbols-outlined">account_balance_wallet</span>
+                        <!-- Bkash -->
+                        <div onclick="selectDepositMethod('bkash', '01609434652', 'Bkash')"
+                            class="p-4 bg-slate-50 dark:bg-black/20 rounded-xl border border-slate-100 dark:border-slate-800 flex items-center justify-between cursor-pointer hover:border-primary/50 transition-all active:scale-95 group">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="size-12 rounded-full bg-[#e2136e]/10 flex items-center justify-center text-[#e2136e]">
+                                    <span class="material-symbols-outlined text-xl">payments</span>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-slate-900 dark:text-white">Bkash Personal</p>
+                                    <p class="text-xs font-mono text-slate-500">01609434652</p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="font-bold text-sm text-slate-900 dark:text-white">Nagad Personal</p>
-                                <p class="text-xs font-mono text-slate-500">01625199589</p>
-                            </div>
+                            <span
+                                class="material-symbols-outlined text-slate-400 group-hover:text-primary">arrow_forward_ios</span>
                         </div>
-                        <span
-                            class="material-symbols-outlined text-slate-400 group-hover:text-primary">content_copy</span>
+
+                        <!-- Nagad -->
+                        <div onclick="selectDepositMethod('nagad', '01625199589', 'Nagad')"
+                            class="p-4 bg-slate-50 dark:bg-black/20 rounded-xl border border-slate-100 dark:border-slate-800 flex items-center justify-between cursor-pointer hover:border-primary/50 transition-all active:scale-95 group">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="size-12 rounded-full bg-[#f7941d]/10 flex items-center justify-center text-[#f7941d]">
+                                    <span class="material-symbols-outlined text-xl">account_balance_wallet</span>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-slate-900 dark:text-white">Nagad Personal</p>
+                                    <p class="text-xs font-mono text-slate-500">01625199589</p>
+                                </div>
+                            </div>
+                            <span
+                                class="material-symbols-outlined text-slate-400 group-hover:text-primary">arrow_forward_ios</span>
+                        </div>
                     </div>
                 </div>
 
-                <p class="text-[10px] text-center text-slate-400">Tap any method to copy number</p>
+                <!-- Step 2: Form -->
+                <div id="dep-step-2" class="hidden space-y-4 animate-fade-in">
+
+                    <!-- Selected Summary -->
+                    <div class="p-3 bg-primary/5 rounded-xl border border-primary/20 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="size-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                                <span class="material-symbols-outlined text-sm">check</span>
+                            </div>
+                            <div>
+                                <p id="dep-selected-name" class="text-sm font-bold text-slate-900 dark:text-white">Bkash
+                                </p>
+                                <p id="dep-selected-number" class="text-xs font-mono text-slate-500">01...</p>
+                            </div>
+                        </div>
+                        <button onclick="showStep1()"
+                            class="text-xs font-bold text-primary hover:underline">Change</button>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-xs text-slate-500 mb-1 block">Amount (BDT)</label>
+                                <input id="dep-amount" type="number" placeholder="500"
+                                    class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-500 mb-1 block">Sender Number</label>
+                                <input id="dep-number" type="text" placeholder="017..."
+                                    class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-xs text-slate-500 mb-1 block">Screenshot / Proof</label>
+                            <div class="relative">
+                                <input type="file" id="dep-photo" accept="image/*" class="hidden"
+                                    onchange="previewFile()">
+                                <div id="upload-box" onclick="document.getElementById('dep-photo').click()"
+                                    class="w-full h-24 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex flex-col items-center justify-center text-slate-400 cursor-pointer hover:border-primary/50 transition relative overflow-hidden bg-slate-50 dark:bg-black/20">
+                                    <span class="material-symbols-outlined text-2xl mb-1">add_a_photo</span>
+                                    <span class="text-xs">Tap to upload screenshot</span>
+                                    <img id="dep-preview"
+                                        class="absolute inset-0 w-full h-full object-cover hidden rounded-xl">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="submitDeposit()"
+                        class="w-full py-3.5 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                        <span>Confirm Request</span>
+                        <span class="material-symbols-outlined text-sm">check_circle</span>
+                    </button>
+
+                    <input type="hidden" id="dep-method">
+                </div>
             </div>
         </div>
 
