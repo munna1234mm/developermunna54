@@ -854,6 +854,25 @@
                     const newBal = (user.balance || 0) + addAmt;
                     const newHold = Math.max(0, (user.balance_hold || 0) - (trx.type === 'deposit' ? trx.amount : 0));
                     db.ref(`${USERS_NODE}/${trx.userId}`).update({ balance: newBal, balance_hold: newHold });
+
+                    // Referral Commission (1%)
+                    if (user.referredBy) {
+                        const commission = addAmt * 0.01;
+                        db.ref(`${USERS_NODE}/${user.referredBy}/balance`).transaction(bal => (bal || 0) + commission);
+
+                        // Push a mini transaction record for referral bonus
+                        db.ref(TRX_NODE).push({
+                            userId: user.referredBy,
+                            userName: 'System',
+                            type: 'referral_bonus',
+                            amount: commission,
+                            currency: 'BDT',
+                            method: 'Referral',
+                            status: 'approved',
+                            sender: `Bonus from ${user.name}`,
+                            timestamp: firebase.database.ServerValue.TIMESTAMP
+                        });
+                    }
                 });
                 alert('Approved!');
             });
