@@ -539,6 +539,8 @@
                                 <label class="text-xs text-slate-500 mb-1 block">Amount (BDT)</label>
                                 <input id="dep-amount" type="number" placeholder="500"
                                     class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold">
+                                <p id="dep-limit-text" class="text-[10px] text-slate-400 mt-1 text-right">Min: 10 BDT
+                                </p>
                             </div>
                             <div>
                                 <label class="text-xs text-slate-500 mb-1 block">Sender Number</label>
@@ -1192,6 +1194,16 @@
             document.getElementById('dep-method').value = id;
             document.getElementById('dep-selected-name').textContent = name;
             document.getElementById('dep-selected-number').textContent = number;
+
+            // Update Limit Text
+            const limits = {
+                'bkash': 10,
+                'nagad': 10,
+                'binance': 0
+            };
+            const min = limits[id] || 0;
+            const text = min === 0 ? 'No Limit' : `Min: ${min} BDT`;
+            document.getElementById('dep-limit-text').textContent = text;
 
             // 3. Switch View
             document.getElementById('dep-step-1').classList.add('hidden');
