@@ -1225,6 +1225,19 @@
                 return;
             }
 
+            // Check Limits
+            const limits = {
+                'bkash': 10,
+                'nagad': 10,
+                'binance': 0
+            };
+            const minLimit = limits[method] || 0;
+
+            if (amount < minLimit) {
+                tg.showAlert(`Minimum deposit for ${method} is ${minLimit} BDT`);
+                return;
+            }
+
             // Create Transaction Object
             const trx = {
                 id: 'trx_' + Date.now().toString(36),
