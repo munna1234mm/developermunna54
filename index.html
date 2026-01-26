@@ -1105,41 +1105,7 @@
             }, 500);
         }
 
-        // Create Transaction Object
-        const trx = {
-            id: 'trx_' + Date.now().toString(36),
-            userId: tg.initDataUnsafe?.user?.id || '123456',
-            userName: tg.initDataUnsafe?.user?.first_name || 'Guest',
-            type: 'deposit',
-            amount: amount,
-            currency: 'BDT',
-            method: method,
-            sender: number,
-            status: 'pending',
-            photo: photoInput.files[0] ? document.getElementById('dep-preview').src : null, // Store Base64
-            timestamp: Date.now()
-        };
 
-        // Save to LocalStorage
-        let trxs = [];
-        try {
-            trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
-        } catch (e) { trxs = []; }
-        trxs.push(trx);
-        localStorage.setItem(TRX_STORAGE_KEY, JSON.stringify(trxs));
-
-        // Update User Hold Balance
-        updateUserHoldBalance(trx.userId, amount);
-
-        tg.HapticFeedback.notificationOccurred('success');
-        tg.showAlert('Deposit Submitted! Pending Approval.');
-        document.getElementById('deposit-modal').classList.add('hidden');
-
-        // Reset Form
-        document.getElementById('dep-amount').value = '';
-        document.getElementById('dep-number').value = '';
-        document.getElementById('dep-preview').classList.add('hidden');
-        }
 
         function updateUserHoldBalance(userId, amount) {
             const USERS_KEY = 'wallet_users';
