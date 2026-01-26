@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
-    <title>Wallet Balance</title>
+    <title>Verified Buy & Sell</title>
     <!-- Telegram Web App Script -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -127,7 +127,7 @@
             </div>
             <h2 id="page-title"
                 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">
-                Wallet</h2>
+                Verified Buy & Sell</h2>
             <div class="flex w-12 items-center justify-end gap-2">
                 <!-- Actions Removed -->
             </div>
@@ -1298,7 +1298,7 @@
             nav.classList.add('text-primary'); nav.classList.remove('text-slate-400');
             nav.querySelector('span:last-child').classList.add('font-bold');
             nav.querySelector('span:first-child').style.fontVariationSettings = "'FILL' 1";
-            document.getElementById('page-title').textContent = { balance: 'Wallet', p2p: 'P2P Trading', referral: 'Refer & Earn', profile: 'My Profile' }[tabId];
+            document.getElementById('page-title').textContent = { balance: 'Verified Buy & Sell', p2p: 'P2P Trading', referral: 'Refer & Earn', profile: 'My Profile' }[tabId];
             if (tabId === 'p2p') renderP2PAds();
             if (tabId === 'balance') tg.BackButton.hide(); else tg.BackButton.show();
             document.getElementById('main-scroll').scrollTop = 0;
