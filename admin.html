@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
+
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
     <title>Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -26,39 +28,56 @@
         }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-        .active-nav { background-color: rgba(19, 171, 236, 0.1); color: #13abec; border-right: 3px solid #13abec; }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .nav-item.active {
+            background-color: rgba(19, 171, 236, 0.1);
+            color: #13abec;
+            border-right: 3px solid #13abec;
+        }
+
+        .nav-item {
+            border-right: 3px solid transparent;
+        }
     </style>
 </head>
+
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white transition-colors duration-300">
-    
+
     <div class="flex h-screen overflow-hidden">
-        
+
         <!-- Sidebar -->
-        <aside class="hidden md:flex flex-col w-64 bg-white dark:bg-[#1a282f] border-r border-slate-200 dark:border-slate-800">
+        <aside
+            class="hidden md:flex flex-col w-64 bg-white dark:bg-[#1a282f] border-r border-slate-200 dark:border-slate-800">
             <div class="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-800">
-                <div class="size-8 rounded bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold mr-3">W</div>
+                <div
+                    class="size-8 rounded bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold mr-3">
+                    W</div>
                 <span class="font-bold text-lg tracking-tight">Wallet Admin</span>
             </div>
-            
+
             <nav class="flex-1 py-6 space-y-1">
-                <a href="#" class="flex items-center px-6 py-3 active-nav">
+                <button onclick="switchView('dashboard')" id="nav-dashboard"
+                    class="nav-item active w-full flex items-center px-6 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-left">
                     <span class="material-symbols-outlined mr-3">dashboard</span>
                     Dashboard
-                </a>
-                <a href="#" class="flex items-center px-6 py-3 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-colors">
+                </button>
+                <button onclick="switchView('users')" id="nav-users"
+                    class="nav-item w-full flex items-center px-6 py-3 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-colors text-left">
                     <span class="material-symbols-outlined mr-3">group</span>
-                    Users
-                </a>
-                <a href="#" class="flex items-center px-6 py-3 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-colors">
-                    <span class="material-symbols-outlined mr-3">receipt_long</span>
-                    Transactions
-                </a>
-                <a href="#" class="flex items-center px-6 py-3 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-colors">
-                    <span class="material-symbols-outlined mr-3">settings</span>
-                    Settings
-                </a>
+                    User Management
+                </button>
+                <button onclick="switchView('p2p')" id="nav-p2p"
+                    class="nav-item w-full flex items-center px-6 py-3 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-colors text-left">
+                    <span class="material-symbols-outlined mr-3">currency_exchange</span>
+                    P2P System
+                </button>
             </nav>
 
             <div class="p-4 border-t border-slate-200 dark:border-slate-800">
@@ -75,121 +94,304 @@
         <!-- Main Content -->
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
             <!-- Mobile Header -->
-            <header class="md:hidden flex items-center justify-between h-16 px-4 bg-white dark:bg-[#1a282f] border-b border-slate-200 dark:border-slate-800">
-                <span class="font-bold text-lg">Admin</span>
-                <button class="p-2 -mr-2">
+            <header
+                class="md:hidden flex items-center justify-between h-16 px-4 bg-white dark:bg-[#1a282f] border-b border-slate-200 dark:border-slate-800">
+                <span class="font-bold text-lg">Admin Panel</span>
+                <button class="p-2 -mr-2 text-slate-500">
                     <span class="material-symbols-outlined">menu</span>
                 </button>
             </header>
 
             <main class="flex-1 overflow-y-auto p-4 md:p-8">
-                <!-- Stats Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white dark:bg-[#1a282f] p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Total Revenue</h3>
-                            <span class="material-symbols-outlined text-green-500 bg-green-500/10 p-1.5 rounded-lg">attach_money</span>
-                        </div>
-                        <p class="text-2xl font-bold">$124,500.00</p>
-                        <p class="text-xs text-green-500 flex items-center gap-1 mt-1 font-medium">
-                            <span class="material-symbols-outlined text-[14px]">trending_up</span> +12.5% this month
-                        </p>
+
+                <!-- VIEW: DASHBOARD -->
+                <div id="view-dashboard" class="view-section">
+                    <div class="mb-8">
+                        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Dashboard Overview</h1>
+                        <p class="text-sm text-slate-500">Welcome back, here's what's happening today.</p>
                     </div>
-                    <div class="bg-white dark:bg-[#1a282f] p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Active Users</h3>
-                            <span class="material-symbols-outlined text-primary bg-primary/10 p-1.5 rounded-lg">group</span>
+
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div
+                            class="bg-white dark:bg-[#1a282f] p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Total Revenue</h3>
+                                <span
+                                    class="material-symbols-outlined text-green-500 bg-green-500/10 p-1.5 rounded-lg">attach_money</span>
+                            </div>
+                            <p class="text-2xl font-bold">$124,500.00</p>
+                            <p class="text-xs text-green-500 flex items-center gap-1 mt-1 font-medium">
+                                <span class="material-symbols-outlined text-[14px]">trending_up</span> +12.5% this month
+                            </p>
                         </div>
-                        <p class="text-2xl font-bold">8,240</p>
-                        <p class="text-xs text-primary flex items-center gap-1 mt-1 font-medium">
-                            <span class="material-symbols-outlined text-[14px]">arrow_upward</span> +140 this week
-                        </p>
-                    </div>
-                    <div class="bg-white dark:bg-[#1a282f] p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">P2P Orders</h3>
-                            <span class="material-symbols-outlined text-orange-500 bg-orange-500/10 p-1.5 rounded-lg">swap_horiz</span>
+                        <div
+                            class="bg-white dark:bg-[#1a282f] p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Total Users</h3>
+                                <span
+                                    class="material-symbols-outlined text-primary bg-primary/10 p-1.5 rounded-lg">group</span>
+                            </div>
+                            <p class="text-2xl font-bold">8,240</p>
+                            <p class="text-xs text-primary flex items-center gap-1 mt-1 font-medium">
+                                <span class="material-symbols-outlined text-[14px]">arrow_upward</span> +140 this week
+                            </p>
                         </div>
-                        <p class="text-2xl font-bold">1,492</p>
-                        <p class="text-xs text-slate-500 flex items-center gap-1 mt-1 font-medium">
-                            Pending: 42
-                        </p>
+                        <div
+                            class="bg-white dark:bg-[#1a282f] p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Active P2P Orders
+                                </h3>
+                                <span
+                                    class="material-symbols-outlined text-orange-500 bg-orange-500/10 p-1.5 rounded-lg">swap_horiz</span>
+                            </div>
+                            <p class="text-2xl font-bold">1,492</p>
+                            <p class="text-xs text-slate-500 flex items-center gap-1 mt-1 font-medium">
+                                Volume: $450k
+                            </p>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Recent Users Table -->
-                <div class="bg-white dark:bg-[#1a282f] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                    <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                        <h3 class="font-bold text-lg">Recent Users</h3>
-                        <button class="text-sm text-primary font-medium hover:underline">View All</button>
+                <!-- VIEW: USERS -->
+                <div id="view-users" class="view-section hidden">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                        <div>
+                            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">User Management</h1>
+                            <p class="text-sm text-slate-500">Manage all registered users and their accounts.</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="text" placeholder="Search user ID, email..."
+                                class="bg-white dark:bg-[#1a282f] border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-primary focus:border-primary">
+                            <button
+                                class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors">Export
+                                CSV</button>
+                        </div>
                     </div>
-                    <div class="overflow-x-auto">
+
+                    <div
+                        class="bg-white dark:bg-[#1a282f] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead
+                                    class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase tracking-wider text-xs">
+                                    <tr>
+                                        <th class="px-6 py-3 font-semibold">User Info</th>
+                                        <th class="px-6 py-3 font-semibold">KYC Status</th>
+                                        <th class="px-6 py-3 font-semibold">Wallet Balance</th>
+                                        <th class="px-6 py-3 font-semibold">Role</th>
+                                        <th class="px-6 py-3 font-semibold text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                                    <!-- User Row 1 -->
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="size-8 rounded-full bg-slate-200 bg-cover"
+                                                    style="background-image: url('https://ui-avatars.com/api/?name=Munna+Dev&background=13abec&color=fff');">
+                                                </div>
+                                                <div>
+                                                    <p class="font-medium text-slate-900 dark:text-white">Munna
+                                                        Developer</p>
+                                                    <p class="text-xs text-slate-500">ID: 8839201</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span
+                                                class="inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded-full bg-green-100 text-green-600 dark:bg-green-500/10 dark:text-green-500">Verified</span>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <p class="font-medium">12,500.00 USDT</p>
+                                            <p class="text-xs text-slate-500">≈ $12,500.00</p>
+                                        </td>
+                                        <td class="px-6 py-4">User</td>
+                                        <td class="px-6 py-4 text-right">
+                                            <button
+                                                class="text-primary hover:bg-primary/10 p-1 rounded transition-colors"
+                                                title="Edit"><span
+                                                    class="material-symbols-outlined text-[18px]">edit</span></button>
+                                            <button
+                                                class="text-red-500 hover:bg-red-500/10 p-1 rounded transition-colors"
+                                                title="Ban"><span
+                                                    class="material-symbols-outlined text-[18px]">block</span></button>
+                                        </td>
+                                    </tr>
+                                    <!-- User Row 2 -->
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="size-8 rounded-full bg-slate-200 bg-cover"
+                                                    style="background-image: url('https://ui-avatars.com/api/?name=John+D&background=random');">
+                                                </div>
+                                                <div>
+                                                    <p class="font-medium text-slate-900 dark:text-white">John Doe</p>
+                                                    <p class="text-xs text-slate-500">ID: 1029384</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span
+                                                class="inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded-full bg-yellow-100 text-yellow-600 dark:bg-yellow-500/10 dark:text-yellow-500">Pending</span>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <p class="font-medium">450.00 USDT</p>
+                                            <p class="text-xs text-slate-500">≈ $450.00</p>
+                                        </td>
+                                        <td class="px-6 py-4">User</td>
+                                        <td class="px-6 py-4 text-right">
+                                            <button
+                                                class="text-primary hover:bg-primary/10 p-1 rounded transition-colors"><span
+                                                    class="material-symbols-outlined text-[18px]">edit</span></button>
+                                            <button
+                                                class="text-red-500 hover:bg-red-500/10 p-1 rounded transition-colors"><span
+                                                    class="material-symbols-outlined text-[18px]">block</span></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="px-6 py-3 border-t border-slate-200 dark:border-slate-800 flex justify-end">
+                            <div class="flex gap-2">
+                                <button
+                                    class="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-50">Previous</button>
+                                <button
+                                    class="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors bg-slate-100 dark:bg-slate-800">1</button>
+                                <button
+                                    class="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">2</button>
+                                <button
+                                    class="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW: P2P MANAGEMENT -->
+                <div id="view-p2p" class="view-section hidden">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                        <div>
+                            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">P2P Management</h1>
+                            <p class="text-sm text-slate-500">Add and manage peer-to-peer trading advertisements.</p>
+                        </div>
+                        <button onclick="toggleP2PForm()"
+                            class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors flex items-center gap-2">
+                            <span class="material-symbols-outlined">add</span>
+                            Create Ad
+                        </button>
+                    </div>
+
+                    <!-- Add P2P Form -->
+                    <div id="p2p-form-container"
+                        class="hidden mb-8 bg-white dark:bg-[#1a282f] p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm relative">
+                        <button onclick="toggleP2PForm()"
+                            class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                        <h3 class="font-bold text-lg mb-4">Create New Advertisement</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Type</label>
+                                <select
+                                    class="w-full bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg text-sm">
+                                    <option value="buy">Buy (Merchant buys from user)</option>
+                                    <option value="sell">Sell (Merchant sells to user)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Asset</label>
+                                <select
+                                    class="w-full bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg text-sm">
+                                    <option value="USDT">USDT</option>
+                                    <option value="BTC">BTC</option>
+                                    <option value="ETH">ETH</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Price
+                                    (USD)</label>
+                                <input type="number" step="0.01" placeholder="1.00"
+                                    class="w-full bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Total
+                                    Amount</label>
+                                <input type="number" step="1" placeholder="1000"
+                                    class="w-full bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Min
+                                    Limit ($)</label>
+                                <input type="number" placeholder="10"
+                                    class="w-full bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Max
+                                    Limit ($)</label>
+                                <input type="number" placeholder="500"
+                                    class="w-full bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg text-sm">
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-end">
+                            <button onclick="saveAd()"
+                                class="bg-success-green text-white px-6 py-2 rounded-lg text-sm font-bold shadow-lg shadow-success-green/20 hover:bg-success-green/90 transition-colors">
+                                Publish Ad
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Active Orders -->
+                    <div
+                        class="bg-white dark:bg-[#1a282f] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                         <table class="w-full text-left text-sm">
-                            <thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase tracking-wider text-xs">
+                            <thead
+                                class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase tracking-wider text-xs">
                                 <tr>
-                                    <th class="px-6 py-3 font-semibold">User</th>
+                                    <th class="px-6 py-3 font-semibold">Type</th>
+                                    <th class="px-6 py-3 font-semibold">Price</th>
+                                    <th class="px-6 py-3 font-semibold">Limits</th>
+                                    <th class="px-6 py-3 font-semibold">Available</th>
                                     <th class="px-6 py-3 font-semibold">Status</th>
-                                    <th class="px-6 py-3 font-semibold">Balance</th>
-                                    <th class="px-6 py-3 font-semibold">Joined</th>
                                     <th class="px-6 py-3 font-semibold text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
                                 <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                                     <td class="px-6 py-4">
-                                        <div class="flex items-center gap-3">
-                                            <div class="size-8 rounded-full bg-slate-200 bg-cover" style="background-image: url('https://ui-avatars.com/api/?name=John+Doe&background=random');"></div>
-                                            <div>
-                                                <p class="font-medium text-slate-900 dark:text-white">John Doe</p>
-                                                <p class="text-xs text-slate-500">john@example.com</p>
-                                            </div>
-                                        </div>
+                                        <span
+                                            class="text-green-500 font-bold bg-green-500/10 px-2 py-0.5 rounded text-xs">BUY</span>
+                                        <span class="ml-2 font-medium">USDT</span>
                                     </td>
+                                    <td class="px-6 py-4 font-bold">$1.02</td>
+                                    <td class="px-6 py-4 text-slate-500">$100 - $5,000</td>
+                                    <td class="px-6 py-4">4,520 USDT</td>
                                     <td class="px-6 py-4">
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-600 dark:bg-green-500/10 dark:text-green-500">Active</span>
+                                        <span class="inline-flex size-2 rounded-full bg-green-500"></span>
+                                        <span class="ml-2 text-xs">Online</span>
                                     </td>
-                                    <td class="px-6 py-4">$4,200.50</td>
-                                    <td class="px-6 py-4 text-slate-500">Oct 24, 2024</td>
                                     <td class="px-6 py-4 text-right">
-                                        <button class="text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]">more_vert</span></button>
+                                        <button class="text-slate-400 hover:text-red-500 transition-colors"><span
+                                                class="material-symbols-outlined text-[18px]">delete</span></button>
                                     </td>
                                 </tr>
                                 <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                                     <td class="px-6 py-4">
-                                        <div class="flex items-center gap-3">
-                                            <div class="size-8 rounded-full bg-slate-200 bg-cover" style="background-image: url('https://ui-avatars.com/api/?name=Alice+Smith&background=random');"></div>
-                                            <div>
-                                                <p class="font-medium text-slate-900 dark:text-white">Alice Smith</p>
-                                                <p class="text-xs text-slate-500">alice@example.com</p>
-                                            </div>
-                                        </div>
+                                        <span
+                                            class="text-red-500 font-bold bg-red-500/10 px-2 py-0.5 rounded text-xs">SELL</span>
+                                        <span class="ml-2 font-medium">USDT</span>
                                     </td>
+                                    <td class="px-6 py-4 font-bold">$0.99</td>
+                                    <td class="px-6 py-4 text-slate-500">$50 - $1,000</td>
+                                    <td class="px-6 py-4">1,200 USDT</td>
                                     <td class="px-6 py-4">
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-600 dark:bg-green-500/10 dark:text-green-500">Active</span>
+                                        <span class="inline-flex size-2 rounded-full bg-slate-400"></span>
+                                        <span class="ml-2 text-xs">Offline</span>
                                     </td>
-                                    <td class="px-6 py-4">$150.00</td>
-                                    <td class="px-6 py-4 text-slate-500">Oct 23, 2024</td>
                                     <td class="px-6 py-4 text-right">
-                                        <button class="text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]">more_vert</span></button>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center gap-3">
-                                            <div class="size-8 rounded-full bg-slate-200 bg-cover" style="background-image: url('https://ui-avatars.com/api/?name=Bob+Wilson&background=random');"></div>
-                                            <div>
-                                                <p class="font-medium text-slate-900 dark:text-white">Bob Wilson</p>
-                                                <p class="text-xs text-slate-500">bob@example.com</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-600 dark:bg-yellow-500/10 dark:text-yellow-500">Pending</span>
-                                    </td>
-                                    <td class="px-6 py-4">$0.00</td>
-                                    <td class="px-6 py-4 text-slate-500">Oct 22, 2024</td>
-                                    <td class="px-6 py-4 text-right">
-                                        <button class="text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]">more_vert</span></button>
+                                        <button class="text-slate-400 hover:text-red-500 transition-colors"><span
+                                                class="material-symbols-outlined text-[18px]">delete</span></button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -201,5 +403,51 @@
         </div>
     </div>
 
+    <script>
+        function switchView(viewId) {
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+
+            // Show selected view
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+
+            // Update Navigation State
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active', 'text-primary');
+                el.classList.add('text-slate-500');
+            });
+
+            // Highlight active nav
+            const activeNav = document.getElementById(`nav-${viewId}`);
+            if (activeNav) {
+                activeNav.classList.add('active');
+                activeNav.classList.remove('text-slate-500');
+            }
+        }
+
+        function toggleP2PForm() {
+            const form = document.getElementById('p2p-form-container');
+            if (form.classList.contains('hidden')) {
+                form.classList.remove('hidden');
+            } else {
+                form.classList.add('hidden');
+            }
+        }
+
+        function saveAd() {
+            alert("This is a demo. In a real app, this would save the advertisement to the database.");
+            toggleP2PForm();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if URL has hash (e.g. #p2p) to open specific tab
+            const hash = window.location.hash.replace('#', '');
+            if (['dashboard', 'users', 'p2p'].includes(hash)) {
+                switchView(hash);
+            }
+        });
+    </script>
 </body>
+
 </html>
