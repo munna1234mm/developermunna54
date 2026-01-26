@@ -665,9 +665,65 @@
             </div>
         </div>
 
+        <!-- Stars Trade Modal -->
+        <div id="stars-trade-modal"
+            class="fixed inset-0 z-[9999] hidden flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
+            <div
+                class="bg-white dark:bg-[#1a282f] w-full max-w-sm rounded-2xl p-6 shadow-xl animate-slide-up space-y-4 max-h-[90vh] overflow-y-auto transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">Sell Telegram Stars</h3>
+                    <button onclick="closeStarsModal()"
+                        class="text-slate-500 hover:text-slate-700 dark:hover:text-white">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div class="p-4 bg-primary/5 rounded-xl border border-primary/20 space-y-2">
+                    <p class="text-xs text-slate-500">Send stars to this post:</p>
+                    <a id="stars-target-link" href="#" target="_blank"
+                        class="text-sm font-bold text-primary break-all underline flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">link</span>
+                        Target Post Link
+                    </a>
+                    <p class="text-[10px] text-slate-400">Total Needed: <span id="stars-needed-count"
+                            class="font-bold">0</span> Stars</p>
+                </div>
+
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-xs text-slate-500 mb-1 block">Sent Star Count</label>
+                        <input id="stars-sent-count" type="number" placeholder="100"
+                            class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-500 mb-1 block">Your Post/Profile Link (Confirmation)</label>
+                        <input id="stars-user-link" type="text" placeholder="https://t.me/yourusername"
+                            class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-500 mb-1 block">Screenshot Proof</label>
+                        <div onclick="document.getElementById('stars-photo').click()"
+                            class="w-full h-24 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex flex-col items-center justify-center text-slate-400 cursor-pointer overflow-hidden bg-slate-50 dark:bg-black/20 relative">
+                            <input type="file" id="stars-photo" accept="image/*" class="hidden"
+                                onchange="previewStarsFile()">
+                            <span class="material-symbols-outlined text-2xl mb-1">add_a_photo</span>
+                            <span class="text-xs">Upload Screenshot</span>
+                            <img id="stars-preview"
+                                class="absolute inset-0 w-full h-full object-cover hidden rounded-xl">
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="submitStarsTrade()"
+                    class="w-full py-3.5 bg-primary text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all">
+                    Submit Proof
+                </button>
+            </div>
+        </div>
+
         <!-- Bottom Navigation Bar -->
         <nav
-            class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 safe-area-bottom z-50">
+            class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-[#0f171a]/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800/50 pb-safe-area z-[100] transition-colors overflow-hidden">
             <div class="flex justify-around items-center h-16">
                 <button onclick="switchTab('balance')" id="nav-balance"
                     class="nav-btn flex flex-col items-center justify-center gap-1 text-primary">
@@ -1054,25 +1110,31 @@
 
             container.innerHTML = history.map(t => {
                 const isDeposit = t.type === 'deposit';
+                const isStars = t.type === 'p2p_trade';
                 const isApproved = t.status === 'approved';
                 const isRejected = t.status === 'rejected';
-                let colorClass = isDeposit ? (isApproved ? 'text-green-500 bg-green-500/10' : 'text-yellow-500 bg-yellow-500/10') : 'text-red-500 bg-red-500/10';
+
+                // For stars, it's like a deposit (user gets money)
+                let colorClass = (isDeposit || isStars) ? (isApproved ? 'text-green-500 bg-green-500/10' : 'text-yellow-500 bg-yellow-500/10') : 'text-red-500 bg-red-500/10';
                 if (isRejected) colorClass = 'text-red-500 bg-red-500/10';
+
+                const displayAmount = isStars ? (t.reward || 0) : t.amount;
+                const typeLabel = isStars ? `Sell ${t.asset}` : t.type;
 
                 return `
                 <div class="flex items-center justify-between p-3 bg-white dark:bg-[#1a282f] rounded-xl border border-slate-100 dark:border-slate-800/50 shadow-sm animate-slide-up">
                     <div class="flex items-center gap-3">
                         <div class="size-10 rounded-full ${colorClass} flex items-center justify-center">
-                            <span class="material-symbols-outlined">${isDeposit ? 'add_circle' : 'remove_circle'}</span>
+                            <span class="material-symbols-outlined">${(isDeposit || isStars) ? 'add_circle' : 'remove_circle'}</span>
                         </div>
                         <div>
-                            <p class="text-sm font-bold text-slate-900 dark:text-white capitalize">${t.type} (${t.method || 'P2P'})</p>
+                            <p class="text-sm font-bold text-slate-900 dark:text-white capitalize">${typeLabel} (${t.method || 'P2P'})</p>
                             <p class="text-[10px] text-slate-500 font-mono">${formatTime(t.timestamp)} • ${t.status}</p>
                         </div>
                     </div>
                     <div class="text-right">
                         <p class="text-sm font-bold ${isApproved ? 'text-green-500' : (isRejected ? 'text-slate-400 line-through' : 'text-slate-900 dark:text-white')}">
-                            ${isDeposit ? '+' : '-'}${parseFloat(t.amount).toFixed(2)} BDT
+                            ${(isDeposit || isStars) ? '+' : '-'}${parseFloat(displayAmount).toFixed(2)} BDT
                         </p>
                         ${t.status === 'pending' ? '<p class="text-[10px] text-yellow-500 font-bold">Pending</p>' : ''}
                     </div>
@@ -1121,7 +1183,7 @@
                             <div class="flex items-center gap-2 text-xs"><span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 rounded text-slate-600 dark:text-slate-300">P2P: ${ad.asset}</span></div>
                             <p class="text-xs text-slate-500 dark:text-slate-400">Limit: $${ad.min} - $${ad.max}</p>
                         </div>
-                        <button onclick="handleP2PAction('${actionLabel.toLowerCase()}')" class="${buttonClass} hover:opacity-90 text-white px-6 py-2 rounded-lg text-sm font-bold transition-all shadow-lg active:scale-95">${actionLabel}</button>
+                        <button onclick='handleP2PAction("${actionLabel.toLowerCase()}", ${JSON.stringify(ad)})' class="${buttonClass} hover:opacity-90 text-white px-6 py-2 rounded-lg text-sm font-bold transition-all shadow-lg active:scale-95">${actionLabel}</button>
                     </div>
                 </div>`;
             }).join('');
@@ -1239,9 +1301,72 @@
             renderP2PAds();
         }
 
-        function handleP2PAction(action) {
+        let activeStarsAd = null;
+
+        function handleP2PAction(action, ad) {
             tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert(`${action.toUpperCase()} order interface would open here.`);
+            if (ad && ad.asset === 'Stars') {
+                activeStarsAd = ad;
+                document.getElementById('stars-target-link').href = ad.targetLink || '#';
+                document.getElementById('stars-needed-count').textContent = ad.starCount || '0';
+                document.getElementById('stars-trade-modal').classList.remove('hidden');
+            } else {
+                tg.showAlert(`${action.toUpperCase()} order interface would open here.`);
+            }
+        }
+
+        function closeStarsModal() { document.getElementById('stars-trade-modal').classList.add('hidden'); }
+
+        function previewStarsFile() {
+            const file = document.getElementById('stars-photo').files[0];
+            const reader = new FileReader();
+            reader.onload = () => {
+                document.getElementById('stars-preview').src = reader.result;
+                document.getElementById('stars-preview').classList.remove('hidden');
+            };
+            if (file) reader.readAsDataURL(file);
+        }
+
+        function submitStarsTrade() {
+            const count = parseFloat(document.getElementById('stars-sent-count').value);
+            const userLink = document.getElementById('stars-user-link').value;
+            const photoInput = document.getElementById('stars-photo');
+
+            if (!count || !userLink || !photoInput.files[0] || !activeStarsAd) {
+                tg.showAlert('Please fill all fields and upload screenshot!');
+                return;
+            }
+
+            const rewardBDT = count * parseFloat(activeStarsAd.price || 0);
+
+            const trxRef = db.ref(TRX_NODE).push();
+            const trxData = {
+                id: trxRef.key,
+                userId: currentUser.id,
+                userName: currentUser.name,
+                type: 'p2p_trade',
+                asset: 'Stars',
+                amount: count, // Star count
+                reward: rewardBDT, // BDT reward
+                currency: 'Stars',
+                method: 'P2P',
+                sender: userLink,
+                status: 'pending',
+                photo: document.getElementById('stars-preview').src,
+                adId: activeStarsAd.id || 'manual',
+                targetLink: activeStarsAd.targetLink || '',
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            trxRef.set(trxData).then(() => {
+                tg.showAlert(`Proof Submitted! You will receive ${rewardBDT.toFixed(2)} BDT after verification.`);
+                closeStarsModal();
+                // Reset fields
+                document.getElementById('stars-sent-count').value = '';
+                document.getElementById('stars-user-link').value = '';
+                document.getElementById('stars-preview').classList.add('hidden');
+                document.getElementById('stars-photo').value = '';
+            });
         }
 
         function copyText(text, msg) {
