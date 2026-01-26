@@ -669,6 +669,18 @@
             }
         }
 
+        function getBotReply(text) {
+            const rules = JSON.parse(localStorage.getItem('bot_rules') || '[]');
+            const lowerText = text.toLowerCase();
+
+            for (const rule of rules) {
+                if (lowerText.includes(rule.keyword)) {
+                    return rule.reply;
+                }
+            }
+            return null; // No match
+        }
+
         function sendUserMessage() {
             const input = document.getElementById('chat-input');
             const text = input.value.trim();
@@ -688,6 +700,23 @@
             input.style.height = 'auto'; // Reset height
             renderChatMessages();
             scrollToBottom();
+
+            // Auto-Reply Logic
+            const replyText = getBotReply(text);
+            if (replyText) {
+                setTimeout(() => {
+                    const botMsg = {
+                        sender: 'admin',
+                        text: replyText,
+                        timestamp: Date.now()
+                    };
+                    const newHistory = getChatHistory();
+                    newHistory.push(botMsg);
+                    localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(newHistory));
+                    renderChatMessages();
+                    tg.HapticFeedback.notificationOccurred('success');
+                }, 1000); // 1s delay
+            }
         }
 
         function scrollToBottom() {
