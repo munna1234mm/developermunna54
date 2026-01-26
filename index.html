@@ -685,13 +685,16 @@
             localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(history));
 
             input.value = '';
+            input.style.height = 'auto'; // Reset height
             renderChatMessages();
             scrollToBottom();
         }
 
         function scrollToBottom() {
             const container = document.getElementById('chat-messages');
-            container.scrollTop = container.scrollHeight;
+            setTimeout(() => {
+                container.scrollTop = container.scrollHeight;
+            }, 50);
         }
 
         function formatTime(ms) {
@@ -822,6 +825,26 @@
         }
 
         window.addEventListener('DOMContentLoaded', initApp);
+
+        // Setup Chat Input Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput) {
+                // Enter to send
+                chatInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendUserMessage();
+                    }
+                });
+
+                // Auto-resize
+                chatInput.addEventListener('input', function () {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
+            }
+        });
     </script>
 </body>
 
