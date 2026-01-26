@@ -228,41 +228,8 @@
                     </div>
                 </div>
 
-                <div class="px-4 space-y-3 pb-10">
-                    <div
-                        class="flex flex-col bg-white dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-center gap-3">
-                                <div
-                                    class="size-10 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold">
-                                    CK</div>
-                                <div>
-                                    <div class="flex items-center gap-1 text-slate-900 dark:text-white">
-                                        <p class="text-sm font-bold">CryptoKing</p>
-                                        <span
-                                            class="material-symbols-outlined text-primary text-[14px] fill-current">verified</span>
-                                    </div>
-                                    <p class="text-[11px] text-slate-500 dark:text-slate-400">1,240 orders | 98.5%</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-xs text-slate-400 mb-0.5">Price</p>
-                                <p class="text-lg font-bold text-slate-900 dark:text-white">$1.02</p>
-                            </div>
-                        </div>
-                        <div class="flex justify-between items-end">
-                            <div class="space-y-1">
-                                <div class="flex items-center gap-2 text-xs">
-                                    <span
-                                        class="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 rounded text-slate-600 dark:text-slate-300">Bank
-                                        Transfer</span>
-                                </div>
-                                <p class="text-xs text-slate-500 dark:text-slate-400">Limit: $100.00 - $2,500.00</p>
-                            </div>
-                            <button onclick="handleP2PAction('buy')"
-                                class="bg-success-green hover:bg-success-green/90 text-white px-6 py-2 rounded-lg text-sm font-bold transition-colors">Buy</button>
-                        </div>
-                    </div>
+                <div id="p2p-list" class="px-4 space-y-3 pb-10">
+                    <!-- Dynamic Ads Injected Here -->
                 </div>
             </div>
 
@@ -1120,6 +1087,10 @@
             };
             document.getElementById('page-title').textContent = titles[tabId];
 
+            if (tabId === 'p2p') {
+                renderP2PAds();
+            }
+
             if (tabId === 'balance') {
                 tg.BackButton.hide();
             } else {
@@ -1143,6 +1114,60 @@
             } catch (e) { return defaults; }
         }
 
+        const P2P_KEY = 'wallet_p2p_ads';
+
+        function renderP2PAds() {
+            const currentType = document.getElementById('btn-p2p-buy').classList.contains('bg-white') ? 'buy' : 'sell';
+            const ads = JSON.parse(localStorage.getItem(P2P_KEY) || '[]');
+            const container = document.getElementById('p2p-list');
+            if (!container) return;
+
+            const filtered = ads.filter(a => a.type === currentType);
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="flex flex-col items-center justify-center py-12 text-slate-400">
+                    <span class="material-symbols-outlined text-4xl mb-2 opacity-30">ads_click</span>
+                    <p class="text-sm">No active advertisements for ${currentType}ing</p>
+                </div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(ad => `
+                <div class="flex flex-col bg-white dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800 animate-slide-up">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="size-10 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold">
+                                ${ad.type.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-1 text-slate-900 dark:text-white">
+                                    <p class="text-sm font-bold">Merchant #${~~(Math.random() * 1000)}</p>
+                                    <span class="material-symbols-outlined text-primary text-[14px] fill-current">verified</span>
+                                </div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400">${Math.floor(Math.random() * 2000)} orders | 99%</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs text-slate-400 mb-0.5">Price</p>
+                            <p class="text-lg font-bold text-slate-900 dark:text-white">$${ad.price}</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-end">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2 text-xs">
+                                <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 rounded text-slate-600 dark:text-slate-300">P2P Asset: ${ad.asset}</span>
+                            </div>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Limit: $${ad.min} - $${ad.max}</p>
+                        </div>
+                        <button onclick="handleP2PAction('${ad.type}')" 
+                            class="${ad.type === 'buy' ? 'bg-success-green' : 'bg-red-500'} hover:opacity-90 text-white px-6 py-2 rounded-lg text-sm font-bold transition-colors">
+                            ${ad.type === 'buy' ? 'Buy' : 'Sell'}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
         function toggleP2PType(type) {
             tg.HapticFeedback.selectionChanged();
             const buyBtn = document.getElementById('btn-p2p-buy');
@@ -1155,6 +1180,7 @@
                 sellBtn.className = "flex-1 py-2 text-sm font-bold rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm transition-all";
                 buyBtn.className = "flex-1 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 transition-all";
             }
+            renderP2PAds();
         }
 
         function handleP2PAction(action) {
