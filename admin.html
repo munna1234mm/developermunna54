@@ -629,6 +629,19 @@
             </div>
         </div>
 
+        <!-- Photo Viewer Modal -->
+        <div id="photo-modal"
+            class="fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/80 p-4 animate-fade-in"
+            onclick="closePhotoModal()">
+            <div class="relative max-w-4xl w-full flex flex-col items-center">
+                <button class="absolute -top-10 right-0 text-white hover:text-red-400 transition-colors">
+                    <span class="material-symbols-outlined text-4xl">close</span>
+                </button>
+                <img id="photo-modal-img" src="" class="max-w-full max-h-[85vh] rounded-lg shadow-2xl animate-scale-up"
+                    onclick="event.stopPropagation()">
+            </div>
+        </div>
+
         <script>
             /* --- Firebase Config & Init --- */
             const firebaseConfig = {
@@ -870,7 +883,7 @@
                         </td>
                         <td class="px-6 py-4 font-bold text-green-500">+${displayAmt}</td>
                         <td class="px-6 py-4">${methodInfo}</td>
-                        <td class="px-6 py-4">${t.photo ? `<a href="${t.photo}" target="_blank" class="text-primary underline text-xs">View Proof</a>` : '<span class="text-slate-400 text-xs">No Proof</span>'}</td>
+                        <td class="px-6 py-4">${t.photo ? `<button onclick="viewPhoto('${t.photo}')" class="text-primary hover:underline text-xs font-bold flex items-center gap-1"><span class="material-symbols-outlined text-sm">image</span>View Proof</button>` : '<span class="text-slate-400 text-xs">No Proof</span>'}</td>
                         <td class="px-6 py-4 text-right">
                             <button onclick="approveDeposit('${t.id}')" class="bg-green-500 text-white px-3 py-1 rounded text-xs font-bold mr-2">Approve</button>
                             <button onclick="rejectDeposit('${t.id}')" class="bg-red-500 text-white px-3 py-1 rounded text-xs font-bold">Reject</button>
@@ -1006,6 +1019,17 @@
 
             function deleteRule(id) {
                 db.ref(`${RULES_NODE}/${id}`).remove();
+            }
+
+            function viewPhoto(src) {
+                const modal = document.getElementById('photo-modal');
+                const img = document.getElementById('photo-modal-img');
+                img.src = src;
+                modal.classList.remove('hidden');
+            }
+
+            function closePhotoModal() {
+                document.getElementById('photo-modal').classList.add('hidden');
             }
 
             /* --- Init --- */
