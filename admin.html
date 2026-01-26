@@ -84,6 +84,11 @@
                     Deposit Requests
                 </button>
                 <!-- New Support Tab -->
+                <button onclick="switchView('withdrawals')" id="nav-withdrawals"
+                    class="nav-item w-full flex items-center px-6 py-3 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-colors text-left">
+                    <span class="material-symbols-outlined mr-3">money_off</span>
+                    Withdrawals
+                </button>
                 <button onclick="switchView('support')" id="nav-support"
                     class="nav-item w-full flex items-center px-6 py-3 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-colors text-left">
                     <span class="material-symbols-outlined mr-3">support_agent</span>
@@ -307,315 +312,345 @@
                     </div>
                 </div>
 
-                <!-- VIEW: P2P MANAGEMENT -->
-                <div id="view-p2p" class="view-section hidden">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                        <div>
-                            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">P2P Management</h1>
-                            <p class="text-sm text-slate-500">Add and manage peer-to-peer trading advertisements.</p>
-                        </div>
-                        <button onclick="toggleP2PForm()"
-                            class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors flex items-center gap-2">
-                            <span class="material-symbols-outlined">add</span>
-                            Create Ad
-                        </button>
-                    </div>
+        </div>
 
-                    <!-- Add P2P Form -->
-                    <div id="p2p-form-container"
-                        class="hidden mb-8 bg-white dark:bg-[#1a282f] p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm relative">
-                        <button onclick="toggleP2PForm()"
-                            class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
-                        <h3 class="font-bold text-lg mb-4">Create New Advertisement</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Type</label>
-                                <select
-                                    class="w-full bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg text-sm">
-                                    <option value="buy">Buy (Merchant buys from user)</option>
-                                    <option value="sell">Sell (Merchant sells to user)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Asset</label>
-                                <select
-                                    class="w-full bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg text-sm">
-                                    <option value="BDT">BDT</option>
-                                    <option value="BTC">BTC</option>
-                                    <option value="ETH">ETH</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Price
-                                    (USD)</label>
-                                <input type="number" step="0.01" placeholder="1.00"
-                                    class="w-full bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg text-sm">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Total
-                                    Amount</label>
-                                <input type="number" step="1" placeholder="1000"
-                                    class="w-full bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg text-sm">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Min
-                                    Limit ($)</label>
-                                <input type="number" placeholder="10"
-                                    class="w-full bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg text-sm">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Max
-                                    Limit ($)</label>
-                                <input type="number" placeholder="500"
-                                    class="w-full bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg text-sm">
-                            </div>
-                        </div>
-                        <div class="mt-6 flex justify-end">
-                            <button onclick="saveAd()"
-                                class="bg-success-green text-white px-6 py-2 rounded-lg text-sm font-bold shadow-lg shadow-success-green/20 hover:bg-success-green/90 transition-colors">
-                                Publish Ad
-                            </button>
-                        </div>
-                    </div>
+        <!-- VIEW: WITHDRAWAL REQUESTS -->
+        <div id="view-withdrawals" class="view-section hidden">
+            <div class="mb-8">
+                <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Withdrawal Requests</h1>
+                <p class="text-sm text-slate-500">Manage user withdrawal requests.</p>
+            </div>
 
-                    <!-- Active Orders -->
-                    <div
-                        class="bg-white dark:bg-[#1a282f] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                        <table class="w-full text-left text-sm">
-                            <thead
-                                class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase tracking-wider text-xs">
-                                <tr>
-                                    <th class="px-6 py-3 font-semibold">Type</th>
-                                    <th class="px-6 py-3 font-semibold">Price</th>
-                                    <th class="px-6 py-3 font-semibold">Limits</th>
-                                    <th class="px-6 py-3 font-semibold">Available</th>
-                                    <th class="px-6 py-3 font-semibold">Status</th>
-                                    <th class="px-6 py-3 font-semibold text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
-                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                                    <td class="px-6 py-4">
-                                        <span
-                                            class="text-green-500 font-bold bg-green-500/10 px-2 py-0.5 rounded text-xs">BUY</span>
-                                        <span class="ml-2 font-medium">BDT</span>
-                                    </td>
-                                    <td class="px-6 py-4 font-bold">$1.02</td>
-                                    <td class="px-6 py-4 text-slate-500">$100 - $5,000</td>
-                                    <td class="px-6 py-4">4,520 BDT</td>
-                                    <td class="px-6 py-4">
-                                        <span class="inline-flex size-2 rounded-full bg-green-500"></span>
-                                        <span class="ml-2 text-xs">Online</span>
-                                    </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <button class="text-slate-400 hover:text-red-500 transition-colors"><span
-                                                class="material-symbols-outlined text-[18px]">delete</span></button>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                                    <td class="px-6 py-4">
-                                        <span
-                                            class="text-red-500 font-bold bg-red-500/10 px-2 py-0.5 rounded text-xs">SELL</span>
-                                        <span class="ml-2 font-medium">BDT</span>
-                                    </td>
-                                    <td class="px-6 py-4 font-bold">$0.99</td>
-                                    <td class="px-6 py-4 text-slate-500">$50 - $1,000</td>
-                                    <td class="px-6 py-4">1,200 BDT</td>
-                                    <td class="px-6 py-4">
-                                        <span class="inline-flex size-2 rounded-full bg-slate-400"></span>
-                                        <span class="ml-2 text-xs">Offline</span>
-                                    </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <button class="text-slate-400 hover:text-red-500 transition-colors"><span
-                                                class="material-symbols-outlined text-[18px]">delete</span></button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+            <div
+                class="bg-white dark:bg-[#1a282f] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead
+                            class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase tracking-wider text-xs">
+                            <tr>
+                                <th class="px-6 py-3">User</th>
+                                <th class="px-6 py-3">Amount</th>
+                                <th class="px-6 py-3">Method</th>
+                                <th class="px-6 py-3">Destination</th>
+                                <th class="px-6 py-3 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="withdrawals-table-body" class="divide-y divide-slate-200 dark:divide-slate-800">
+                            <!-- Injected -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: P2P MANAGEMENT -->
+        <div id="view-p2p" class="view-section hidden">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-900 dark:text-white">P2P Management</h1>
+                    <p class="text-sm text-slate-500">Add and manage peer-to-peer trading advertisements.</p>
+                </div>
+                <button onclick="toggleP2PForm()"
+                    class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors flex items-center gap-2">
+                    <span class="material-symbols-outlined">add</span>
+                    Create Ad
+                </button>
+            </div>
+
+            <!-- Add P2P Form -->
+            <div id="p2p-form-container"
+                class="hidden mb-8 bg-white dark:bg-[#1a282f] p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm relative">
+                <button onclick="toggleP2PForm()"
+                    class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+                <h3 class="font-bold text-lg mb-4">Create New Advertisement</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Type</label>
+                        <select
+                            class="w-full bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg text-sm">
+                            <option value="buy">Buy (Merchant buys from user)</option>
+                            <option value="sell">Sell (Merchant sells to user)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Asset</label>
+                        <select
+                            class="w-full bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg text-sm">
+                            <option value="BDT">BDT</option>
+                            <option value="BTC">BTC</option>
+                            <option value="ETH">ETH</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Price
+                            (USD)</label>
+                        <input type="number" step="0.01" placeholder="1.00"
+                            class="w-full bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Total
+                            Amount</label>
+                        <input type="number" step="1" placeholder="1000"
+                            class="w-full bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Min
+                            Limit ($)</label>
+                        <input type="number" placeholder="10"
+                            class="w-full bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Max
+                            Limit ($)</label>
+                        <input type="number" placeholder="500"
+                            class="w-full bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg text-sm">
                     </div>
                 </div>
+                <div class="mt-6 flex justify-end">
+                    <button onclick="saveAd()"
+                        class="bg-success-green text-white px-6 py-2 rounded-lg text-sm font-bold shadow-lg shadow-success-green/20 hover:bg-success-green/90 transition-colors">
+                        Publish Ad
+                    </button>
+                </div>
+            </div>
 
-                <!-- VIEW: LIVE SUPPORT -->
-                <div id="view-support" class="view-section hidden h-full flex flex-col">
-                    <div class="mb-4">
-                        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Live Support</h1>
-                        <p class="text-sm text-slate-500">Respond to user inquiries in real-time.</p>
+            <!-- Active Orders -->
+            <div
+                class="bg-white dark:bg-[#1a282f] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                <table class="w-full text-left text-sm">
+                    <thead
+                        class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase tracking-wider text-xs">
+                        <tr>
+                            <th class="px-6 py-3 font-semibold">Type</th>
+                            <th class="px-6 py-3 font-semibold">Price</th>
+                            <th class="px-6 py-3 font-semibold">Limits</th>
+                            <th class="px-6 py-3 font-semibold">Available</th>
+                            <th class="px-6 py-3 font-semibold">Status</th>
+                            <th class="px-6 py-3 font-semibold text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                            <td class="px-6 py-4">
+                                <span
+                                    class="text-green-500 font-bold bg-green-500/10 px-2 py-0.5 rounded text-xs">BUY</span>
+                                <span class="ml-2 font-medium">BDT</span>
+                            </td>
+                            <td class="px-6 py-4 font-bold">$1.02</td>
+                            <td class="px-6 py-4 text-slate-500">$100 - $5,000</td>
+                            <td class="px-6 py-4">4,520 BDT</td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex size-2 rounded-full bg-green-500"></span>
+                                <span class="ml-2 text-xs">Online</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <button class="text-slate-400 hover:text-red-500 transition-colors"><span
+                                        class="material-symbols-outlined text-[18px]">delete</span></button>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                            <td class="px-6 py-4">
+                                <span
+                                    class="text-red-500 font-bold bg-red-500/10 px-2 py-0.5 rounded text-xs">SELL</span>
+                                <span class="ml-2 font-medium">BDT</span>
+                            </td>
+                            <td class="px-6 py-4 font-bold">$0.99</td>
+                            <td class="px-6 py-4 text-slate-500">$50 - $1,000</td>
+                            <td class="px-6 py-4">1,200 BDT</td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex size-2 rounded-full bg-slate-400"></span>
+                                <span class="ml-2 text-xs">Offline</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <button class="text-slate-400 hover:text-red-500 transition-colors"><span
+                                        class="material-symbols-outlined text-[18px]">delete</span></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- VIEW: LIVE SUPPORT -->
+        <div id="view-support" class="view-section hidden h-full flex flex-col">
+            <div class="mb-4">
+                <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Live Support</h1>
+                <p class="text-sm text-slate-500">Respond to user inquiries in real-time.</p>
+            </div>
+
+            <div
+                class="flex-1 bg-white dark:bg-[#1a282f] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex">
+                <!-- Chat List -->
+                <div class="w-80 border-r border-slate-200 dark:border-slate-800 flex flex-col">
+                    <div class="p-4 border-b border-slate-200 dark:border-slate-800">
+                        <input type="text" placeholder="Search chats..."
+                            class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-lg text-sm">
+                    </div>
+                    <div class="flex-1 overflow-y-auto">
+                        <!-- Chat Item (Active) -->
+                        <div
+                            class="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer bg-slate-50 dark:bg-slate-800/50 border-l-4 border-primary">
+                            <div class="flex items-center justify-between mb-1">
+                                <h4 class="font-bold text-sm text-slate-900 dark:text-white">Munna Developer
+                                </h4>
+                                <span class="text-[10px] text-slate-500">Just now</span>
+                            </div>
+                            <p class="text-xs text-slate-500 truncate">I have a question about my withdrawal.
+                            </p>
+                        </div>
+                        <!-- Chat Item -->
+                        <div class="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer text-slate-500">
+                            class="material-symbols-outlined">delete</span></button>
+                            </td>
+                            </tr>
+                            </tbody>
+                            </table>
+                        </div>
                     </div>
 
-                    <div
-                        class="flex-1 bg-white dark:bg-[#1a282f] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex">
-                        <!-- Chat List -->
-                        <div class="w-80 border-r border-slate-200 dark:border-slate-800 flex flex-col">
-                            <div class="p-4 border-b border-slate-200 dark:border-slate-800">
-                                <input type="text" placeholder="Search chats..."
-                                    class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-lg text-sm">
+                    <!-- View: Bot Settings -->
+                    <div id="view-support" class="view-section hidden space-y-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-2xl font-bold text-slate-800 dark:text-white">AI Bot Settings
+                                </h2>
+                                <p class="text-slate-500">Configure auto-replies for the user chat.</p>
                             </div>
-                            <div class="flex-1 overflow-y-auto">
-                                <!-- Chat Item (Active) -->
-                                <div
-                                    class="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer bg-slate-50 dark:bg-slate-800/50 border-l-4 border-primary">
-                                    <div class="flex items-center justify-between mb-1">
-                                        <h4 class="font-bold text-sm text-slate-900 dark:text-white">Munna Developer
-                                        </h4>
-                                        <span class="text-[10px] text-slate-500">Just now</span>
-                                    </div>
-                                    <p class="text-xs text-slate-500 truncate">I have a question about my withdrawal.
-                                    </p>
+                        </div>
+
+                        <!-- Add Rule Form -->
+                        <div
+                            class="bg-white dark:bg-[#1a282f] rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <h3 class="font-bold text-lg mb-4 text-slate-900 dark:text-white">Add New Rule</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Keyword
+                                        (e.g. 'hello')</label>
+                                    <input type="text" id="rule-keyword"
+                                        class="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-primary"
+                                        placeholder="Enter keyword...">
                                 </div>
-                                <!-- Chat Item -->
-                                <div
-                                    class="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer text-slate-500">
-                                    class="material-symbols-outlined">delete</span></button>
-                                    </td>
-                                    </tr>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Bot
+                                        Reply</label>
+                                    <div class="flex gap-2">
+                                        <input type="text" id="rule-reply"
+                                            class="flex-1 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-primary"
+                                            placeholder="Enter the automated reply...">
+                                        <button onclick="addBotRule()"
+                                            class="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg font-bold transition-all">Add</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rules List -->
+                        <div
+                            class="bg-white dark:bg-[#1a282f] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                            <div class="p-6 border-b border-slate-200 dark:border-slate-800">
+                                <h3 class="font-bold text-lg text-slate-900 dark:text-white">Active Rules</h3>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm text-left">
+                                    <thead class="text-xs text-slate-500 uppercase bg-slate-50 dark:bg-slate-800/50">
+                                        <tr>
+                                            <th class="px-6 py-3">Keyword</th>
+                                            <th class="px-6 py-3">Reply</th>
+                                            <th class="px-6 py-3 text-right">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="rules-table-body">
+                                        <!-- Rules injected here -->
                                     </tbody>
-                                    </table>
-                                </div>
+                                </table>
                             </div>
+                        </div>
+                    </div>
 
-                            <!-- View: Bot Settings -->
-                            <div id="view-support" class="view-section hidden space-y-6">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white">AI Bot Settings
-                                        </h2>
-                                        <p class="text-slate-500">Configure auto-replies for the user chat.</p>
-                                    </div>
-                                </div>
+                    </main>
+                </div>
+            </div>
 
-                                <!-- Add Rule Form -->
-                                <div
-                                    class="bg-white dark:bg-[#1a282f] rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
-                                    <h3 class="font-bold text-lg mb-4 text-slate-900 dark:text-white">Add New Rule</h3>
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div>
-                                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Keyword
-                                                (e.g. 'hello')</label>
-                                            <input type="text" id="rule-keyword"
-                                                class="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-primary"
-                                                placeholder="Enter keyword...">
-                                        </div>
-                                        <div class="md:col-span-2">
-                                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Bot
-                                                Reply</label>
-                                            <div class="flex gap-2">
-                                                <input type="text" id="rule-reply"
-                                                    class="flex-1 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-primary"
-                                                    placeholder="Enter the automated reply...">
-                                                <button onclick="addBotRule()"
-                                                    class="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg font-bold transition-all">Add</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+            <script>
+                function switchView(viewId) {
+                    // Hide all views
+                    document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
 
-                                <!-- Rules List -->
-                                <div
-                                    class="bg-white dark:bg-[#1a282f] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                                    <div class="p-6 border-b border-slate-200 dark:border-slate-800">
-                                        <h3 class="font-bold text-lg text-slate-900 dark:text-white">Active Rules</h3>
-                                    </div>
-                                    <div class="overflow-x-auto">
-                                        <table class="w-full text-sm text-left">
-                                            <thead
-                                                class="text-xs text-slate-500 uppercase bg-slate-50 dark:bg-slate-800/50">
-                                                <tr>
-                                                    <th class="px-6 py-3">Keyword</th>
-                                                    <th class="px-6 py-3">Reply</th>
-                                                    <th class="px-6 py-3 text-right">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="rules-table-body">
-                                                <!-- Rules injected here -->
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
+                    // Show selected view
+                    const view = document.getElementById(`view-${viewId}`);
+                    if (view) view.classList.remove('hidden');
 
-            </main>
-        </div>
-    </div>
+                    // Update Navigation State
+                    document.querySelectorAll('.nav-item').forEach(el => {
+                        el.classList.remove('active', 'text-primary');
+                        el.classList.add('text-slate-500');
+                    });
 
-    <script>
-        function switchView(viewId) {
-            // Hide all views
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+                    // Highlight active nav
+                    const activeNav = document.getElementById(`nav-${viewId}`);
+                    if (activeNav) {
+                        activeNav.classList.add('active');
+                        activeNav.classList.remove('text-slate-500');
+                    }
 
-            // Show selected view
-            const view = document.getElementById(`view-${viewId}`);
-            if (view) view.classList.remove('hidden');
+                    if (viewId === 'support') {
+                        renderRules();
+                        startChatPolling();
+                    } else {
+                        stopChatPolling();
+                    }
 
-            // Update Navigation State
-            document.querySelectorAll('.nav-item').forEach(el => {
-                el.classList.remove('active', 'text-primary');
-                el.classList.add('text-slate-500');
-            });
+                    if (viewId === 'users') {
+                        renderUsers();
+                    }
+                    if (viewId === 'deposits') {
+                        renderDeposits();
+                    }
+                    if (viewId === 'withdrawals') {
+                        renderWithdrawals();
+                    }
+                }
 
-            // Highlight active nav
-            const activeNav = document.getElementById(`nav-${viewId}`);
-            if (activeNav) {
-                activeNav.classList.add('active');
-                activeNav.classList.remove('text-slate-500');
-            }
+                function toggleP2PForm() {
+                    const form = document.getElementById('p2p-form-container');
+                    if (form.classList.contains('hidden')) {
+                        form.classList.remove('hidden');
+                    } else {
+                        form.classList.add('hidden');
+                    }
+                }
 
-            if (viewId === 'support') {
-                renderRules();
-                startChatPolling();
-            } else {
-                stopChatPolling();
-            }
+                function saveAd() {
+                    alert("This is a demo. In a real app, this would save the advertisement to the database.");
+                    toggleP2PForm();
+                }
 
-            if (viewId === 'users') {
-                renderUsers();
-            }
-            if (viewId === 'deposits') {
-                renderDeposits();
-            }
-        }
+                /* --- User Management Logic --- */
+                const USERS_STORAGE_KEY = 'wallet_users';
 
-        function toggleP2PForm() {
-            const form = document.getElementById('p2p-form-container');
-            if (form.classList.contains('hidden')) {
-                form.classList.remove('hidden');
-            } else {
-                form.classList.add('hidden');
-            }
-        }
+                function renderUsers() {
+                    let users = [];
+                    try {
+                        users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+                    } catch (e) { users = []; }
 
-        function saveAd() {
-            alert("This is a demo. In a real app, this would save the advertisement to the database.");
-            toggleP2PForm();
-        }
+                    const tbody = document.querySelector('tbody');
+                    if (!tbody) return;
 
-        /* --- User Management Logic --- */
-        const USERS_STORAGE_KEY = 'wallet_users';
-
-        function renderUsers() {
-            let users = [];
-            try {
-                users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
-            } catch (e) { users = []; }
-
-            const tbody = document.querySelector('tbody');
-            if (!tbody) return;
-
-            if (users.length === 0) {
-                tbody.innerHTML = `
+                    if (users.length === 0) {
+                        tbody.innerHTML = `
                     <tr>
                         <td colspan="5" class="px-6 py-8 text-center text-slate-500">
                             No users registered yet. Open the Wallet App to register a user.
                         </td>
                     </tr>
                 `;
-                return;
-            }
+                        return;
+                    }
 
-            tbody.innerHTML = users.map(u => `
+                    tbody.innerHTML = users.map(u => `
                 <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
@@ -638,24 +673,82 @@
                     </td>
                 </tr>
             `).join('');
-        }
+                }
 
-        /* --- Deposit Logic --- */
-        const TRX_STORAGE_KEY = 'wallet_transactions';
+                /* --- Withdraw Logic --- */
+                function renderWithdrawals() {
+                    const trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
+                    const pending = trxs.filter(t => t.type === 'withdrawal' && t.status === 'pending');
+                    const tbody = document.getElementById('withdrawals-table-body');
 
-        function renderDeposits() {
-            const trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
-            const pending = trxs.filter(t => t.type === 'deposit' && t.status === 'pending');
-            const tbody = document.getElementById('deposits-table-body');
+                    if (!tbody) return;
 
-            if (!tbody) return;
+                    if (pending.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">No pending withdrawal requests.</td></tr>`;
+                        return;
+                    }
 
-            if (pending.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">No pending deposits.</td></tr>`;
-                return;
-            }
+                    tbody.innerHTML = pending.map(t => `
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                            <td class="px-6 py-4">
+                                <p class="font-medium text-slate-900 dark:text-white">${t.userName}</p>
+                                <p class="text-xs text-slate-500">ID: ${t.userId}</p>
+                            </td>
+                            <td class="px-6 py-4 font-bold text-red-500">-${t.amount} BDT</td>
+                            <td class="px-6 py-4 capitalize">${t.method}</td>
+                            <td class="px-6 py-4 font-mono text-xs">${t.sender}</td>
+                            <td class="px-6 py-4 text-right space-x-2">
+                                <button onclick="updateWithdrawStatus('${t.id}', 'approved')" class="text-green-500 hover:bg-green-500/10 px-3 py-1 rounded text-xs font-bold transition-colors">Approve</button>
+                                <button onclick="updateWithdrawStatus('${t.id}', 'rejected')" class="text-red-500 hover:bg-red-500/10 px-3 py-1 rounded text-xs font-bold transition-colors">Reject (Refund)</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
 
-            tbody.innerHTML = pending.map(t => `
+                function updateWithdrawStatus(trxId, status) {
+                    let trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
+                    const idx = trxs.findIndex(t => t.id === trxId);
+
+                    if (idx === -1) return;
+
+                    // Update Status
+                    trxs[idx].status = status;
+                    localStorage.setItem(TRX_STORAGE_KEY, JSON.stringify(trxs));
+
+                    // Logic: If Rejected, Refund Balance
+                    if (status === 'rejected') {
+                        const userId = trxs[idx].userId;
+                        const amount = trxs[idx].amount; // Refund this amount
+
+                        let users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+                        const uIdx = users.findIndex(u => u.id == userId);
+
+                        if (uIdx !== -1) {
+                            users[uIdx].balance += amount;
+                            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+                        }
+                    }
+
+                    alert(`Withdrawal ${status}!`);
+                    renderWithdrawals();
+                }
+
+                /* --- Deposit Logic --- */
+                const TRX_STORAGE_KEY = 'wallet_transactions';
+
+                function renderDeposits() {
+                    const trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
+                    const pending = trxs.filter(t => t.type === 'deposit' && t.status === 'pending');
+                    const tbody = document.getElementById('deposits-table-body');
+
+                    if (!tbody) return;
+
+                    if (pending.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">No pending deposits.</td></tr>`;
+                        return;
+                    }
+
+                    tbody.innerHTML = pending.map(t => `
                 <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30">
                     <td class="px-6 py-4">
                         <p class="font-medium text-slate-900 dark:text-white">${t.userName}</p>
@@ -675,98 +768,98 @@
                     </td>
                 </tr>
             `).join('');
-        }
-
-        function approveDeposit(trxId) {
-            if (!confirm('Approve this deposit? Funds will be added to user.')) return;
-
-            let trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
-            const idx = trxs.findIndex(t => t.id === trxId);
-            if (idx === -1) return;
-
-            const trx = trxs[idx];
-            trx.status = 'approved';
-            trxs[idx] = trx;
-            localStorage.setItem(TRX_STORAGE_KEY, JSON.stringify(trxs));
-
-            // Update User Balance
-            let users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
-            const uIdx = users.findIndex(u => u.id == trx.userId);
-            if (uIdx >= 0) {
-                users[uIdx].balance += trx.amount; // Add to Main
-                if (users[uIdx].balance_hold >= trx.amount) {
-                    users[uIdx].balance_hold -= trx.amount; // Release from Hold
-                } else {
-                    users[uIdx].balance_hold = 0;
                 }
-                localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-            }
 
-            renderDeposits();
-            alert('Deposit Approved!');
-        }
+                function approveDeposit(trxId) {
+                    if (!confirm('Approve this deposit? Funds will be added to user.')) return;
 
-        function rejectDeposit(trxId) {
-            if (!confirm('Reject this deposit?')) return;
+                    let trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
+                    const idx = trxs.findIndex(t => t.id === trxId);
+                    if (idx === -1) return;
 
-            let trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
-            const idx = trxs.findIndex(t => t.id === trxId);
-            if (idx === -1) return;
+                    const trx = trxs[idx];
+                    trx.status = 'approved';
+                    trxs[idx] = trx;
+                    localStorage.setItem(TRX_STORAGE_KEY, JSON.stringify(trxs));
 
-            const trx = trxs[idx];
-            trx.status = 'rejected';
-            trxs[idx] = trx;
-            localStorage.setItem(TRX_STORAGE_KEY, JSON.stringify(trxs));
+                    // Update User Balance
+                    let users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+                    const uIdx = users.findIndex(u => u.id == trx.userId);
+                    if (uIdx >= 0) {
+                        users[uIdx].balance += trx.amount; // Add to Main
+                        if (users[uIdx].balance_hold >= trx.amount) {
+                            users[uIdx].balance_hold -= trx.amount; // Release from Hold
+                        } else {
+                            users[uIdx].balance_hold = 0;
+                        }
+                        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+                    }
 
-            // Remove from User Hold
-            let users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
-            const uIdx = users.findIndex(u => u.id == trx.userId);
-            if (uIdx >= 0) {
-                if (users[uIdx].balance_hold >= trx.amount) {
-                    users[uIdx].balance_hold -= trx.amount;
-                } else {
-                    users[uIdx].balance_hold = 0;
+                    renderDeposits();
+                    alert('Deposit Approved!');
                 }
-                localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-            }
 
-            renderDeposits();
-        }
-        /* --- End Deposit Logic --- */
+                function rejectDeposit(trxId) {
+                    if (!confirm('Reject this deposit?')) return;
 
-        function deleteUser(id) {
-            if (!confirm('Delete this user?')) return;
-            let users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
-            users = users.filter(u => u.id !== id);
-            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-            renderUsers();
-        }
+                    let trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
+                    const idx = trxs.findIndex(t => t.id === trxId);
+                    if (idx === -1) return;
 
-        /* --- Bot Rules Logic --- */
-        const RULES_STORAGE_KEY = 'bot_rules';
+                    const trx = trxs[idx];
+                    trx.status = 'rejected';
+                    trxs[idx] = trx;
+                    localStorage.setItem(TRX_STORAGE_KEY, JSON.stringify(trxs));
 
-        function getRules() {
-            try {
-                return JSON.parse(localStorage.getItem(RULES_STORAGE_KEY) || '[]');
-            } catch { return []; }
-        }
+                    // Remove from User Hold
+                    let users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+                    const uIdx = users.findIndex(u => u.id == trx.userId);
+                    if (uIdx >= 0) {
+                        if (users[uIdx].balance_hold >= trx.amount) {
+                            users[uIdx].balance_hold -= trx.amount;
+                        } else {
+                            users[uIdx].balance_hold = 0;
+                        }
+                        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+                    }
 
-        function saveRules(rules) {
-            localStorage.setItem(RULES_STORAGE_KEY, JSON.stringify(rules));
-            renderRules();
-        }
+                    renderDeposits();
+                }
+                /* --- End Deposit Logic --- */
 
-        function renderRules() {
-            const rules = getRules();
-            const tbody = document.getElementById('rules-table-body');
-            if (!tbody) return;
+                function deleteUser(id) {
+                    if (!confirm('Delete this user?')) return;
+                    let users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+                    users = users.filter(u => u.id !== id);
+                    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+                    renderUsers();
+                }
 
-            if (rules.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" class="px-6 py-8 text-center text-slate-500">No auto-reply rules set. Add one above!</td></tr>`;
-                return;
-            }
+                /* --- Bot Rules Logic --- */
+                const RULES_STORAGE_KEY = 'bot_rules';
 
-            tbody.innerHTML = rules.map((r, i) => `
+                function getRules() {
+                    try {
+                        return JSON.parse(localStorage.getItem(RULES_STORAGE_KEY) || '[]');
+                    } catch { return []; }
+                }
+
+                function saveRules(rules) {
+                    localStorage.setItem(RULES_STORAGE_KEY, JSON.stringify(rules));
+                    renderRules();
+                }
+
+                function renderRules() {
+                    const rules = getRules();
+                    const tbody = document.getElementById('rules-table-body');
+                    if (!tbody) return;
+
+                    if (rules.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="3" class="px-6 py-8 text-center text-slate-500">No auto-reply rules set. Add one above!</td></tr>`;
+                        return;
+                    }
+
+                    tbody.innerHTML = rules.map((r, i) => `
                 <tr class="border-b border-slate-100 dark:border-slate-800 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/30">
                     <td class="px-6 py-4 font-mono text-primary">${r.keyword}</td>
                     <td class="px-6 py-4 text-slate-600 dark:text-slate-300">${r.reply}</td>
@@ -775,89 +868,89 @@
                     </td>
                 </tr>
             `).join('');
-        }
+                }
 
-        function addBotRule() {
-            const keywordInput = document.getElementById('rule-keyword');
-            const replyInput = document.getElementById('rule-reply');
+                function addBotRule() {
+                    const keywordInput = document.getElementById('rule-keyword');
+                    const replyInput = document.getElementById('rule-reply');
 
-            const keyword = keywordInput.value.trim().toLowerCase();
-            const reply = replyInput.value.trim();
+                    const keyword = keywordInput.value.trim().toLowerCase();
+                    const reply = replyInput.value.trim();
 
-            if (!keyword || !reply) {
-                alert('Please enter both a keyword and a reply.');
-                return;
-            }
+                    if (!keyword || !reply) {
+                        alert('Please enter both a keyword and a reply.');
+                        return;
+                    }
 
-            const rules = getRules();
-            rules.push({ keyword, reply });
-            saveRules(rules);
+                    const rules = getRules();
+                    rules.push({ keyword, reply });
+                    saveRules(rules);
 
-            keywordInput.value = '';
-            replyInput.value = '';
-        }
+                    keywordInput.value = '';
+                    replyInput.value = '';
+                }
 
-        function deleteRule(index) {
-            const rules = getRules();
-            rules.splice(index, 1);
-            saveRules(rules);
-        }
+                function deleteRule(index) {
+                    const rules = getRules();
+                    rules.splice(index, 1);
+                    saveRules(rules);
+                }
 
-        function forceReloadChat() {
-            renderAdminChat();
-            const btn = document.querySelector('button[title="Refresh Chat"]');
-            if (btn) {
-                btn.classList.add('animate-spin');
-                setTimeout(() => btn.classList.remove('animate-spin'), 500);
-            }
-        }
+                function forceReloadChat() {
+                    renderAdminChat();
+                    const btn = document.querySelector('button[title="Refresh Chat"]');
+                    if (btn) {
+                        btn.classList.add('animate-spin');
+                        setTimeout(() => btn.classList.remove('animate-spin'), 500);
+                    }
+                }
 
-        function formatTime(ms) {
-            const date = new Date(ms);
-            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
+                function formatTime(ms) {
+                    const date = new Date(ms);
+                    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                }
 
-        // Listen for storage changes
-        window.addEventListener('storage', (e) => {
-            if (e.key === CHAT_STORAGE_KEY) {
-                renderAdminChat();
-            }
-        });
-
-        function resetChat() {
-            if (confirm('Are you sure you want to clear all chat history? This cannot be undone.')) {
-                localStorage.removeItem(CHAT_STORAGE_KEY);
-                renderAdminChat();
-            }
-        }
-
-        // Initialize and Event Listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            const hash = window.location.hash.replace('#', '');
-            if (['dashboard', 'users', 'p2p', 'support'].includes(hash)) {
-                switchView(hash);
-            }
-
-            // Chat Input Enter Key
-            const chatInput = document.getElementById('admin-chat-input');
-            if (chatInput) {
-                chatInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        sendAdminReply();
+                // Listen for storage changes
+                window.addEventListener('storage', (e) => {
+                    if (e.key === CHAT_STORAGE_KEY) {
+                        renderAdminChat();
                     }
                 });
-            }
 
-            // Sync Status Check
-            setInterval(() => {
-                const statusDot = document.getElementById('sync-status-dot');
-                if (statusDot) {
-                    statusDot.classList.toggle('opacity-50');
+                function resetChat() {
+                    if (confirm('Are you sure you want to clear all chat history? This cannot be undone.')) {
+                        localStorage.removeItem(CHAT_STORAGE_KEY);
+                        renderAdminChat();
+                    }
                 }
-            }, 2000);
-        });
-    </script>
+
+                // Initialize and Event Listeners
+                document.addEventListener('DOMContentLoaded', () => {
+                    const hash = window.location.hash.replace('#', '');
+                    if (['dashboard', 'users', 'p2p', 'support'].includes(hash)) {
+                        switchView(hash);
+                    }
+
+                    // Chat Input Enter Key
+                    const chatInput = document.getElementById('admin-chat-input');
+                    if (chatInput) {
+                        chatInput.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                sendAdminReply();
+                            }
+                        });
+                    }
+
+                    // Sync Status Check
+                    setInterval(() => {
+                        const statusDot = document.getElementById('sync-status-dot');
+                        if (statusDot) {
+                            statusDot.classList.toggle('opacity-50');
+                        }
+                    }, 2000);
+                });
+            </script>
 </body>
 
 </html>
