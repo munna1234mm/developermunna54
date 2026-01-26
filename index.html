@@ -126,23 +126,7 @@
                 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">
                 Wallet</h2>
             <div class="flex w-12 items-center justify-end gap-2">
-                <div id="p2p-actions" class="hidden flex gap-1">
-                    <button
-                        class="flex items-center justify-center size-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                        <span class="material-symbols-outlined text-[20px]">history</span>
-                    </button>
-                    <button
-                        class="flex items-center justify-center size-8 rounded-full bg-slate-100 dark:bg-slate-800 text-primary">
-                        <span class="material-symbols-outlined text-[20px]">add_box</span>
-                    </button>
-                </div>
-                <!-- Chat Button -->
-                <button onclick="toggleChat()"
-                    class="flex size-10 cursor-pointer items-center justify-center rounded-full bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white transition-colors relative">
-                    <span class="material-symbols-outlined text-[24px]">chat</span>
-                    <span id="chat-badge"
-                        class="absolute top-0 right-0 size-3 bg-red-500 rounded-full border-2 border-slate-200 dark:border-slate-800 hidden"></span>
-                </button>
+                <!-- Actions Removed -->
             </div>
         </header>
 
@@ -739,10 +723,6 @@
     </div>
 
     <script>
-        window.onerror = function (msg, url, line, col, error) {
-            alert("Error: " + msg + "\nLine: " + line);
-            return false;
-        };
         const tg = window.Telegram.WebApp;
 
         // Theme Management
@@ -1137,13 +1117,6 @@
                 profile: 'My Profile'
             };
             document.getElementById('page-title').textContent = titles[tabId];
-
-            const p2pActions = document.getElementById('p2p-actions');
-            if (tabId === 'p2p') {
-                p2pActions.classList.remove('hidden');
-            } else {
-                p2pActions.classList.add('hidden');
-            }
 
             if (tabId === 'balance') {
                 tg.BackButton.hide();
