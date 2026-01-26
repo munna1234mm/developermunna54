@@ -1187,7 +1187,109 @@
 
         function handleWithdraw() {
             tg.HapticFeedback.impactOccurred('medium');
-            tg.showAlert('Withdrawal interface would open here.');
+            showWdStep1();
+            document.getElementById('withdraw-modal').classList.remove('hidden');
+
+            // Update Bal Display
+            const userId = tg.initDataUnsafe?.user?.id || '123456';
+            const users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+            const u = users.find(u => u.id == userId);
+            const bal = u ? u.balance : 0;
+            document.getElementById('wd-avail-bal').textContent = bal.toFixed(2);
+        }
+
+        /* --- Withdrawal Wizard Logic --- */
+        function showWdStep1() {
+            document.getElementById('wd-step-1').classList.remove('hidden');
+            document.getElementById('wd-step-2').classList.add('hidden');
+            document.getElementById('wd-title').textContent = 'Withdraw Funds';
+        }
+
+        function closeWithdrawModal() {
+            document.getElementById('withdraw-modal').classList.add('hidden');
+            setTimeout(showWdStep1, 300);
+        }
+
+        function selectWithdrawMethod(id, name) {
+            document.getElementById('wd-method').value = id;
+            document.getElementById('wd-selected-name').textContent = name;
+
+            document.getElementById('wd-step-1').classList.add('hidden');
+            document.getElementById('wd-step-2').classList.remove('hidden');
+            document.getElementById('wd-title').textContent = 'Withdraw Details';
+        }
+
+        function submitWithdraw() {
+            const amount = parseFloat(document.getElementById('wd-amount').value);
+            const number = document.getElementById('wd-number').value;
+            const method = document.getElementById('wd-method').value;
+
+            if (!amount || amount <= 0 || !number) {
+                tg.showAlert('Please fill in all fields!');
+                return;
+            }
+
+            // 1. Check Limits
+            const limits = {
+                'bkash': 10,
+                'nagad': 10,
+                'binance': 0
+            };
+            const minLimit = limits[method] || 0;
+
+            if (amount < minLimit) {
+                tg.showAlert(`Minimum withdrawal for ${method} is ${minLimit} BDT`);
+                return;
+            }
+
+            // 2. Check Balance
+            const userId = tg.initDataUnsafe?.user?.id || '123456';
+            let users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+            const idx = users.findIndex(u => u.id == userId);
+
+            if (idx === -1 || users[idx].balance < amount) {
+                tg.showAlert('Insufficient Balance!');
+                return;
+            }
+
+            if (!confirm(`Confirm withdraw ${amount} BDT via ${method}?`)) return;
+
+            // 3. Deduct Balance
+            users[idx].balance -= amount;
+            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+
+            // Update UI
+            document.getElementById('bal-main').textContent = users[idx].balance.toFixed(2);
+            document.getElementById('wd-avail-bal').textContent = users[idx].balance.toFixed(2);
+
+
+            // 4. Create Transaction
+            const trx = {
+                id: 'trx_' + Date.now().toString(36),
+                userId: userId,
+                userName: tg.initDataUnsafe?.user?.first_name || 'Guest',
+                type: 'withdrawal',
+                amount: amount,
+                currency: 'BDT',
+                method: method,
+                sender: number, // Destination number
+                status: 'pending',
+                photo: null,
+                timestamp: Date.now()
+            };
+
+            let trxs = JSON.parse(localStorage.getItem(TRX_STORAGE_KEY) || '[]');
+            trxs.push(trx);
+            localStorage.setItem(TRX_STORAGE_KEY, JSON.stringify(trxs));
+
+            tg.HapticFeedback.notificationOccurred('success');
+            tg.showAlert('Withdrawal Requested!');
+            closeWithdrawModal();
+            renderHistory();
+
+            // Reset
+            document.getElementById('wd-amount').value = '';
+            document.getElementById('wd-number').value = '';
         }
 
         window.addEventListener('DOMContentLoaded', initApp);
