@@ -1051,9 +1051,13 @@
                 let userData = snapshot.val();
                 if (!userData) {
                     const startParam = tg.initDataUnsafe?.start_param || "";
+                    console.log("Start Param Detected:", startParam);
+
                     let referredBy = null;
                     if (startParam.startsWith('ref_')) {
                         referredBy = startParam.replace('ref_', '');
+                        console.log("Referred By ID:", referredBy);
+                        // Optional: alert(`Referral detected! Referrer ID: ${referredBy}`);
                     }
 
                     userData = {
@@ -1106,7 +1110,9 @@
             document.getElementById('profile-ref-count').innerHTML = currentUser.referralCount || 0;
             document.getElementById('profile-pic-large').style.backgroundImage = `url('${currentUser.photo}')`;
             document.getElementById('user-avatar').style.backgroundImage = `url('${currentUser.photo}')`;
-            document.getElementById('ref-link').textContent = `t.me/buysell_shoperobot?start=ref_${currentUser.id}`;
+            // Updated to use startapp for direct Mini App opening
+            const botUsername = 'buysell_shoperobot'; // Ensure this matches your bot's username
+            document.getElementById('ref-link').textContent = `t.me/${botUsername}/app?startapp=ref_${currentUser.id}`;
         }
 
         /* --- Rendering --- */
