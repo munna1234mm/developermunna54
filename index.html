@@ -479,7 +479,7 @@
             </div>
 
             <!-- Chat Messages -->
-            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-[#eefeef] dark:bg-[#0b1419]">
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 pb-20 space-y-4 bg-[#eefeef] dark:bg-[#0b1419]">
                 <!-- Messages will be injected here -->
                 <div class="flex justify-center my-4">
                     <span
@@ -710,10 +710,48 @@
         });
         /* --- End Chat System --- */
 
+        const USERS_STORAGE_KEY = 'wallet_users';
+
+        function registerUser() {
+            const user = tg.initDataUnsafe?.user || {
+                id: 123456,
+                first_name: 'Guest',
+                last_name: 'User',
+                username: 'guest_user',
+                photo_url: null
+            };
+
+            const newUser = {
+                id: user.id,
+                name: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
+                username: user.username || 'guest',
+                photo: user.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.first_name || 'Guest')}&background=13abec&color=fff`,
+                balance: 0,
+                status: 'Verified',
+                lastActive: Date.now()
+            };
+
+            let users = [];
+            try {
+                users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+            } catch (e) { users = []; }
+
+            // Update or Add
+            const existingIndex = users.findIndex(u => u.id === newUser.id);
+            if (existingIndex >= 0) {
+                users[existingIndex] = { ...users[existingIndex], ...newUser };
+            } else {
+                users.push(newUser);
+            }
+
+            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+        }
+
         function initApp() {
             tg.ready();
             tg.expand();
             initTheme();
+            registerUser(); // Register on startup
 
             const user = tg.initDataUnsafe?.user;
             if (user) {
@@ -733,47 +771,72 @@
             });
         }
 
-        function switchTab(tabId) {
-            tg.HapticFeedback.impactOccurred('light');
+        // Polling for fast sync
+        setInterval(() => {
+            // Optional: Check connection
+        }, 500);
 
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.nav-btn').forEach(el => {
-                el.classList.remove('text-primary');
-                el.classList.add('text-slate-400');
-                el.querySelector('span:last-child').classList.remove('font-bold');
-                el.querySelector('span:first-child').style.fontVariationSettings = "'FILL' 0";
-            });
+        window.addEventListener('DOMContentLoaded', initApp);
 
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+        // Setup Chat Input Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput) {
+                // Enter to send
+                chatInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendUserMessage();
+                    }
+                });
 
-            const activeNav = document.getElementById(`nav-${tabId}`);
-            activeNav.classList.add('text-primary');
-            activeNav.classList.remove('text-slate-400');
-            activeNav.querySelector('span:last-child').classList.add('font-bold');
-            activeNav.querySelector('span:first-child').style.fontVariationSettings = "'FILL' 1";
-
-            const titles = {
-                balance: 'Wallet',
-                p2p: 'P2P Trading',
-                referral: 'Refer & Earn',
-                profile: 'My Profile'
-            };
-            document.getElementById('page-title').textContent = titles[tabId];
-
-            const p2pActions = document.getElementById('p2p-actions');
-            if (tabId === 'p2p') {
-                p2pActions.classList.remove('hidden');
-            } else {
-                p2pActions.classList.add('hidden');
+                // Auto-resize
+                chatInput.addEventListener('input', function () {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
             }
+        });
+        tg.HapticFeedback.impactOccurred('light');
 
-            if (tabId === 'balance') {
-                tg.BackButton.hide();
-            } else {
-                tg.BackButton.show();
-            }
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.nav-btn').forEach(el => {
+            el.classList.remove('text-primary');
+            el.classList.add('text-slate-400');
+            el.querySelector('span:last-child').classList.remove('font-bold');
+            el.querySelector('span:first-child').style.fontVariationSettings = "'FILL' 0";
+        });
 
-            document.getElementById('main-scroll').scrollTop = 0;
+        document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+        const activeNav = document.getElementById(`nav-${tabId}`);
+        activeNav.classList.add('text-primary');
+        activeNav.classList.remove('text-slate-400');
+        activeNav.querySelector('span:last-child').classList.add('font-bold');
+        activeNav.querySelector('span:first-child').style.fontVariationSettings = "'FILL' 1";
+
+        const titles = {
+            balance: 'Wallet',
+            p2p: 'P2P Trading',
+            referral: 'Refer & Earn',
+            profile: 'My Profile'
+        };
+        document.getElementById('page-title').textContent = titles[tabId];
+
+        const p2pActions = document.getElementById('p2p-actions');
+        if (tabId === 'p2p') {
+            p2pActions.classList.remove('hidden');
+        } else {
+            p2pActions.classList.add('hidden');
+        }
+
+        if (tabId === 'balance') {
+            tg.BackButton.hide();
+        } else {
+            tg.BackButton.show();
+        }
+
+        document.getElementById('main-scroll').scrollTop = 0;
         }
 
         function toggleP2PType(type) {

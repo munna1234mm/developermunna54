@@ -526,6 +526,10 @@
             } else {
                 stopChatPolling();
             }
+
+            if (viewId === 'users') {
+                renderUsers();
+            }
         }
 
         function toggleP2PForm() {
@@ -542,6 +546,62 @@
             toggleP2PForm();
         }
 
+        /* --- User Management Logic --- */
+        const USERS_STORAGE_KEY = 'wallet_users';
+
+        function renderUsers() {
+            let users = [];
+            try {
+                users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+            } catch (e) { users = []; }
+
+            const tbody = document.querySelector('tbody');
+            if (!tbody) return;
+
+            if (users.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-6 py-8 text-center text-slate-500">
+                            No users registered yet. Open the Wallet App to register a user.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = users.map(u => `
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="size-8 rounded-full bg-slate-200 bg-cover" style="background-image: url('${u.photo}');"></div>
+                            <div>
+                                <p class="font-medium text-slate-900 dark:text-white">${u.name}</p>
+                                <p class="text-xs text-slate-500">ID: ${u.id}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded-full bg-green-100 text-green-600 dark:bg-green-500/10 dark:text-green-500">${u.status}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <p class="font-medium">${u.balance.toFixed(2)} USDT</p>
+                    </td>
+                    <td class="px-6 py-4">User</td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="deleteUser(${u.id})" class="text-red-500 hover:bg-red-500/10 p-1 rounded transition-colors" title="Delete"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function deleteUser(id) {
+            if (!confirm('Delete this user?')) return;
+            let users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+            users = users.filter(u => u.id !== id);
+            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+            renderUsers();
+        }
+
         /* --- Admin Chat Logic --- */
         const CHAT_STORAGE_KEY = 'wallet_chat_history';
         let adminChatInterval;
@@ -554,6 +614,13 @@
                 console.error("Chat sync error:", e);
                 return [];
             }
+        }
+
+        // ... (renderAdminChat remains same) ...
+
+        function startChatPolling() {
+            renderAdminChat();
+            if (!adminChatInterval) adminChatInterval = setInterval(renderAdminChat, 500); // Fast 500ms sync
         }
 
         function renderAdminChat() {
