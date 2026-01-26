@@ -600,7 +600,7 @@
 
         function startChatPolling() {
             renderAdminChat();
-            if (!adminChatInterval) adminChatInterval = setInterval(renderAdminChat, 1000);
+            if (!adminChatInterval) adminChatInterval = setInterval(renderAdminChat, 2000);
         }
 
         function stopChatPolling() {
@@ -614,6 +614,13 @@
             const date = new Date(ms);
             return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
+
+        // Listen for storage changes
+        window.addEventListener('storage', (e) => {
+            if (e.key === CHAT_STORAGE_KEY) {
+                renderAdminChat();
+            }
+        });
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
