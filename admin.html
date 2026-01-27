@@ -539,6 +539,7 @@
                                     <option value="USDT">
                                     <option value="Pubg UC">
                                     <option value="FreeFire Diamonds">
+                                    <option value="VPN">
                                 </datalist>
                             </div>
                             <div id="p2p-secret-box" class="hidden col-span-1 md:col-span-2">
@@ -1255,7 +1256,7 @@
         }
 
         function renderDeposits(trxs) {
-            const allPending = trxs.filter(t => (t.type === 'deposit' || t.type === 'p2p_trade' || t.type === 'p2p_buy' || t.type === 'p2p_buy_stars') && (t.status === 'pending' || t.status === 'hold'));
+            const allPending = trxs.filter(t => (t.type === 'deposit' || t.type === 'p2p_trade' || t.type === 'p2p_buy' || t.type === 'p2p_buy_stars' || t.type === 'p2p_buy_vpn') && (t.status === 'pending' || t.status === 'hold'));
 
             const pending = allPending.filter(t => t.status === 'pending');
             const held = allPending.filter(t => t.status === 'hold');
@@ -1286,10 +1287,18 @@
                             methodInfo = `<p class="uppercase text-xs font-bold text-blue-500">BUY: Stars</p><p class="text-[10px] text-slate-400 truncate max-w-[150px]">Link: ${t.targetLink}</p>`;
                             amountColor = 'text-blue-500';
                             amountPrefix = ''; // No plus since balance already deducted
-                        } else if (isP2PBuy) {
+                        } else if (isP2PBuy || t.type === 'p2p_buy_vpn') {
                             displayAmt = `${t.amount.toFixed(2)} BDT`;
-                            methodInfo = `<p class="uppercase text-xs font-bold text-blue-500">BUY: ${t.asset}</p><p class="text-[10px] text-slate-400 truncate max-w-[150px]">Link: ${t.targetLink || 'P2P'}</p>`;
-                            amountColor = 'text-blue-500';
+                            const isVpn = t.type === 'p2p_buy_vpn';
+                            methodInfo = `<p class="uppercase text-xs font-bold ${isVpn ? 'text-indigo-500' : 'text-blue-500'}">BUY: ${t.asset}</p>
+                            ${isVpn ? `
+                            <div class="text-[10px] text-slate-400 space-y-0.5 mt-1 border-t border-slate-100 pt-1">
+                                <p><strong>Name:</strong> ${t.vpnName || 'N/A'}</p>
+                                <p><strong>Email:</strong> ${t.vpnEmail || 'N/A'}</p>
+                                <p class="line-clamp-2"><strong>Desc:</strong> ${t.vpnDesc || 'N/A'}</p>
+                            </div>
+                            ` : `<p class="text-[10px] text-slate-400 truncate max-w-[150px]">Link: ${t.targetLink || 'P2P'}</p>`}`;
+                            amountColor = isVpn ? 'text-indigo-500' : 'text-blue-500';
                             amountPrefix = '';
                         }
 
@@ -1344,9 +1353,16 @@
                         } else if (isStarsBuy) {
                             displayAmt = `${t.amount.toFixed(2)} BDT (${t.quantity} Stars)`;
                             methodInfo = `<p class="uppercase text-xs font-bold text-blue-500">BUY: Stars</p><p class="text-[10px] text-slate-400 truncate max-w-[150px]">Link: ${t.targetLink}</p>`;
-                        } else if (isP2PBuy) {
+                        } else if (isP2PBuy || t.type === 'p2p_buy_vpn') {
                             displayAmt = `${t.amount.toFixed(2)} BDT`;
-                            methodInfo = `<p class="uppercase text-xs font-bold text-blue-500">BUY: ${t.asset}</p><p class="text-[10px] text-slate-400 truncate max-w-[150px]">Link: ${t.targetLink || 'P2P'}</p>`;
+                            const isVpn = t.type === 'p2p_buy_vpn';
+                            methodInfo = `<p class="uppercase text-xs font-bold ${isVpn ? 'text-indigo-500' : 'text-blue-500'}">BUY: ${t.asset}</p>
+                            ${isVpn ? `
+                            <div class="text-[10px] text-slate-400 space-y-0.5 mt-1">
+                                <p><strong>Name:</strong> ${t.vpnName || 'N/A'}</p>
+                                <p><strong>Email:</strong> ${t.vpnEmail || 'N/A'}</p>
+                            </div>
+                            ` : `<p class="text-[10px] text-slate-400 truncate max-w-[150px]">Link: ${t.targetLink || 'P2P'}</p>`}`;
                         }
 
                         return `
@@ -1456,7 +1472,7 @@
                 db.ref(`${TRX_NODE}/${trxId}`).update({ status: 'rejected' });
 
                 // IF it's a "Buy" request, we must REFUND the deducted amount
-                const isP2PBuy = trx.type === 'p2p_buy' || trx.type === 'p2p_buy_stars';
+                const isP2PBuy = trx.type === 'p2p_buy' || trx.type === 'p2p_buy_stars' || trx.type === 'p2p_buy_vpn';
                 if (isP2PBuy) {
                     db.ref(`${USERS_NODE}/${trx.userId}/balance`).transaction(bal => (bal || 0) + (trx.amount || 0));
                 }
@@ -1544,7 +1560,7 @@
                 db.ref(`${TRX_NODE}/${trxId}`).update({ status: 'rejected' });
 
                 const isSell = trx.type === 'deposit' || trx.type === 'p2p_trade';
-                const isBuy = trx.type === 'p2p_buy' || trx.type === 'p2p_buy_stars';
+                const isBuy = trx.type === 'p2p_buy' || trx.type === 'p2p_buy_stars' || trx.type === 'p2p_buy_vpn';
                 const amt = trx.type === 'p2p_trade' ? (trx.reward || 0) : (trx.amount || 0);
 
                 if (isSell) {

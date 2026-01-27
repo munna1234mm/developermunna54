@@ -980,6 +980,73 @@
             </div>
         </div>
 
+        <!-- Buy VPN Modal -->
+        <div id="buy-vpn-modal"
+            class="fixed inset-0 z-[9999] hidden flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
+            <div
+                class="bg-white dark:bg-[#1a282f] w-full max-w-sm rounded-t-2xl sm:rounded-2xl p-6 shadow-xl animate-slide-up space-y-4 max-h-[90vh] overflow-y-auto transition-all duration-300">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <span class="material-symbols-outlined text-indigo-500">vpn_lock</span>
+                        Buy VPN Service
+                    </h3>
+                    <button onclick="document.getElementById('buy-vpn-modal').classList.add('hidden')"
+                        class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div class="bg-indigo-50 dark:bg-indigo-900/20 p-3 rounded-lg flex items-center gap-3">
+                    <div
+                        class="size-8 rounded-full bg-indigo-100 dark:bg-indigo-800 flex items-center justify-center text-indigo-600 dark:text-indigo-300 font-bold">
+                        price</div>
+                    <div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Price</p>
+                        <p id="buy-vpn-rate" class="text-sm font-bold text-slate-900 dark:text-white">0.00 BDT</p>
+                    </div>
+                </div>
+
+                <div id="buy-vpn-rules-box"
+                    class="hidden bg-orange-50 dark:bg-orange-900/20 p-3 rounded-xl border border-orange-100 dark:border-orange-900/30">
+                    <p class="text-[10px] font-bold text-orange-600 dark:text-orange-400 uppercase mb-1">Service Rules
+                    </p>
+                    <p id="buy-vpn-rules-text" class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                    </p>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase ml-1">VPN
+                            Name</label>
+                        <input id="buy-vpn-name" type="text" placeholder="e.g. ExpressVPN, NordVPN"
+                            class="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 ring-primary/50 transition-all font-bold">
+                    </div>
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase ml-1">Contact
+                            Email</label>
+                        <input id="buy-vpn-email" type="email" placeholder="yourname@gmail.com"
+                            class="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 ring-primary/50 transition-all font-bold">
+                    </div>
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase ml-1">Order
+                            Details / Quantity</label>
+                        <textarea id="buy-vpn-desc" placeholder="e.g. I want 2 accounts for 1 month" rows="3"
+                            class="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 ring-primary/50 transition-all"></textarea>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button onclick="submitVPNOrder()"
+                        class="w-full py-3.5 bg-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                        Submit VPN Request
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- NID Verification Modal -->
         <div id="nid-modal"
             class="fixed inset-0 z-[9999] hidden flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
@@ -1805,6 +1872,46 @@
 
                     document.getElementById('buy-stars-modal').classList.remove('hidden');
                 }
+                else if (action === 'buy' && ad.asset === 'VPN') {
+                    // USER BUYS VPN
+                    activeStarsAd = ad;
+                    document.getElementById('buy-vpn-rate').textContent = `${parseFloat(ad.price).toFixed(2)} BDT`;
+                    document.getElementById('buy-vpn-name').value = '';
+                    document.getElementById('buy-vpn-email').value = '';
+                    document.getElementById('buy-vpn-desc').value = '';
+
+                    // Rules
+                    const rulesBox = document.getElementById('buy-vpn-rules-box');
+                    const rulesText = document.getElementById('buy-vpn-rules-text');
+                    if (ad.rules) {
+                        rulesBox.classList.remove('hidden');
+                        rulesText.textContent = ad.rules;
+                    } else {
+                        rulesBox.classList.add('hidden');
+                    }
+
+                    document.getElementById('buy-vpn-modal').classList.remove('hidden');
+                }
+                else if (action === 'buy' && ad.asset === 'VPN') {
+                    // USER BUYS VPN
+                    activeStarsAd = ad;
+                    document.getElementById('buy-vpn-rate').textContent = `${parseFloat(ad.price).toFixed(2)} BDT`;
+                    document.getElementById('buy-vpn-name').value = '';
+                    document.getElementById('buy-vpn-email').value = '';
+                    document.getElementById('buy-vpn-desc').value = '';
+
+                    // Rules
+                    const rulesBox = document.getElementById('buy-vpn-rules-box');
+                    const rulesText = document.getElementById('buy-vpn-rules-text');
+                    if (ad.rules) {
+                        rulesBox.classList.remove('hidden');
+                        rulesText.textContent = ad.rules;
+                    } else {
+                        rulesBox.classList.add('hidden');
+                    }
+
+                    document.getElementById('buy-vpn-modal').classList.remove('hidden');
+                }
                 else if (ad && ad.authType === 'credentials') {
                     // USER SELLS to Merchant (Submit Creds)
                     activeStarsAd = ad;
@@ -2127,6 +2234,54 @@
                     });
                 }).catch(err => {
                     tg.showAlert('Reference Error: ' + err.message);
+                });
+            }
+
+            function submitVPNOrder() {
+                const vpnName = document.getElementById('buy-vpn-name').value;
+                const vpnEmail = document.getElementById('buy-vpn-email').value;
+                const vpnDesc = document.getElementById('buy-vpn-desc').value;
+
+                if (!vpnName || !vpnEmail || !vpnDesc) {
+                    tg.showAlert('Please fill all fields!');
+                    return;
+                }
+
+                const price = parseFloat(activeStarsAd.price);
+                if ((currentUser.balance || 0) < price) {
+                    tg.showAlert(`Insufficient Balance! Need ${price.toFixed(2)} BDT.`);
+                    return;
+                }
+
+                if (!confirm(`Confirm VPN Purchase for ${price.toFixed(2)} BDT?\n\nBalance will be deducted.`)) return;
+
+                const newBal = (currentUser.balance || 0) - price;
+                db.ref(`${USERS_NODE}/${currentUser.id}`).update({ balance: newBal }).then(() => {
+                    const trxRef = db.ref(TRX_NODE).push();
+                    const trxData = {
+                        id: trxRef.key,
+                        userId: currentUser.id,
+                        userName: currentUser.name,
+                        type: 'p2p_buy_vpn',
+                        asset: 'VPN',
+                        amount: price,
+                        vpnName: vpnName,
+                        vpnEmail: vpnEmail,
+                        vpnDesc: vpnDesc,
+                        currency: 'BDT',
+                        method: 'Balance',
+                        status: 'pending',
+                        adId: activeStarsAd.id,
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    };
+
+                    trxRef.set(trxData).then(() => {
+                        tg.HapticFeedback.notificationOccurred('success');
+                        tg.showAlert('VPN Request Submitted! Admin will contact you via email.');
+                        document.getElementById('buy-vpn-modal').classList.add('hidden');
+                    });
+                }).catch(err => {
+                    tg.showAlert('Error: ' + err.message);
                 });
             }
 
