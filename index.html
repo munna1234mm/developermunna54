@@ -1401,37 +1401,58 @@
                 if (!container) return;
 
                 if (history.length === 0) {
-                    container.innerHTML = `<div class="flex flex-col items-center justify-center py-8 text-slate-400">
-                    <span class="material-symbols-outlined text-[32px] mb-2 opacity-50">history_toggle_off</span>
-                    <p class="text-sm">No recent transactions</p>
-                </div>`;
+                    container.innerHTML = `<div class="p-6 text-center text-slate-400 text-xs">No transactions yet</div>`;
                     return;
                 }
 
                 container.innerHTML = history.map(t => {
                     const isDeposit = t.type === 'deposit';
                     const isStars = t.type === 'p2p_trade';
-                    const isRefBonus = t.type === 'referral_bonus';
-                    const isApproved = t.status === 'approved';
+                    const isP2PBuy = t.type === 'p2p_buy';
+                    const isStarsBuy = t.type === 'p2p_buy_stars';
+                    const isRefBonus = t.type === 'ref_bonus';
                     const isRejected = t.status === 'rejected';
+                    const isApproved = t.status === 'approved';
 
-                    // For stars and referral bonus, it's like a deposit (user gets money)
-                    let colorClass = (isDeposit || isStars || isRefBonus) ? (isApproved ? 'text-green-500 bg-green-500/10' : 'text-yellow-500 bg-yellow-500/10') : 'text-red-500 bg-red-500/10';
-                    if (isRejected) colorClass = 'text-red-500 bg-red-500/10';
+                    let typeLabel = t.type ? t.type.replace('_', ' ') : 'Transaction';
+                    let displayAmount = t.amount;
+                    let colorClass = 'bg-slate-100 dark:bg-slate-800 text-slate-500';
+                    let icon = 'history';
 
-                    const displayAmount = isStars ? (t.reward || 0) : t.amount;
-                    let typeLabel = t.type;
-                    if (isStars) typeLabel = `Sell ${t.asset}`;
-                    if (isRefBonus) typeLabel = "Referral Bonus";
+                    if (isDeposit) {
+                        typeLabel = 'Deposit';
+                        colorClass = 'bg-primary/10 text-primary';
+                        icon = 'add_card';
+                    } else if (isRefBonus) {
+                        typeLabel = 'Referral Bonus';
+                        colorClass = 'bg-purple-500/10 text-purple-500';
+                        icon = 'redeem';
+                    } else if (isStars) { // User Selling
+                        typeLabel = `Sold ${t.asset || 'Item'}`;
+                        displayAmount = t.reward;
+                        colorClass = 'bg-green-500/10 text-green-500';
+                        icon = 'sell';
+                    } else if (isP2PBuy) { // User Buying (Credential/Item)
+                        typeLabel = `Bought ${t.asset || 'Item'}`;
+                        colorClass = 'bg-blue-500/10 text-blue-500';
+                        icon = 'shopping_bag';
+                    } else if (isStarsBuy) { // User Buying Stars
+                        typeLabel = `Bought ${t.quantity} Stars`;
+                        colorClass = 'bg-blue-500/10 text-blue-500';
+                        icon = 'stars';
+                    } else if (t.type === 'withdraw') {
+                        colorClass = 'bg-red-500/10 text-red-500';
+                        icon = 'payments';
+                    }
 
                     return `
                 <div class="flex items-center justify-between p-3 bg-white dark:bg-[#1a282f] rounded-xl border border-slate-100 dark:border-slate-800/50 shadow-sm animate-slide-up">
                     <div class="flex items-center gap-3">
                         <div class="size-10 rounded-full ${colorClass} flex items-center justify-center">
-                            <span class="material-symbols-outlined">${(isDeposit || isStars || isRefBonus) ? 'add_circle' : 'remove_circle'}</span>
+                            <span class="material-symbols-outlined">${icon}</span>
                         </div>
                         <div>
-                            <p class="text-sm font-bold text-slate-900 dark:text-white capitalize">${typeLabel} (${t.method || 'P2P'})</p>
+                            <p class="text-sm font-bold text-slate-900 dark:text-white capitalize">${typeLabel}</p>
                             <p class="text-[10px] text-slate-500 font-mono">${formatTime(t.timestamp)} • ${t.status}</p>
                         </div>
                     </div>
