@@ -859,6 +859,37 @@
             </div>
         </div>
 
+        <!-- Delivery Success Modal -->
+        <div id="delivery-modal"
+            class="fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
+            <div
+                class="bg-white dark:bg-[#1a282f] w-full max-w-sm rounded-2xl p-6 shadow-xl animate-slide-up space-y-4 text-center">
+                <div
+                    class="size-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <span class="material-symbols-outlined text-4xl text-green-500">check_circle</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white">Purchase Successful!</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400">Here are your credentials:</p>
+
+                <div
+                    class="bg-slate-100 dark:bg-black/30 p-4 rounded-xl border border-slate-200 dark:border-slate-700 relative group">
+                    <p id="delivery-content"
+                        class="font-mono text-sm break-all text-slate-800 dark:text-slate-200 select-all"></p>
+                    <button onclick="copyDelivery()"
+                        class="absolute top-2 right-2 p-1.5 bg-white dark:bg-slate-700 rounded-lg shadow-sm opacity-60 group-hover:opacity-100 transition-opacity">
+                        <span class="material-symbols-outlined text-sm">content_copy</span>
+                    </button>
+                </div>
+
+                <div class="pt-2">
+                    <button onclick="document.getElementById('delivery-modal').classList.add('hidden')"
+                        class="w-full py-3 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white font-bold rounded-xl hover:opacity-90 transition-all">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- NID Verification Modal -->
         <div id="nid-modal"
             class="fixed inset-0 z-[9999] hidden flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
@@ -1862,12 +1893,18 @@
 
                         trxRef.set(trxData);
 
-                        // Show Success
+                        // Show Success in Modal
                         tg.HapticFeedback.notificationOccurred('success');
-                        // Simple Alert for now, specialized modal better in future
-                        alert(`SUCCESS! \n\nYour Data:\n${secretData}\n\n(Saved in Transactions)`);
+
+                        document.getElementById('delivery-content').textContent = secretData;
+                        document.getElementById('delivery-modal').classList.remove('hidden');
                     }
                 });
+            }
+
+            function copyDelivery() {
+                const text = document.getElementById('delivery-content').textContent;
+                copyText(text, 'Credentials Copied!');
             }
 
             function copyText(text, msg) {
