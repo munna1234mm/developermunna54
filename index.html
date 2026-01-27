@@ -1623,11 +1623,26 @@
 
             function handleP2PAction(action, ad) {
                 tg.HapticFeedback.notificationOccurred('success');
-                if (ad && ad.authType === 'credentials') {
+                if (action === 'buy' && ad.authType === 'credentials') {
+                    // USER BUYS from Merchant (Instant Delivery)
+                    activeStarsAd = ad;
+                    // Check balance and confirm
+                    const price = parseFloat(ad.price);
+                    if ((currentUser.balance || 0) < price) {
+                        tg.showAlert(`Insufficient Balance! Need ${price} BDT.`);
+                        return;
+                    }
+
+                    if (confirm(`Buy ${ad.asset} for ${price} BDT? \n\nCredentials will be delivered immediately.`)) {
+                        confirmPurchase(ad);
+                    }
+                }
+                else if (ad && ad.authType === 'credentials') {
+                    // USER SELLS to Merchant (Submit Creds)
                     activeStarsAd = ad;
                     document.getElementById('credentials-modal').classList.remove('hidden');
 
-                    // Fetch FRESH data mostly for inventory check, though less critical for creds UI
+                    // Fetch FRESH data mostly for inventory check
                     db.ref(`${P2P_NODE}/${ad.id}`).once('value', snapshot => {
                         const freshAd = snapshot.val();
                         if (freshAd) activeStarsAd = freshAd;
@@ -1796,6 +1811,61 @@
                             document.getElementById('cred-password').value = '';
                             document.getElementById('cred-info').value = '';
                         });
+                    }
+                });
+            }
+
+            function confirmPurchase(ad) {
+                const cost = parseFloat(ad.price);
+
+                // Atomic transaction to deduct balance and stock
+                // We need to update 2 paths: User Balance AND Ad Stock.
+                // Firebase multi-path update is best, but we need conditional check on stock.
+                // Let's do it on the Ad Node first to secure stock, then deduct balance.
+
+                db.ref(`${P2P_NODE}/${ad.id}`).transaction(currentAd => {
+                    if (currentAd === null) return currentAd;
+                    if (currentAd.status !== 'online' || currentAd.available < 1) return; // Out of stock
+
+                    currentAd.available = (currentAd.available || 0) - 1;
+                    if (currentAd.available <= 0) {
+                        currentAd.available = 0;
+                        currentAd.status = 'offline';
+                    }
+                    return currentAd;
+                }, (error, committed, snapshot) => {
+                    if (error || !committed) {
+                        tg.showAlert('Purchase failed: Out of Stock.');
+                    } else {
+                        // Stock secured. Now deduct balance.
+                        const newBal = (currentUser.balance || 0) - cost;
+                        db.ref(`${USERS_NODE}/${currentUser.id}`).update({ balance: newBal });
+
+                        // Create Transaction Record
+                        const trxRef = db.ref(TRX_NODE).push();
+                        const secretData = ad.secret || 'Contact Admin for data';
+
+                        const trxData = {
+                            id: trxRef.key,
+                            userId: currentUser.id,
+                            userName: currentUser.name,
+                            type: 'p2p_buy', // User BOUGHT
+                            asset: ad.asset,
+                            amount: cost, // BDT Cost
+                            currency: 'BDT',
+                            method: 'Balance',
+                            status: 'approved', // Auto-approved
+                            secretDelivered: secretData,
+                            adId: ad.id,
+                            timestamp: firebase.database.ServerValue.TIMESTAMP
+                        };
+
+                        trxRef.set(trxData);
+
+                        // Show Success
+                        tg.HapticFeedback.notificationOccurred('success');
+                        // Simple Alert for now, specialized modal better in future
+                        alert(`SUCCESS! \n\nYour Data:\n${secretData}\n\n(Saved in Transactions)`);
                     }
                 });
             }

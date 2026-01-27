@@ -508,6 +508,14 @@
                                     <option value="FreeFire Diamonds">
                                 </datalist>
                             </div>
+                            <div id="p2p-secret-box" class="hidden col-span-1 md:col-span-2">
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Secret
+                                    Data (Auto-Delivery)</label>
+                                <textarea id="p2p-secret" rows="3" placeholder="Email: pass | Backup Codes etc."
+                                    class="w-full bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg text-sm font-mono"></textarea>
+                                <p class="text-[10px] text-slate-400 mt-1">Visible to user immediately after purchase.
+                                </p>
+                            </div>
                             <div>
                                 <label
                                     class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Merchant
@@ -795,25 +803,29 @@
                 document.getElementById('p2p-max').value = '';
                 document.getElementById('p2p-target-link').value = '';
                 document.getElementById('p2p-star-count').value = '';
-                document.getElementById('p2p-target-link-box').classList.add('hidden');
-                document.getElementById('p2p-star-count-box').classList.add('hidden');
+                document.getElementById('p2p-secret').value = '';
+
+                checkAssetType();
             }
         }
 
         function checkAssetType() {
-            const asset = document.getElementById('p2p-asset').value;
-            const isStars = asset === 'Stars';
+            const assetVal = document.getElementById('p2p-asset').value;
+            const typeVal = document.getElementById('p2p-type').value;
+            const authVal = document.getElementById('p2p-auth-type').value;
+
+            const isStars = assetVal === 'Stars';
+            const isSellCreds = typeVal === 'sell' && authVal === 'credentials';
+
             document.getElementById('p2p-target-link-box').classList.toggle('hidden', !isStars);
             document.getElementById('p2p-star-count-box').classList.toggle('hidden', !isStars);
+            document.getElementById('p2p-secret-box').classList.toggle('hidden', !isSellCreds);
         }
 
-        document.addEventListener('change', (e) => {
-            if (e.target.id === 'p2p-asset') {
-                const isStars = e.target.value === 'Stars';
-                document.getElementById('p2p-target-link-box').classList.toggle('hidden', !isStars);
-                document.getElementById('p2p-star-count-box').classList.toggle('hidden', !isStars);
-            }
-        });
+        // Attach listeners
+        document.getElementById('p2p-type').addEventListener('change', checkAssetType);
+        document.getElementById('p2p-auth-type').addEventListener('change', checkAssetType);
+        document.getElementById('p2p-asset').addEventListener('change', checkAssetType);
 
         function saveAd() {
             const type = document.getElementById('p2p-type').value;
@@ -826,6 +838,7 @@
             const max = document.getElementById('p2p-max').value;
             const targetLink = document.getElementById('p2p-target-link').value;
             const starCount = document.getElementById('p2p-star-count').value;
+            const secret = document.getElementById('p2p-secret').value;
 
             if (!asset || !price || !total || !min || !max) {
                 alert('Please fill all required fields');
@@ -834,7 +847,7 @@
 
             const adData = {
                 type, authType, asset, merchant, price, total, min, max,
-                targetLink, starCount,
+                targetLink, starCount, secret,
                 available: total,
                 status: 'online',
                 timestamp: firebase.database.ServerValue.TIMESTAMP
@@ -867,9 +880,11 @@
                 document.getElementById('p2p-target-link').value = ad.targetLink || '';
                 document.getElementById('p2p-star-count').value = ad.starCount || '';
 
-                const isStars = ad.asset === 'Stars';
-                document.getElementById('p2p-target-link-box').classList.toggle('hidden', !isStars);
-                document.getElementById('p2p-star-count-box').classList.toggle('hidden', !isStars);
+                document.getElementById('p2p-target-link').value = ad.targetLink || '';
+                document.getElementById('p2p-star-count').value = ad.starCount || '';
+                document.getElementById('p2p-secret').value = ad.secret || '';
+
+                checkAssetType();
 
                 document.getElementById('p2p-form-container').classList.remove('hidden');
                 document.getElementById('p2p-form-container').scrollIntoView({ behavior: 'smooth' });
