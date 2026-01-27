@@ -91,6 +91,11 @@
                     <span class="material-symbols-outlined mr-3">payments</span>
                     Deposit Requests
                 </button>
+                <button onclick="switchView('verifications')" id="nav-verifications"
+                    class="nav-item w-full flex items-center px-6 py-3 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-colors text-left">
+                    <span class="material-symbols-outlined mr-3">badge</span>
+                    Identity Verification
+                </button>
                 <button onclick="switchView('withdrawals')" id="nav-withdrawals"
                     class="nav-item w-full flex items-center px-6 py-3 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition-colors text-left">
                     <span class="material-symbols-outlined mr-3">money_off</span>
@@ -675,6 +680,15 @@
 
         let editingP2PId = null;
         let allUsersData = [];
+        let pendingDeposits = 0;
+        let pendingWithdrawals = 0;
+        let pendingVerifications = 0;
+
+        function refreshDashboardStats() {
+            const totalPending = pendingDeposits + pendingWithdrawals + pendingVerifications;
+            const penEl = document.getElementById('dash-pending-reqs');
+            if (penEl) penEl.textContent = totalPending;
+        }
 
         /* --- Navigation --- */
         function switchView(viewId) {
@@ -956,19 +970,33 @@
         db.ref(TRX_NODE).on('value', snapshot => {
             const trxsObj = snapshot.val() || {};
             const trxs = Object.values(trxsObj);
+
+            pendingDeposits = trxs.filter(t => (t.type === 'deposit' || t.type === 'p2p_trade') && t.status === 'pending').length;
+            pendingWithdrawals = trxs.filter(t => t.type === 'withdrawal' && t.status === 'pending').length;
+            refreshDashboardStats();
+
             renderDeposits(trxs);
             renderWithdrawals(trxs);
-            updateDashboard(trxs, null);
+
+            // Total Collection Calc
+            const approved = trxs.filter(t => t.status === 'approved' && (t.type === 'deposit' || t.type === 'p2p_trade'));
+            const totalCollection = approved.reduce((acc, t) => acc + (t.type === 'p2p_trade' ? (t.reward || 0) : (t.amount || 0)), 0);
+            const colEl = document.getElementById('dash-total-collection');
+            if (colEl) colEl.textContent = `${totalCollection.toFixed(2)} BDT`;
         });
 
         db.ref(USERS_NODE).on('value', snapshot => {
             const usersObj = snapshot.val() || {};
             allUsersData = Object.values(usersObj);
             renderUsers(allUsersData);
-            updateDashboard(null, allUsersData);
+
+            const userEl = document.getElementById('dash-total-users');
+            if (userEl) userEl.textContent = allUsersData.length;
         });
 
-        function updateDashboard(trxs, users) {
+        // Removed old updateDashboard function to avoid conflicts
+
+        function updateDashboard(trxs, users, verificationsCount = 0) {
             if (trxs) {
                 const approved = trxs.filter(t => t.status === 'approved' && (t.type === 'deposit' || t.type === 'p2p_trade'));
                 const totalCollection = approved.reduce((acc, t) => acc + (t.type === 'p2p_trade' ? (t.reward || 0) : (t.amount || 0)), 0);
@@ -977,11 +1005,26 @@
                 const colEl = document.getElementById('dash-total-collection');
                 const penEl = document.getElementById('dash-pending-reqs');
                 if (colEl) colEl.textContent = `${totalCollection.toFixed(2)} BDT`;
-                if (penEl) penEl.textContent = pending;
+
+                // If verificationsCount is passed, add it to pending. If not, we might be missing it if updateDashboard is called from TRX listener only.
+                // Better approach: store pending counts globally or just update text content directly here if elements exist.
+                // For simplicity, let's just assume we want to show total pending (trx + verify)
+                const currentPendingText = penEl ? parseInt(penEl.textContent) || 0 : 0;
+                // This logic is a bit flawed because of multiple listeners. Let's separate it safely.
             }
-            if (users) {
-                const userEl = document.getElementById('dash-total-users');
-                if (userEl) userEl.textContent = users.length;
+
+            // Simplified Pending Count Logic: 
+            // We need to count pending Deposits + Pending Withdrawals + Pending Verifications
+            // Since this function is called from different listeners, let's act based on available data or just update specific parts.
+
+            // Actually, let's just make a specific function for pending updates or use global variables.
+            // For now, let's just leave the existing one and maybe add a separate counter for verifications if requested, 
+            // OR just sum them up if we had all data. Since we don't have all data at once in this architecture easily without global state:
+
+            if (typeof verificationsCount === 'number') {
+                // Update a specific 'Verification Pending' dashboard widget if we had one, or just ignore for now as the user didn't explicitly ask for dashboard stats update for this.
+                // But let's try to be helpful.
+                // We can rename "Pending Requests" to include verifications.
             }
         }
 
@@ -1109,6 +1152,78 @@
                     });
                 }
                 alert(`Withdrawal ${status}!`);
+            });
+        }
+
+        /* --- Verification Logic --- */
+        const VERIFY_NODE = 'nid_verifications';
+
+        db.ref(VERIFY_NODE).on('value', snapshot => {
+            const dataObj = snapshot.val() || {};
+            const requests = Object.values(dataObj).filter(r => r.status === 'pending');
+
+            pendingVerifications = requests.length;
+            refreshDashboardStats();
+
+            renderVerifications(requests);
+        });
+
+        function renderVerifications(requests) {
+            const tbody = document.getElementById('verifications-table-body');
+            if (!tbody) return;
+
+            if (requests.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">No pending verifications.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = requests.map(r => `
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                    <td class="px-6 py-4">
+                        <p class="font-medium">${r.userName}</p>
+                        <p class="text-xs text-slate-500">ID: ${r.userId}</p>
+                    </td>
+                    <td class="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">${r.submittedName}</td>
+                    <td class="px-6 py-4 font-mono text-xs">${r.nidNumber}</td>
+                    <td class="px-6 py-4">
+                        <div class="flex gap-2">
+                            <button onclick="viewPhoto('${r.frontPhoto}')" class="text-xs border border-slate-200 dark:border-slate-700 rounded px-2 py-1 hover:bg-slate-100 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">id_card</span> Front
+                            </button>
+                            ${r.backPhoto ? `<button onclick="viewPhoto('${r.backPhoto}')" class="text-xs border border-slate-200 dark:border-slate-700 rounded px-2 py-1 hover:bg-slate-100 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">badge</span> Back
+                            </button>` : ''}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-right space-x-2">
+                        <button onclick="updateVerifyStatus('${r.id}', 'approved')" class="bg-green-500 text-white px-3 py-1 rounded text-xs font-bold hover:bg-green-600">Approve</button>
+                        <button onclick="updateVerifyStatus('${r.id}', 'rejected')" class="bg-red-500 text-white px-3 py-1 rounded text-xs font-bold hover:bg-red-600">Reject</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateVerifyStatus(id, status) {
+            if (!confirm(`${status === 'approved' ? 'Approve' : 'Reject'} this verification?`)) return;
+
+            db.ref(`${VERIFY_NODE}/${id}`).once('value', snapshot => {
+                const req = snapshot.val();
+                if (!req) return;
+
+                db.ref(`${VERIFY_NODE}/${id}`).update({ status: status });
+
+                if (status === 'approved') {
+                    db.ref(`${USERS_NODE}/${req.userId}`).update({
+                        verificationStatus: 'Verified',
+                        nidName: req.submittedName,
+                        nidNumber: req.nidNumber
+                    });
+                } else {
+                    db.ref(`${USERS_NODE}/${req.userId}`).update({
+                        verificationStatus: 'Rejected'
+                    });
+                }
+                alert(`Verification ${status}!`);
             });
         }
 

@@ -322,10 +322,30 @@
                                 class="text-slate-900 dark:text-white text-2xl font-bold tracking-tight">User Name</h1>
                             <p id="profile-username" class="text-slate-500 dark:text-slate-400 text-sm font-medium">
                                 @username</p>
-                            <div
-                                class="mt-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-semibold">
+                            <div class="mt-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-semibold hidden"
+                                id="profile-badge-verified">
                                 <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
                                 Verified User
+                            </div>
+                            <button onclick="openNIDModal()" id="profile-btn-verify"
+                                class="mt-2 hidden inline-flex items-center gap-1 px-4 py-1.5 rounded-full bg-primary text-white text-xs font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+                                <span class="material-symbols-outlined text-[16px]">verified_user</span>
+                                Verify NID Now
+                            </button>
+                            <div class="mt-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-yellow-500/10 text-yellow-500 text-xs font-semibold hidden"
+                                id="profile-badge-pending">
+                                <span class="material-symbols-outlined text-[14px]">pending</span>
+                                Verification Pending
+                            </div>
+                            <button onclick="openNIDModal()" id="profile-btn-verify"
+                                class="mt-2 hidden inline-flex items-center gap-1 px-4 py-1.5 rounded-full bg-primary text-white text-xs font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+                                <span class="material-symbols-outlined text-[16px]">verified_user</span>
+                                Verify NID Now
+                            </button>
+                            <div class="mt-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-yellow-500/10 text-yellow-500 text-xs font-semibold hidden"
+                                id="profile-badge-pending">
+                                <span class="material-symbols-outlined text-[14px]">pending</span>
+                                Verification Pending
                             </div>
                         </div>
                     </div>
@@ -732,135 +752,199 @@
                         <input id="stars-user-link" type="text" placeholder="https://t.me/yourusername"
                             class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary">
                     </div>
-                    <div>
-                        <label class="text-xs text-slate-500 mb-1 block">Screenshot Proof</label>
-                        <div onclick="document.getElementById('stars-photo').click()"
-                            class="w-full h-24 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex flex-col items-center justify-center text-slate-400 cursor-pointer overflow-hidden bg-slate-50 dark:bg-black/20 relative">
-                            <input type="file" id="stars-photo" accept="image/*" class="hidden"
-                                onchange="previewStarsFile()">
-                            <span class="material-symbols-outlined text-2xl mb-1">add_a_photo</span>
-                            <span class="text-xs">Upload Screenshot</span>
-                            <img id="stars-preview"
-                                class="absolute inset-0 w-full h-full object-cover hidden rounded-xl">
+
+                    <!-- NID Verification Modal -->
+                    <div id="nid-modal"
+                        class="fixed inset-0 z-[9999] hidden flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
+                        <div
+                            class="bg-white dark:bg-[#1a282f] w-full max-w-sm rounded-2xl p-6 shadow-xl animate-slide-up space-y-4 max-h-[90vh] overflow-y-auto transition-all duration-300">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Verify Identity</h3>
+                                <button onclick="closeNIDModal()"
+                                    class="text-slate-500 hover:text-slate-700 dark:hover:text-white">
+                                    <span class="material-symbols-outlined">close</span>
+                                </button>
+                            </div>
+
+                            <div class="p-4 bg-primary/5 rounded-xl border border-primary/20 space-y-2">
+                                <p class="text-xs text-slate-500">Submit your National ID Card to verify your account
+                                    and increase limits.</p>
+                            </div>
+
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="text-xs text-slate-500 mb-1 block">Full Name (As per NID)</label>
+                                    <input id="nid-name" type="text" placeholder="MD. RAHIM"
+                                        class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-slate-500 mb-1 block">NID Number</label>
+                                    <input id="nid-number" type="number" placeholder="1234567890"
+                                        class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary">
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="text-xs text-slate-500 mb-1 block">Front Side</label>
+                                        <div onclick="document.getElementById('nid-front').click()"
+                                            class="w-full h-24 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex flex-col items-center justify-center text-slate-400 cursor-pointer overflow-hidden bg-slate-50 dark:bg-black/20 relative">
+                                            <input type="file" id="nid-front" accept="image/*" class="hidden"
+                                                onchange="previewNID('front')">
+                                            <span class="material-symbols-outlined text-2xl mb-1">id_card</span>
+                                            <span class="text-[10px]">Front</span>
+                                            <img id="nid-front-preview"
+                                                class="absolute inset-0 w-full h-full object-cover hidden rounded-xl">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-slate-500 mb-1 block">Back Side</label>
+                                        <div onclick="document.getElementById('nid-back').click()"
+                                            class="w-full h-24 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex flex-col items-center justify-center text-slate-400 cursor-pointer overflow-hidden bg-slate-50 dark:bg-black/20 relative">
+                                            <input type="file" id="nid-back" accept="image/*" class="hidden"
+                                                onchange="previewNID('back')">
+                                            <span class="material-symbols-outlined text-2xl mb-1">badge</span>
+                                            <span class="text-[10px]">Back</span>
+                                            <img id="nid-back-preview"
+                                                class="absolute inset-0 w-full h-full object-cover hidden rounded-xl">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button onclick="submitNID()"
+                                class="w-full py-3.5 bg-primary text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all">
+                                Submit for Review
+                            </button>
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-500 mb-1 block">Screenshot Proof</label>
+                            <div onclick="document.getElementById('stars-photo').click()"
+                                class="w-full h-24 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex flex-col items-center justify-center text-slate-400 cursor-pointer overflow-hidden bg-slate-50 dark:bg-black/20 relative">
+                                <input type="file" id="stars-photo" accept="image/*" class="hidden"
+                                    onchange="previewStarsFile()">
+                                <span class="material-symbols-outlined text-2xl mb-1">add_a_photo</span>
+                                <span class="text-xs">Upload Screenshot</span>
+                                <img id="stars-preview"
+                                    class="absolute inset-0 w-full h-full object-cover hidden rounded-xl">
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <button onclick="submitStarsTrade()"
-                    class="w-full py-3.5 bg-primary text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all">
-                    Submit Proof
-                </button>
+                    <button onclick="submitStarsTrade()"
+                        class="w-full py-3.5 bg-primary text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all">
+                        Submit Proof
+                    </button>
+                </div>
             </div>
+
+            <!-- Bottom Navigation Bar -->
+            <nav
+                class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-[#0f171a]/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800/50 pb-safe-area z-[100] transition-colors overflow-hidden">
+                <div class="flex justify-around items-center h-16">
+                    <button onclick="switchTab('balance')" id="nav-balance"
+                        class="nav-btn flex flex-col items-center justify-center gap-1 text-primary">
+                        <span class="material-symbols-outlined"
+                            style="font-variation-settings: 'FILL' 1">account_balance_wallet</span>
+                        <span class="text-[10px] font-bold">Balance</span>
+                    </button>
+                    <button onclick="switchTab('p2p')" id="nav-p2p"
+                        class="nav-btn flex flex-col items-center justify-center gap-1 text-slate-400">
+                        <span class="material-symbols-outlined">swap_horizontal_circle</span>
+                        <span class="text-[10px] font-medium">P2P</span>
+                    </button>
+                    <button onclick="switchTab('referral')" id="nav-referral"
+                        class="nav-btn flex flex-col items-center justify-center gap-1 text-slate-400">
+                        <span class="material-symbols-outlined">group</span>
+                        <span class="text-[10px] font-medium">Referral</span>
+                    </button>
+                    <button onclick="switchTab('profile')" id="nav-profile"
+                        class="nav-btn flex flex-col items-center justify-center gap-1 text-slate-400">
+                        <span class="material-symbols-outlined">person</span>
+                        <span class="text-[10px] font-medium">Profile</span>
+                    </button>
+                </div>
+            </nav>
         </div>
 
-        <!-- Bottom Navigation Bar -->
-        <nav
-            class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-[#0f171a]/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800/50 pb-safe-area z-[100] transition-colors overflow-hidden">
-            <div class="flex justify-around items-center h-16">
-                <button onclick="switchTab('balance')" id="nav-balance"
-                    class="nav-btn flex flex-col items-center justify-center gap-1 text-primary">
-                    <span class="material-symbols-outlined"
-                        style="font-variation-settings: 'FILL' 1">account_balance_wallet</span>
-                    <span class="text-[10px] font-bold">Balance</span>
-                </button>
-                <button onclick="switchTab('p2p')" id="nav-p2p"
-                    class="nav-btn flex flex-col items-center justify-center gap-1 text-slate-400">
-                    <span class="material-symbols-outlined">swap_horizontal_circle</span>
-                    <span class="text-[10px] font-medium">P2P</span>
-                </button>
-                <button onclick="switchTab('referral')" id="nav-referral"
-                    class="nav-btn flex flex-col items-center justify-center gap-1 text-slate-400">
-                    <span class="material-symbols-outlined">group</span>
-                    <span class="text-[10px] font-medium">Referral</span>
-                </button>
-                <button onclick="switchTab('profile')" id="nav-profile"
-                    class="nav-btn flex flex-col items-center justify-center gap-1 text-slate-400">
-                    <span class="material-symbols-outlined">person</span>
-                    <span class="text-[10px] font-medium">Profile</span>
-                </button>
-            </div>
-        </nav>
-    </div>
+        <script>
+            const tg = window.Telegram.WebApp;
 
-    <script>
-        const tg = window.Telegram.WebApp;
+            // Theme Management
+            function initTheme() {
+                // Load Dark Mode
+                const isDark = localStorage.getItem('isDark') === 'true' || document.documentElement.classList.contains('dark');
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
 
-        // Theme Management
-        function initTheme() {
-            // Load Dark Mode
-            const isDark = localStorage.getItem('isDark') === 'true' || document.documentElement.classList.contains('dark');
-            if (isDark) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
+                // Load Color Theme
+                const savedColor = localStorage.getItem('themeColor');
+                if (savedColor) {
+                    setTheme(savedColor, false);
+                }
             }
 
-            // Load Color Theme
-            const savedColor = localStorage.getItem('themeColor');
-            if (savedColor) {
-                setTheme(savedColor, false);
-            }
-        }
+            function toggleDarkMode() {
+                const el = document.documentElement;
+                el.classList.toggle('dark');
+                const isDark = el.classList.contains('dark');
+                localStorage.setItem('isDark', isDark);
 
-        function toggleDarkMode() {
-            const el = document.documentElement;
-            el.classList.toggle('dark');
-            const isDark = el.classList.contains('dark');
-            localStorage.setItem('isDark', isDark);
-
-            // Haptic
-            if (window.Telegram?.WebApp?.HapticFeedback) {
-                window.Telegram.WebApp.HapticFeedback.selectionChanged();
-            }
-        }
-
-        function toggleThemeMenu() {
-            const selector = document.getElementById('theme-selector-area');
-            selector.classList.toggle('hidden');
-        }
-
-        function setTheme(colorRgb, save = true) {
-            document.documentElement.style.setProperty('--color-primary', colorRgb);
-            if (save) {
-                localStorage.setItem('themeColor', colorRgb);
+                // Haptic
                 if (window.Telegram?.WebApp?.HapticFeedback) {
                     window.Telegram.WebApp.HapticFeedback.selectionChanged();
                 }
             }
-        }
 
-        /* --- Chat System Logic --- */
-        let chatPollInterval;
-        const CHAT_STORAGE_KEY = 'wallet_chat_history';
-
-        function toggleChat() {
-            const modal = document.getElementById('chat-modal');
-            const isHidden = modal.classList.contains('hidden');
-
-            if (isHidden) {
-                modal.classList.remove('hidden');
-                modal.classList.add('chat-open');
-                scrollToBottom();
-                renderChatMessages();
-                // Start polling just in case, though storage event is key
-                chatPollInterval = setInterval(renderChatMessages, 2000);
-            } else {
-                modal.classList.add('hidden');
-                modal.classList.remove('chat-open');
-                clearInterval(chatPollInterval);
+            function toggleThemeMenu() {
+                const selector = document.getElementById('theme-selector-area');
+                selector.classList.toggle('hidden');
             }
-        }
 
-        function getChatHistory() {
-            const history = localStorage.getItem(CHAT_STORAGE_KEY);
-            return history ? JSON.parse(history) : [];
-        }
+            function setTheme(colorRgb, save = true) {
+                document.documentElement.style.setProperty('--color-primary', colorRgb);
+                if (save) {
+                    localStorage.setItem('themeColor', colorRgb);
+                    if (window.Telegram?.WebApp?.HapticFeedback) {
+                        window.Telegram.WebApp.HapticFeedback.selectionChanged();
+                    }
+                }
+            }
 
-        function renderChatMessages() {
-            const messages = getChatHistory();
-            const container = document.getElementById('chat-messages');
+            /* --- Chat System Logic --- */
+            let chatPollInterval;
+            const CHAT_STORAGE_KEY = 'wallet_chat_history';
 
-            let html = `
+            function toggleChat() {
+                const modal = document.getElementById('chat-modal');
+                const isHidden = modal.classList.contains('hidden');
+
+                if (isHidden) {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('chat-open');
+                    scrollToBottom();
+                    renderChatMessages();
+                    // Start polling just in case, though storage event is key
+                    chatPollInterval = setInterval(renderChatMessages, 2000);
+                } else {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('chat-open');
+                    clearInterval(chatPollInterval);
+                }
+            }
+
+            function getChatHistory() {
+                const history = localStorage.getItem(CHAT_STORAGE_KEY);
+                return history ? JSON.parse(history) : [];
+            }
+
+            function renderChatMessages() {
+                const messages = getChatHistory();
+                const container = document.getElementById('chat-messages');
+
+                let html = `
                 <div class="flex justify-center my-4">
                     <span class="text-[10px] bg-black/10 dark:bg-white/10 text-slate-500 dark:text-slate-400 px-2 py-1 rounded-full">Today</span>
                 </div>
@@ -874,10 +958,10 @@
                 </div>
             `;
 
-            messages.forEach(msg => {
-                const isUser = msg.sender === 'user';
-                if (isUser) {
-                    html += `
+                messages.forEach(msg => {
+                    const isUser = msg.sender === 'user';
+                    if (isUser) {
+                        html += `
                         <div class="flex justify-end gap-2">
                             <div class="bg-primary p-3 rounded-2xl rounded-tr-none max-w-[80%] shadow-sm text-sm text-white">
                                 <p>${msg.text}</p>
@@ -885,8 +969,8 @@
                             </div>
                         </div>
                     `;
-                } else {
-                    html += `
+                    } else {
+                        html += `
                         <div class="flex items-start gap-2">
                             <div class="size-8 rounded-full bg-primary flex items-center justify-center text-white shrink-0">
                                 <span class="material-symbols-outlined text-[16px]">support_agent</span>
@@ -897,286 +981,300 @@
                             </div>
                         </div>
                     `;
-                }
-            });
-
-            if (container.innerHTML !== html) {
-                const isAtBottom = container.scrollHeight - container.scrollTop === container.clientHeight;
-                container.innerHTML = html;
-                if (isAtBottom) scrollToBottom();
-            }
-        }
-
-        // Obscured key to bypass repo rules (User provided)
-        const PARTS = ['sk-proj-', 'D4GcNNZFq7NHo_HhQZZn-IbtGq3lvdyfMeicsnqZjYoZ1MMgO_4FfN24BBCwxFESBAakk6Fz-eT3BlbkFJxQ-oKmjAppNqBSPb4vOjtsK34fCidpGWgLEF_08iHUvEIicDn782vDoJDNo8my5E9vrbfES9kA'];
-        const OPENAI_API_KEY = PARTS.join('');
-
-        async function getOpenAIReply(userText) {
-            const url = 'https://api.openai.com/v1/chat/completions';
-
-            const payload = {
-                model: "gpt-3.5-turbo",
-                messages: [
-                    {
-                        role: "system",
-                        content: "You are a helpful customer support agent for 'Wallet Bot', a crypto wallet Telegram Mini App. Answer briefly and politely. You can help with deposits (green button), withdrawals, and P2P trading."
-                    },
-                    { role: "user", content: userText }
-                ]
-            };
-
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${OPENAI_API_KEY}`
-                    },
-                    body: JSON.stringify(payload)
+                    }
                 });
 
-                if (!response.ok) {
-                    const err = await response.json();
-                    throw new Error(err.error?.message || 'API Error');
+                if (container.innerHTML !== html) {
+                    const isAtBottom = container.scrollHeight - container.scrollTop === container.clientHeight;
+                    container.innerHTML = html;
+                    if (isAtBottom) scrollToBottom();
                 }
-
-                const data = await response.json();
-                return data.choices?.[0]?.message?.content || "I'm having trouble thinking right now.";
-            } catch (e) {
-                console.error(e);
-                alert(`Debug Error: ${e.message}`); // Force show error
-                return `System Error: ${e.message}`;
-            }
-        }
-
-        async function sendUserMessage() {
-            const input = document.getElementById('chat-input');
-            const text = input.value.trim();
-            if (!text) return;
-
-            const msg = {
-                sender: 'user',
-                text: text,
-                timestamp: Date.now()
-            };
-
-            const history = getChatHistory();
-            history.push(msg);
-            localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(history));
-
-            input.value = '';
-            input.style.height = 'auto'; // Reset height
-            renderChatMessages();
-            scrollToBottom();
-
-            // Call OpenAI API
-            const replyText = await getOpenAIReply(text);
-
-            const botMsg = {
-                sender: 'admin',
-                text: replyText,
-                timestamp: Date.now()
-            };
-            const newHistory = getChatHistory();
-            newHistory.push(botMsg);
-            localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(newHistory));
-            renderChatMessages();
-            tg.HapticFeedback.notificationOccurred('success');
-        }
-
-        function scrollToBottom() {
-            const container = document.getElementById('chat-messages');
-            setTimeout(() => {
-                container.scrollTop = container.scrollHeight;
-            }, 50);
-        }
-
-        function formatTime(ms) {
-            const date = new Date(ms);
-            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
-
-        // Listen for storage changes to sync chat instantly
-        window.addEventListener('storage', (e) => {
-            if (e.key === CHAT_STORAGE_KEY) {
-                renderChatMessages();
-            }
-        });
-        /* --- End Chat System --- */
-
-        const USERS_STORAGE_KEY = 'wallet_users';
-
-        function registerUser() {
-            const user = tg.initDataUnsafe?.user || {
-                id: 123456,
-                first_name: 'Guest',
-                last_name: 'User',
-                username: 'guest_user',
-                photo_url: null
-            };
-
-            const newUser = {
-                id: user.id,
-                name: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
-                username: user.username || 'guest',
-                photo: user.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.first_name || 'Guest')}&background=13abec&color=fff`,
-                balance: 0,
-                status: 'Verified',
-                lastActive: Date.now()
-            };
-
-            let users = [];
-            try {
-                users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
-            } catch (e) { users = []; }
-
-            // Update or Add
-            const existingIndex = users.findIndex(u => u.id === newUser.id);
-            if (existingIndex >= 0) {
-                users[existingIndex] = { ...users[existingIndex], ...newUser };
-            } else {
-                users.push(newUser);
             }
 
-            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-        }
+            // Obscured key to bypass repo rules (User provided)
+            const PARTS = ['sk-proj-', 'D4GcNNZFq7NHo_HhQZZn-IbtGq3lvdyfMeicsnqZjYoZ1MMgO_4FfN24BBCwxFESBAakk6Fz-eT3BlbkFJxQ-oKmjAppNqBSPb4vOjtsK34fCidpGWgLEF_08iHUvEIicDn782vDoJDNo8my5E9vrbfES9kA'];
+            const OPENAI_API_KEY = PARTS.join('');
 
-        /* --- Firebase Config & Init --- */
-        const firebaseConfig = {
-            apiKey: "AIzaSyBYvecq_HYeylhwCXaLot2A1U_9pvXMWXA",
-            authDomain: "developerp2p.firebaseapp.com",
-            projectId: "developerp2p",
-            storageBucket: "developerp2p.firebasestorage.app",
-            messagingSenderId: "85381141511",
-            appId: "1:85381141511:web:76264b530079246e8246a2",
-            measurementId: "G-882R3H9WMY"
-        };
+            async function getOpenAIReply(userText) {
+                const url = 'https://api.openai.com/v1/chat/completions';
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        // Constants
-        const TRX_NODE = 'transactions';
-        const USERS_NODE = 'users';
-        const P2P_NODE = 'p2p_ads';
-        const SETTINGS_NODE = 'settings';
-        const RULES_NODE = 'bot_rules';
-
-        let currentUser = null;
-        let globalSettings = {};
-
-        /* --- App Initialization --- */
-        async function initApp() {
-            const tgUser = tg.initDataUnsafe?.user || { id: '123456', first_name: 'Guest' };
-            initTheme();
-
-            // 1. Listen for Settings
-            db.ref(SETTINGS_NODE).on('value', snapshot => {
-                globalSettings = snapshot.val() || {
-                    bkashNum: '01609434652', nagadNum: '01625199589', binanceId: '763666850',
-                    bkashMin: 10, nagadMin: 10, binanceMin: 0
+                const payload = {
+                    model: "gpt-3.5-turbo",
+                    messages: [
+                        {
+                            role: "system",
+                            content: "You are a helpful customer support agent for 'Wallet Bot', a crypto wallet Telegram Mini App. Answer briefly and politely. You can help with deposits (green button), withdrawals, and P2P trading."
+                        },
+                        { role: "user", content: userText }
+                    ]
                 };
-            });
 
-            // 2. Listen for User Profile
-            db.ref(`${USERS_NODE}/${tgUser.id}`).on('value', snapshot => {
-                let userData = snapshot.val();
-                if (!userData) {
-                    const startParam = tg.initDataUnsafe?.start_param || "";
-                    console.log("Start Param Detected:", startParam);
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${OPENAI_API_KEY}`
+                        },
+                        body: JSON.stringify(payload)
+                    });
 
-                    let referredBy = null;
-                    if (startParam.startsWith('ref_')) {
-                        referredBy = startParam.replace('ref_', '');
-                        console.log("Referred By ID:", referredBy);
-                        // Optional: alert(`Referral detected! Referrer ID: ${referredBy}`);
+                    if (!response.ok) {
+                        const err = await response.json();
+                        throw new Error(err.error?.message || 'API Error');
                     }
 
-                    userData = {
-                        id: tgUser.id,
-                        name: tgUser.first_name,
-                        balance: 0,
-                        balance_hold: 0,
-                        referralCount: 0,
-                        status: 'Active',
-                        referredBy: referredBy,
-                        photo: tgUser.photo_url || `https://ui-avatars.com/api/?name=${tgUser.first_name}&background=13abec&color=fff`
+                    const data = await response.json();
+                    return data.choices?.[0]?.message?.content || "I'm having trouble thinking right now.";
+                } catch (e) {
+                    console.error(e);
+                    alert(`Debug Error: ${e.message}`); // Force show error
+                    return `System Error: ${e.message}`;
+                }
+            }
+
+            async function sendUserMessage() {
+                const input = document.getElementById('chat-input');
+                const text = input.value.trim();
+                if (!text) return;
+
+                const msg = {
+                    sender: 'user',
+                    text: text,
+                    timestamp: Date.now()
+                };
+
+                const history = getChatHistory();
+                history.push(msg);
+                localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(history));
+
+                input.value = '';
+                input.style.height = 'auto'; // Reset height
+                renderChatMessages();
+                scrollToBottom();
+
+                // Call OpenAI API
+                const replyText = await getOpenAIReply(text);
+
+                const botMsg = {
+                    sender: 'admin',
+                    text: replyText,
+                    timestamp: Date.now()
+                };
+                const newHistory = getChatHistory();
+                newHistory.push(botMsg);
+                localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(newHistory));
+                renderChatMessages();
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+
+            function scrollToBottom() {
+                const container = document.getElementById('chat-messages');
+                setTimeout(() => {
+                    container.scrollTop = container.scrollHeight;
+                }, 50);
+            }
+
+            function formatTime(ms) {
+                const date = new Date(ms);
+                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+
+            // Listen for storage changes to sync chat instantly
+            window.addEventListener('storage', (e) => {
+                if (e.key === CHAT_STORAGE_KEY) {
+                    renderChatMessages();
+                }
+            });
+            /* --- End Chat System --- */
+
+            const USERS_STORAGE_KEY = 'wallet_users';
+
+            function registerUser() {
+                const user = tg.initDataUnsafe?.user || {
+                    id: 123456,
+                    first_name: 'Guest',
+                    last_name: 'User',
+                    username: 'guest_user',
+                    photo_url: null
+                };
+
+                const newUser = {
+                    id: user.id,
+                    name: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
+                    username: user.username || 'guest',
+                    photo: user.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.first_name || 'Guest')}&background=13abec&color=fff`,
+                    balance: 0,
+                    status: 'Verified',
+                    lastActive: Date.now()
+                };
+
+                let users = [];
+                try {
+                    users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+                } catch (e) { users = []; }
+
+                // Update or Add
+                const existingIndex = users.findIndex(u => u.id === newUser.id);
+                if (existingIndex >= 0) {
+                    users[existingIndex] = { ...users[existingIndex], ...newUser };
+                } else {
+                    users.push(newUser);
+                }
+
+                localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+            }
+
+            /* --- Firebase Config & Init --- */
+            const firebaseConfig = {
+                apiKey: "AIzaSyBYvecq_HYeylhwCXaLot2A1U_9pvXMWXA",
+                authDomain: "developerp2p.firebaseapp.com",
+                projectId: "developerp2p",
+                storageBucket: "developerp2p.firebasestorage.app",
+                messagingSenderId: "85381141511",
+                appId: "1:85381141511:web:76264b530079246e8246a2",
+                measurementId: "G-882R3H9WMY"
+            };
+
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.database();
+
+            // Constants
+            const TRX_NODE = 'transactions';
+            const USERS_NODE = 'users';
+            const P2P_NODE = 'p2p_ads';
+            const SETTINGS_NODE = 'settings';
+            const RULES_NODE = 'bot_rules';
+
+            let currentUser = null;
+            let globalSettings = {};
+
+            /* --- App Initialization --- */
+            async function initApp() {
+                const tgUser = tg.initDataUnsafe?.user || { id: '123456', first_name: 'Guest' };
+                initTheme();
+
+                // 1. Listen for Settings
+                db.ref(SETTINGS_NODE).on('value', snapshot => {
+                    globalSettings = snapshot.val() || {
+                        bkashNum: '01609434652', nagadNum: '01625199589', binanceId: '763666850',
+                        bkashMin: 10, nagadMin: 10, binanceMin: 0
                     };
-                    db.ref(`${USERS_NODE}/${tgUser.id}`).set(userData);
+                });
 
-                    if (referredBy) {
-                        db.ref(`${USERS_NODE}/${referredBy}/referralCount`).transaction(count => (count || 0) + 1);
+                // 2. Listen for User Profile
+                db.ref(`${USERS_NODE}/${tgUser.id}`).on('value', snapshot => {
+                    let userData = snapshot.val();
+                    if (!userData) {
+                        const startParam = tg.initDataUnsafe?.start_param || "";
+                        console.log("Start Param Detected:", startParam);
+
+                        let referredBy = null;
+                        if (startParam.startsWith('ref_')) {
+                            referredBy = startParam.replace('ref_', '');
+                            console.log("Referred By ID:", referredBy);
+                            // Optional: alert(`Referral detected! Referrer ID: ${referredBy}`);
+                        }
+
+                        userData = {
+                            id: tgUser.id,
+                            name: tgUser.first_name,
+                            balance: 0,
+                            balance_hold: 0,
+                            referralCount: 0,
+                            status: 'Active',
+                            referredBy: referredBy,
+                            photo: tgUser.photo_url || `https://ui-avatars.com/api/?name=${tgUser.first_name}&background=13abec&color=fff`
+                        };
+                        db.ref(`${USERS_NODE}/${tgUser.id}`).set(userData);
+
+                        if (referredBy) {
+                            db.ref(`${USERS_NODE}/${referredBy}/referralCount`).transaction(count => (count || 0) + 1);
+                        }
                     }
+                    currentUser = userData;
+                    updateUI();
+                });
+
+                // 3. Listen for My Transactions
+                db.ref(TRX_NODE).on('value', snapshot => {
+                    const trxsObj = snapshot.val() || {};
+                    const myTrxs = Object.values(trxsObj)
+                        .filter(t => t.userId == tgUser.id)
+                        .sort((a, b) => b.timestamp - a.timestamp);
+                    renderHistory(myTrxs);
+                });
+
+                // 4. Listen for P2P Ads
+                db.ref(P2P_NODE).on('value', () => {
+                    if (!document.getElementById('tab-p2p').classList.contains('hidden')) {
+                        renderP2PAds();
+                    }
+                });
+
+                tg.expand();
+                tg.ready();
+            }
+
+            function updateUI() {
+                if (!currentUser) return;
+                document.getElementById('profile-name').innerHTML = currentUser.name;
+                document.getElementById('profile-username').innerHTML = '@' + (tg.initDataUnsafe?.user?.username || 'user');
+                document.getElementById('bal-main').innerHTML = (currentUser.balance || 0).toFixed(2);
+                document.getElementById('bal-hold').innerHTML = (currentUser.balance_hold || 0).toFixed(2);
+                document.getElementById('profile-bal-total').innerHTML = (currentUser.balance || 0).toFixed(2);
+                document.getElementById('profile-ref-count').innerHTML = currentUser.referralCount || 0;
+                document.getElementById('profile-pic-large').style.backgroundImage = `url('${currentUser.photo}')`;
+                document.getElementById('user-avatar').style.backgroundImage = `url('${currentUser.photo}')`;
+                // Updated to use startapp for direct Mini App opening
+                const botUsername = 'buysell_shoperobot';
+                document.getElementById('ref-link').textContent = `t.me/${botUsername}/shope?startapp=ref_${currentUser.id}`;
+
+                // Verification Status UI
+                const status = currentUser.verificationStatus || 'Unverified';
+                document.getElementById('profile-badge-verified').classList.add('hidden');
+                document.getElementById('profile-badge-pending').classList.add('hidden');
+                document.getElementById('profile-btn-verify').classList.add('hidden');
+
+                if (status === 'Verified') {
+                    document.getElementById('profile-badge-verified').classList.remove('hidden');
+                } else if (status === 'pending') {
+                    document.getElementById('profile-badge-pending').classList.remove('hidden');
+                } else {
+                    document.getElementById('profile-btn-verify').classList.remove('hidden');
                 }
-                currentUser = userData;
-                updateUI();
-            });
+            }
 
-            // 3. Listen for My Transactions
-            db.ref(TRX_NODE).on('value', snapshot => {
-                const trxsObj = snapshot.val() || {};
-                const myTrxs = Object.values(trxsObj)
-                    .filter(t => t.userId == tgUser.id)
-                    .sort((a, b) => b.timestamp - a.timestamp);
-                renderHistory(myTrxs);
-            });
+            /* --- Rendering --- */
+            function renderHistory(history) {
+                const container = document.getElementById('recent-activity-list');
+                if (!container) return;
 
-            // 4. Listen for P2P Ads
-            db.ref(P2P_NODE).on('value', () => {
-                if (!document.getElementById('tab-p2p').classList.contains('hidden')) {
-                    renderP2PAds();
-                }
-            });
-
-            tg.expand();
-            tg.ready();
-        }
-
-        function updateUI() {
-            if (!currentUser) return;
-            document.getElementById('profile-name').innerHTML = currentUser.name;
-            document.getElementById('profile-username').innerHTML = '@' + (tg.initDataUnsafe?.user?.username || 'user');
-            document.getElementById('bal-main').innerHTML = (currentUser.balance || 0).toFixed(2);
-            document.getElementById('bal-hold').innerHTML = (currentUser.balance_hold || 0).toFixed(2);
-            document.getElementById('profile-bal-total').innerHTML = (currentUser.balance || 0).toFixed(2);
-            document.getElementById('profile-ref-count').innerHTML = currentUser.referralCount || 0;
-            document.getElementById('profile-pic-large').style.backgroundImage = `url('${currentUser.photo}')`;
-            document.getElementById('user-avatar').style.backgroundImage = `url('${currentUser.photo}')`;
-            // Updated to use startapp for direct Mini App opening
-            const botUsername = 'buysell_shoperobot';
-            document.getElementById('ref-link').textContent = `t.me/${botUsername}/shope?startapp=ref_${currentUser.id}`;
-        }
-
-        /* --- Rendering --- */
-        function renderHistory(history) {
-            const container = document.getElementById('recent-activity-list');
-            if (!container) return;
-
-            if (history.length === 0) {
-                container.innerHTML = `<div class="flex flex-col items-center justify-center py-8 text-slate-400">
+                if (history.length === 0) {
+                    container.innerHTML = `<div class="flex flex-col items-center justify-center py-8 text-slate-400">
                     <span class="material-symbols-outlined text-[32px] mb-2 opacity-50">history_toggle_off</span>
                     <p class="text-sm">No recent transactions</p>
                 </div>`;
-                return;
-            }
+                    return;
+                }
 
-            container.innerHTML = history.map(t => {
-                const isDeposit = t.type === 'deposit';
-                const isStars = t.type === 'p2p_trade';
-                const isRefBonus = t.type === 'referral_bonus';
-                const isApproved = t.status === 'approved';
-                const isRejected = t.status === 'rejected';
+                container.innerHTML = history.map(t => {
+                    const isDeposit = t.type === 'deposit';
+                    const isStars = t.type === 'p2p_trade';
+                    const isRefBonus = t.type === 'referral_bonus';
+                    const isApproved = t.status === 'approved';
+                    const isRejected = t.status === 'rejected';
 
-                // For stars and referral bonus, it's like a deposit (user gets money)
-                let colorClass = (isDeposit || isStars || isRefBonus) ? (isApproved ? 'text-green-500 bg-green-500/10' : 'text-yellow-500 bg-yellow-500/10') : 'text-red-500 bg-red-500/10';
-                if (isRejected) colorClass = 'text-red-500 bg-red-500/10';
+                    // For stars and referral bonus, it's like a deposit (user gets money)
+                    let colorClass = (isDeposit || isStars || isRefBonus) ? (isApproved ? 'text-green-500 bg-green-500/10' : 'text-yellow-500 bg-yellow-500/10') : 'text-red-500 bg-red-500/10';
+                    if (isRejected) colorClass = 'text-red-500 bg-red-500/10';
 
-                const displayAmount = isStars ? (t.reward || 0) : t.amount;
-                let typeLabel = t.type;
-                if (isStars) typeLabel = `Sell ${t.asset}`;
-                if (isRefBonus) typeLabel = "Referral Bonus";
+                    const displayAmount = isStars ? (t.reward || 0) : t.amount;
+                    let typeLabel = t.type;
+                    if (isStars) typeLabel = `Sell ${t.asset}`;
+                    if (isRefBonus) typeLabel = "Referral Bonus";
 
-                return `
+                    return `
                 <div class="flex items-center justify-between p-3 bg-white dark:bg-[#1a282f] rounded-xl border border-slate-100 dark:border-slate-800/50 shadow-sm animate-slide-up">
                     <div class="flex items-center gap-3">
                         <div class="size-10 rounded-full ${colorClass} flex items-center justify-center">
@@ -1194,31 +1292,31 @@
                         ${t.status === 'pending' ? '<p class="text-[10px] text-yellow-500 font-bold">Pending</p>' : ''}
                     </div>
                 </div>`;
-            }).join('');
-        }
+                }).join('');
+            }
 
-        async function renderP2PAds() {
-            const currentTab = document.getElementById('btn-p2p-buy').classList.contains('bg-white') ? 'buy' : 'sell';
-            const targetMerchantType = (currentTab === 'buy') ? 'sell' : 'buy';
-            const container = document.getElementById('p2p-list');
-            if (!container) return;
+            async function renderP2PAds() {
+                const currentTab = document.getElementById('btn-p2p-buy').classList.contains('bg-white') ? 'buy' : 'sell';
+                const targetMerchantType = (currentTab === 'buy') ? 'sell' : 'buy';
+                const container = document.getElementById('p2p-list');
+                if (!container) return;
 
-            const snapshot = await db.ref(P2P_NODE).once('value');
-            const adsObj = snapshot.val() || {};
-            const filtered = Object.values(adsObj).filter(a => a.type === targetMerchantType);
+                const snapshot = await db.ref(P2P_NODE).once('value');
+                const adsObj = snapshot.val() || {};
+                const filtered = Object.values(adsObj).filter(a => a.type === targetMerchantType);
 
-            if (filtered.length === 0) {
-                container.innerHTML = `<div class="flex flex-col items-center justify-center py-12 text-slate-400">
+                if (filtered.length === 0) {
+                    container.innerHTML = `<div class="flex flex-col items-center justify-center py-12 text-slate-400">
                     <span class="material-symbols-outlined text-4xl mb-2 opacity-30">ads_click</span>
                     <p class="text-sm">No advertisements found</p>
                 </div>`;
-                return;
-            }
+                    return;
+                }
 
-            container.innerHTML = filtered.map(ad => {
-                const actionLabel = currentTab === 'buy' ? 'Buy' : 'Sell';
-                const buttonClass = currentTab === 'buy' ? 'bg-success-green' : 'bg-red-500';
-                return `
+                container.innerHTML = filtered.map(ad => {
+                    const actionLabel = currentTab === 'buy' ? 'Buy' : 'Sell';
+                    const buttonClass = currentTab === 'buy' ? 'bg-success-green' : 'bg-red-500';
+                    return `
                 <div class="flex flex-col bg-white dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800 animate-slide-up shadow-sm">
                     <div class="flex justify-between items-start mb-3">
                         <div class="flex items-center gap-3">
@@ -1241,152 +1339,152 @@
                         <button onclick='handleP2PAction("${actionLabel.toLowerCase()}", ${JSON.stringify(ad)})' class="${buttonClass} hover:opacity-90 text-white px-6 py-2 rounded-lg text-sm font-bold transition-all shadow-lg active:scale-95">${actionLabel}</button>
                     </div>
                 </div>`;
-            }).join('');
-        }
-
-        /* --- Actions --- */
-        function submitDeposit() {
-            const amount = parseFloat(document.getElementById('dep-amount').value);
-            const number = document.getElementById('dep-number').value;
-            const method = document.getElementById('dep-method').value;
-            const photoInput = document.getElementById('dep-photo');
-
-            if (!amount || amount <= 0 || !number || !currentUser) {
-                tg.showAlert('Please fill all fields!');
-                return;
+                }).join('');
             }
 
-            const min = globalSettings[`${method}Min`] || 0;
-            if (amount < min) {
-                tg.showAlert(`Minimum deposit for ${method} is ${min} BDT`);
-                return;
-            }
+            /* --- Actions --- */
+            function submitDeposit() {
+                const amount = parseFloat(document.getElementById('dep-amount').value);
+                const number = document.getElementById('dep-number').value;
+                const method = document.getElementById('dep-method').value;
+                const photoInput = document.getElementById('dep-photo');
 
-            const trxRef = db.ref(TRX_NODE).push();
-            const trxData = {
-                id: trxRef.key,
-                userId: currentUser.id,
-                userName: currentUser.name,
-                type: 'deposit',
-                amount: amount,
-                currency: 'BDT',
-                method: method,
-                sender: number,
-                status: 'pending',
-                photo: document.getElementById('dep-preview').src || null,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            };
-
-            trxRef.set(trxData).then(() => {
-                const newHold = (currentUser.balance_hold || 0) + amount;
-                db.ref(`${USERS_NODE}/${currentUser.id}`).update({ balance_hold: newHold });
-                tg.showAlert('Deposit Submitted! Waiting for approval.');
-                closeDepositModal();
-            });
-        }
-
-        function submitWithdraw() {
-            const amount = parseFloat(document.getElementById('wd-amount').value);
-            const number = document.getElementById('wd-number').value;
-            const method = document.getElementById('wd-method').value;
-
-            if (!amount || amount <= 0 || !number || !currentUser) {
-                tg.showAlert('Please fill all fields!');
-                return;
-            }
-
-            if (currentUser.balance < amount) {
-                tg.showAlert('Insufficient Balance!');
-                return;
-            }
-
-            const trxRef = db.ref(TRX_NODE).push();
-            const trxData = {
-                id: trxRef.key,
-                userId: currentUser.id,
-                userName: currentUser.name,
-                type: 'withdrawal',
-                amount: amount,
-                currency: 'BDT',
-                method: method,
-                sender: number,
-                status: 'pending',
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            };
-
-            trxRef.set(trxData).then(() => {
-                const newBal = (currentUser.balance || 0) - amount;
-                db.ref(`${USERS_NODE}/${currentUser.id}`).update({ balance: newBal });
-                tg.showAlert('Withdrawal Requested!');
-                closeWithdrawModal();
-            });
-        }
-
-        /* --- UI Helpers --- */
-        function switchTab(tabId) {
-            tg.HapticFeedback.impactOccurred('light');
-            activeTab = tabId;
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.nav-btn').forEach(el => {
-                el.classList.remove('text-primary'); el.classList.add('text-slate-400');
-                el.querySelector('span:last-child').classList.remove('font-bold');
-                el.querySelector('span:first-child').style.fontVariationSettings = "'FILL' 0";
-            });
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-            const nav = document.getElementById(`nav-${tabId}`);
-            if (nav) {
-                nav.classList.add('text-primary'); nav.classList.remove('text-slate-400');
-                nav.querySelector('span:last-child').classList.add('font-bold');
-                nav.querySelector('span:first-child').style.fontVariationSettings = "'FILL' 1";
-            }
-            document.getElementById('page-title').textContent = { balance: 'Verified Buy & Sell', p2p: 'P2P Trading', referral: 'Refer & Earn', profile: 'My Profile', leaderboard: 'Leaderboard' }[tabId];
-            if (tabId === 'p2p') renderP2PAds();
-            if (tabId === 'leaderboard') renderLeaderboard();
-            if (tabId === 'balance') tg.BackButton.hide(); else tg.BackButton.show();
-            document.getElementById('main-scroll').scrollTop = 0;
-        }
-
-        function renderLeaderboard() {
-            const listContainer = document.getElementById('leaderboard-list');
-            if (!listContainer) return;
-
-            listContainer.innerHTML = `<div class="flex justify-center py-10"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>`;
-
-            db.ref(USERS_NODE).once('value').then(snapshot => {
-                const usersObj = snapshot.val() || {};
-                const users = Object.values(usersObj).sort((a, b) => (b.balance || 0) - (a.balance || 0));
-
-                if (users.length === 0) {
-                    listContainer.innerHTML = `<div class="flex flex-col items-center justify-center py-10 text-slate-500">
-                        <span class="material-symbols-outlined text-[48px] mb-2 opacity-30">group_off</span>
-                        <p class="text-sm">No users found in the leaderboard</p>
-                    </div>`;
+                if (!amount || amount <= 0 || !number || !currentUser) {
+                    tg.showAlert('Please fill all fields!');
                     return;
                 }
 
-                // Limit to Top 100
-                const topUsers = users.slice(0, 100);
+                const min = globalSettings[`${method}Min`] || 0;
+                if (amount < min) {
+                    tg.showAlert(`Minimum deposit for ${method} is ${min} BDT`);
+                    return;
+                }
 
-                listContainer.innerHTML = topUsers.map((u, index) => {
-                    const rank = index + 1;
-                    const isTop3 = rank <= 3;
-                    let rankClass = "bg-slate-100 dark:bg-slate-800 text-slate-500";
-                    let rankIcon = "";
+                const trxRef = db.ref(TRX_NODE).push();
+                const trxData = {
+                    id: trxRef.key,
+                    userId: currentUser.id,
+                    userName: currentUser.name,
+                    type: 'deposit',
+                    amount: amount,
+                    currency: 'BDT',
+                    method: method,
+                    sender: number,
+                    status: 'pending',
+                    photo: document.getElementById('dep-preview').src || null,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                };
 
-                    if (rank === 1) {
-                        rankClass = "bg-yellow-400 text-yellow-900 font-black scale-110 shadow-lg shadow-yellow-500/30";
-                        rankIcon = "🏆";
-                    } else if (rank === 2) {
-                        rankClass = "bg-slate-300 text-slate-700 font-bold shadow-lg shadow-slate-400/20";
-                        rankIcon = "🥈";
-                    } else if (rank === 3) {
-                        rankClass = "bg-orange-300 text-orange-900 font-bold shadow-lg shadow-orange-500/20";
-                        rankIcon = "🥉";
+                trxRef.set(trxData).then(() => {
+                    const newHold = (currentUser.balance_hold || 0) + amount;
+                    db.ref(`${USERS_NODE}/${currentUser.id}`).update({ balance_hold: newHold });
+                    tg.showAlert('Deposit Submitted! Waiting for approval.');
+                    closeDepositModal();
+                });
+            }
+
+            function submitWithdraw() {
+                const amount = parseFloat(document.getElementById('wd-amount').value);
+                const number = document.getElementById('wd-number').value;
+                const method = document.getElementById('wd-method').value;
+
+                if (!amount || amount <= 0 || !number || !currentUser) {
+                    tg.showAlert('Please fill all fields!');
+                    return;
+                }
+
+                if (currentUser.balance < amount) {
+                    tg.showAlert('Insufficient Balance!');
+                    return;
+                }
+
+                const trxRef = db.ref(TRX_NODE).push();
+                const trxData = {
+                    id: trxRef.key,
+                    userId: currentUser.id,
+                    userName: currentUser.name,
+                    type: 'withdrawal',
+                    amount: amount,
+                    currency: 'BDT',
+                    method: method,
+                    sender: number,
+                    status: 'pending',
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                };
+
+                trxRef.set(trxData).then(() => {
+                    const newBal = (currentUser.balance || 0) - amount;
+                    db.ref(`${USERS_NODE}/${currentUser.id}`).update({ balance: newBal });
+                    tg.showAlert('Withdrawal Requested!');
+                    closeWithdrawModal();
+                });
+            }
+
+            /* --- UI Helpers --- */
+            function switchTab(tabId) {
+                tg.HapticFeedback.impactOccurred('light');
+                activeTab = tabId;
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('.nav-btn').forEach(el => {
+                    el.classList.remove('text-primary'); el.classList.add('text-slate-400');
+                    el.querySelector('span:last-child').classList.remove('font-bold');
+                    el.querySelector('span:first-child').style.fontVariationSettings = "'FILL' 0";
+                });
+                document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+                const nav = document.getElementById(`nav-${tabId}`);
+                if (nav) {
+                    nav.classList.add('text-primary'); nav.classList.remove('text-slate-400');
+                    nav.querySelector('span:last-child').classList.add('font-bold');
+                    nav.querySelector('span:first-child').style.fontVariationSettings = "'FILL' 1";
+                }
+                document.getElementById('page-title').textContent = { balance: 'Verified Buy & Sell', p2p: 'P2P Trading', referral: 'Refer & Earn', profile: 'My Profile', leaderboard: 'Leaderboard' }[tabId];
+                if (tabId === 'p2p') renderP2PAds();
+                if (tabId === 'leaderboard') renderLeaderboard();
+                if (tabId === 'balance') tg.BackButton.hide(); else tg.BackButton.show();
+                document.getElementById('main-scroll').scrollTop = 0;
+            }
+
+            function renderLeaderboard() {
+                const listContainer = document.getElementById('leaderboard-list');
+                if (!listContainer) return;
+
+                listContainer.innerHTML = `<div class="flex justify-center py-10"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>`;
+
+                db.ref(USERS_NODE).once('value').then(snapshot => {
+                    const usersObj = snapshot.val() || {};
+                    const users = Object.values(usersObj).sort((a, b) => (b.balance || 0) - (a.balance || 0));
+
+                    if (users.length === 0) {
+                        listContainer.innerHTML = `<div class="flex flex-col items-center justify-center py-10 text-slate-500">
+                        <span class="material-symbols-outlined text-[48px] mb-2 opacity-30">group_off</span>
+                        <p class="text-sm">No users found in the leaderboard</p>
+                    </div>`;
+                        return;
                     }
 
-                    const userPhoto = u.photo || `https://ui-avatars.com/api/?name=${u.name}&background=random`;
+                    // Limit to Top 100
+                    const topUsers = users.slice(0, 100);
 
-                    return `
+                    listContainer.innerHTML = topUsers.map((u, index) => {
+                        const rank = index + 1;
+                        const isTop3 = rank <= 3;
+                        let rankClass = "bg-slate-100 dark:bg-slate-800 text-slate-500";
+                        let rankIcon = "";
+
+                        if (rank === 1) {
+                            rankClass = "bg-yellow-400 text-yellow-900 font-black scale-110 shadow-lg shadow-yellow-500/30";
+                            rankIcon = "🏆";
+                        } else if (rank === 2) {
+                            rankClass = "bg-slate-300 text-slate-700 font-bold shadow-lg shadow-slate-400/20";
+                            rankIcon = "🥈";
+                        } else if (rank === 3) {
+                            rankClass = "bg-orange-300 text-orange-900 font-bold shadow-lg shadow-orange-500/20";
+                            rankIcon = "🥉";
+                        }
+
+                        const userPhoto = u.photo || `https://ui-avatars.com/api/?name=${u.name}&background=random`;
+
+                        return `
                         <div class="flex items-center gap-4 bg-white dark:bg-[#1a282f] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-transform active:scale-[0.99] ${isTop3 ? 'border-primary/20 bg-primary/5' : ''}">
                             <div class="size-10 rounded-full flex items-center justify-center text-sm font-bold ${rankClass} shrink-0">
                                 ${rankIcon || rank}
@@ -1402,190 +1500,257 @@
                             </div>
                         </div>
                     `;
-                }).join('');
-            }).catch(err => {
-                console.error("Leaderboard Error:", err);
-                listContainer.innerHTML = `<div class="p-4 text-center text-red-500 text-xs">Error loading database. Please check your connection.</div>`;
-            });
-        }
-
-        let activeTab = 'balance';
-
-        function handleBack() {
-            if (activeTab === 'leaderboard') {
-                switchTab('profile');
-            } else {
-                switchTab('balance');
-            }
-        }
-
-        tg.BackButton.onClick(handleBack);
-
-        function toggleP2PType(type) {
-            tg.HapticFeedback.selectionChanged();
-            const buyBtn = document.getElementById('btn-p2p-buy');
-            const sellBtn = document.getElementById('btn-p2p-sell');
-            if (type === 'buy') {
-                buyBtn.className = "flex-1 py-2 text-sm font-bold rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm transition-all";
-                sellBtn.className = "flex-1 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 transition-all";
-            } else {
-                sellBtn.className = "flex-1 py-2 text-sm font-bold rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm transition-all";
-                buyBtn.className = "flex-1 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 transition-all";
-            }
-            renderP2PAds();
-        }
-
-        let activeStarsAd = null;
-
-        function handleP2PAction(action, ad) {
-            tg.HapticFeedback.notificationOccurred('success');
-            if (ad && ad.asset === 'Stars') {
-                activeStarsAd = ad;
-                document.getElementById('stars-target-link').href = ad.targetLink || '#';
-                document.getElementById('stars-needed-count').textContent = ad.starCount || '0';
-                document.getElementById('stars-trade-modal').classList.remove('hidden');
-            } else {
-                tg.showAlert(`${action.toUpperCase()} order interface would open here.`);
-            }
-        }
-
-        function closeStarsModal() { document.getElementById('stars-trade-modal').classList.add('hidden'); }
-
-        function previewStarsFile() {
-            const file = document.getElementById('stars-photo').files[0];
-            const reader = new FileReader();
-            reader.onload = () => {
-                document.getElementById('stars-preview').src = reader.result;
-                document.getElementById('stars-preview').classList.remove('hidden');
-            };
-            if (file) reader.readAsDataURL(file);
-        }
-
-        function submitStarsTrade() {
-            const count = parseFloat(document.getElementById('stars-sent-count').value);
-            const userLink = document.getElementById('stars-user-link').value;
-            const photoInput = document.getElementById('stars-photo');
-
-            if (!count || !userLink || !photoInput.files[0] || !activeStarsAd) {
-                tg.showAlert('Please fill all fields and upload screenshot!');
-                return;
+                    }).join('');
+                }).catch(err => {
+                    console.error("Leaderboard Error:", err);
+                    listContainer.innerHTML = `<div class="p-4 text-center text-red-500 text-xs">Error loading database. Please check your connection.</div>`;
+                });
             }
 
-            const rewardBDT = count * parseFloat(activeStarsAd.price || 0);
+            let activeTab = 'balance';
 
-            const trxRef = db.ref(TRX_NODE).push();
-            const trxData = {
-                id: trxRef.key,
-                userId: currentUser.id,
-                userName: currentUser.name,
-                type: 'p2p_trade',
-                asset: 'Stars',
-                amount: count, // Star count
-                reward: rewardBDT, // BDT reward
-                currency: 'Stars',
-                method: 'P2P',
-                sender: userLink,
-                status: 'pending',
-                photo: document.getElementById('stars-preview').src,
-                adId: activeStarsAd.id || 'manual',
-                targetLink: activeStarsAd.targetLink || '',
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            };
-
-            trxRef.set(trxData).then(() => {
-                tg.showAlert(`Proof Submitted! You will receive ${rewardBDT.toFixed(2)} BDT after verification.`);
-                closeStarsModal();
-                // Reset fields
-                document.getElementById('stars-sent-count').value = '';
-                document.getElementById('stars-user-link').value = '';
-                document.getElementById('stars-preview').classList.add('hidden');
-                document.getElementById('stars-photo').value = '';
-            });
-        }
-
-        function copyText(text, msg) {
-            const tempInput = document.createElement("input");
-            tempInput.value = text;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand("copy");
-            document.body.removeChild(tempInput);
-
-            tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert(msg || 'Copied!');
-        }
-
-        function copyRefLink() {
-            const link = document.getElementById('ref-link').textContent;
-            copyText(link, 'Referral Link Copied!');
-        }
-
-        function inviteFriends() {
-            const link = document.getElementById('ref-link').textContent;
-            const text = encodeURIComponent(
-                "✨━━━━━━━━━━━━━━━━━━✨\n" +
-                "   🏆 VERIFIED BUY & SELL 🏆\n" +
-                "✨━━━━━━━━━━━━━━━━━━✨\n\n" +
-                "🚀 আমাদের নতুন P2P ওয়ালেটে জয়েন করুন এবং আজই ইনকাম শুরু করুন!\n\n" +
-                "🎁 কি কি থাকছে আমাদের অ্যাপে? 🎁\n\n" +
-                "🔹 ১% আজীবন রেফার কমিশন! (Lifetime Bonus)\n" +
-                "🔹 দ্রুত ডিপোজিট ও উইথড্র (Bkash, Nagad, Binance)\n" +
-                "🔹 ১০০% বিশ্বস্ত এবং সিকিউর ট্রানজেকশন।\n\n" +
-                "🔥 বসে না থেকে এখনই জয়েন করুন এবং বন্ধুদের ইনভাইট করে আয় করুন আনলিমিটেড! 📈\n\n" +
-                "👇 জয়েন করার লিঙ্ক এখানে:\n"
-            );
-            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${text}`;
-            tg.openTelegramLink(shareUrl);
-        }
-
-        function selectDepositMethod(id, unused, name) {
-            const num = globalSettings[`${id}Num`] || '';
-            const min = globalSettings[`${id}Min`] || 0;
-            copyText(num, `${name} Number Copied!`);
-            document.getElementById('dep-method').value = id;
-            document.getElementById('dep-selected-name').textContent = name;
-            document.getElementById('dep-selected-number').textContent = num;
-            document.getElementById('dep-limit-text').textContent = min === 0 ? 'No Limit' : `Min: ${min} BDT`;
-
-            // Binance specific placeholder "00", others "10" or min
-            if (id === 'binance') {
-                document.getElementById('dep-amount').placeholder = "00";
-            } else {
-                document.getElementById('dep-amount').placeholder = min > 0 ? min : "10";
+            function handleBack() {
+                if (activeTab === 'leaderboard') {
+                    switchTab('profile');
+                } else {
+                    switchTab('balance');
+                }
             }
 
-            document.getElementById('dep-step-1').classList.add('hidden');
-            document.getElementById('dep-step-2').classList.remove('hidden');
-            document.getElementById('dep-title').textContent = 'Submit Details';
-        }
+            tg.BackButton.onClick(handleBack);
 
-        function selectWithdrawMethod(id, name) {
-            document.getElementById('wd-method').value = id;
-            document.getElementById('wd-selected-name').textContent = name;
-
-            // Binance specific placeholder "00", others "Min 10 BDT"
-            if (id === 'binance') {
-                document.getElementById('wd-amount').placeholder = "00";
-            } else {
-                document.getElementById('wd-amount').placeholder = "Min 10 BDT";
+            function toggleP2PType(type) {
+                tg.HapticFeedback.selectionChanged();
+                const buyBtn = document.getElementById('btn-p2p-buy');
+                const sellBtn = document.getElementById('btn-p2p-sell');
+                if (type === 'buy') {
+                    buyBtn.className = "flex-1 py-2 text-sm font-bold rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm transition-all";
+                    sellBtn.className = "flex-1 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 transition-all";
+                } else {
+                    sellBtn.className = "flex-1 py-2 text-sm font-bold rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm transition-all";
+                    buyBtn.className = "flex-1 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 transition-all";
+                }
+                renderP2PAds();
             }
 
-            document.getElementById('wd-step-1').classList.add('hidden');
-            document.getElementById('wd-step-2').classList.remove('hidden');
-            document.getElementById('wd-title').textContent = 'Withdraw Details';
-        }
+            let activeStarsAd = null;
 
-        function handleDeposit() { tg.HapticFeedback.impactOccurred('medium'); document.getElementById('deposit-modal').classList.remove('hidden'); showStep1(); }
-        function handleWithdraw() { tg.HapticFeedback.impactOccurred('medium'); document.getElementById('withdraw-modal').classList.remove('hidden'); showWdStep1(); }
-        function closeDepositModal() { document.getElementById('deposit-modal').classList.add('hidden'); }
-        function closeWithdrawModal() { document.getElementById('withdraw-modal').classList.add('hidden'); }
-        function showStep1() { document.getElementById('dep-step-1').classList.remove('hidden'); document.getElementById('dep-step-2').classList.add('hidden'); document.getElementById('dep-title').textContent = 'Select Method'; }
-        function showWdStep1() { document.getElementById('wd-step-1').classList.remove('hidden'); document.getElementById('wd-step-2').classList.add('hidden'); document.getElementById('wd-title').textContent = 'Withdraw Funds'; }
-        function previewFile() { const file = document.getElementById('dep-photo').files[0]; const reader = new FileReader(); reader.onload = () => { document.getElementById('dep-preview').src = reader.result; document.getElementById('dep-preview').classList.remove('hidden'); }; if (file) reader.readAsDataURL(file); }
+            function handleP2PAction(action, ad) {
+                tg.HapticFeedback.notificationOccurred('success');
+                if (ad && ad.asset === 'Stars') {
+                    activeStarsAd = ad;
+                    document.getElementById('stars-target-link').href = ad.targetLink || '#';
+                    document.getElementById('stars-needed-count').textContent = ad.starCount || '0';
+                    document.getElementById('stars-trade-modal').classList.remove('hidden');
+                } else {
+                    tg.showAlert(`${action.toUpperCase()} order interface would open here.`);
+                }
+            }
 
-        window.addEventListener('DOMContentLoaded', initApp);
+            function closeStarsModal() { document.getElementById('stars-trade-modal').classList.add('hidden'); }
 
-    </script>
+            function previewStarsFile() {
+                const file = document.getElementById('stars-photo').files[0];
+                const reader = new FileReader();
+                reader.onload = () => {
+                    document.getElementById('stars-preview').src = reader.result;
+                    document.getElementById('stars-preview').classList.remove('hidden');
+                };
+                if (file) reader.readAsDataURL(file);
+            }
+
+            function submitStarsTrade() {
+                const count = parseFloat(document.getElementById('stars-sent-count').value);
+                const userLink = document.getElementById('stars-user-link').value;
+                const photoInput = document.getElementById('stars-photo');
+
+                if (!count || !userLink || !photoInput.files[0] || !activeStarsAd) {
+                    tg.showAlert('Please fill all fields and upload screenshot!');
+                    return;
+                }
+
+                const rewardBDT = count * parseFloat(activeStarsAd.price || 0);
+
+                const trxRef = db.ref(TRX_NODE).push();
+                const trxData = {
+                    id: trxRef.key,
+                    userId: currentUser.id,
+                    userName: currentUser.name,
+                    type: 'p2p_trade',
+                    asset: 'Stars',
+                    amount: count, // Star count
+                    reward: rewardBDT, // BDT reward
+                    currency: 'Stars',
+                    method: 'P2P',
+                    sender: userLink,
+                    status: 'pending',
+                    photo: document.getElementById('stars-preview').src,
+                    adId: activeStarsAd.id || 'manual',
+                    targetLink: activeStarsAd.targetLink || '',
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                };
+
+                trxRef.set(trxData).then(() => {
+                    tg.showAlert(`Proof Submitted! You will receive ${rewardBDT.toFixed(2)} BDT after verification.`);
+                    closeStarsModal();
+                    // Reset fields
+                    document.getElementById('stars-sent-count').value = '';
+                    document.getElementById('stars-user-link').value = '';
+                    document.getElementById('stars-preview').classList.add('hidden');
+                    document.getElementById('stars-photo').value = '';
+                });
+            }
+
+            function copyText(text, msg) {
+                const tempInput = document.createElement("input");
+                tempInput.value = text;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand("copy");
+                document.body.removeChild(tempInput);
+
+                tg.HapticFeedback.notificationOccurred('success');
+                tg.showAlert(msg || 'Copied!');
+            }
+
+            function copyRefLink() {
+                const link = document.getElementById('ref-link').textContent;
+                copyText(link, 'Referral Link Copied!');
+            }
+
+            function inviteFriends() {
+                const link = document.getElementById('ref-link').textContent;
+                const text = encodeURIComponent(
+                    "✨━━━━━━━━━━━━━━━━━━✨\n" +
+                    "   🏆 VERIFIED BUY & SELL 🏆\n" +
+                    "✨━━━━━━━━━━━━━━━━━━✨\n\n" +
+                    "🚀 আমাদের নতুন P2P ওয়ালেটে জয়েন করুন এবং আজই ইনকাম শুরু করুন!\n\n" +
+                    "🎁 কি কি থাকছে আমাদের অ্যাপে? 🎁\n\n" +
+                    "🔹 ১% আজীবন রেফার কমিশন! (Lifetime Bonus)\n" +
+                    "🔹 দ্রুত ডিপোজিট ও উইথড্র (Bkash, Nagad, Binance)\n" +
+                    "🔹 ১০০% বিশ্বস্ত এবং সিকিউর ট্রানজেকশন।\n\n" +
+                    "🔥 বসে না থেকে এখনই জয়েন করুন এবং বন্ধুদের ইনভাইট করে আয় করুন আনলিমিটেড! 📈\n\n" +
+                    "👇 জয়েন করার লিঙ্ক এখানে:\n"
+                );
+                const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${text}`;
+                tg.openTelegramLink(shareUrl);
+            }
+
+            function selectDepositMethod(id, unused, name) {
+                const num = globalSettings[`${id}Num`] || '';
+                const min = globalSettings[`${id}Min`] || 0;
+                copyText(num, `${name} Number Copied!`);
+                document.getElementById('dep-method').value = id;
+                document.getElementById('dep-selected-name').textContent = name;
+                document.getElementById('dep-selected-number').textContent = num;
+                document.getElementById('dep-limit-text').textContent = min === 0 ? 'No Limit' : `Min: ${min} BDT`;
+
+                // Binance specific placeholder "00", others "10" or min
+                if (id === 'binance') {
+                    document.getElementById('dep-amount').placeholder = "00";
+                } else {
+                    document.getElementById('dep-amount').placeholder = min > 0 ? min : "10";
+                }
+
+                document.getElementById('dep-step-1').classList.add('hidden');
+                document.getElementById('dep-step-2').classList.remove('hidden');
+                document.getElementById('dep-title').textContent = 'Submit Details';
+            }
+
+            function selectWithdrawMethod(id, name) {
+                document.getElementById('wd-method').value = id;
+                document.getElementById('wd-selected-name').textContent = name;
+
+                // Binance specific placeholder "00", others "Min 10 BDT"
+                if (id === 'binance') {
+                    document.getElementById('wd-amount').placeholder = "00";
+                } else {
+                    document.getElementById('wd-amount').placeholder = "Min 10 BDT";
+                }
+
+                document.getElementById('wd-step-1').classList.add('hidden');
+                document.getElementById('wd-step-2').classList.remove('hidden');
+                document.getElementById('wd-title').textContent = 'Withdraw Details';
+            }
+
+            function handleDeposit() { tg.HapticFeedback.impactOccurred('medium'); document.getElementById('deposit-modal').classList.remove('hidden'); showStep1(); }
+            function handleWithdraw() { tg.HapticFeedback.impactOccurred('medium'); document.getElementById('withdraw-modal').classList.remove('hidden'); showWdStep1(); }
+            function closeDepositModal() { document.getElementById('deposit-modal').classList.add('hidden'); }
+            function closeWithdrawModal() { document.getElementById('withdraw-modal').classList.add('hidden'); }
+            function showStep1() { document.getElementById('dep-step-1').classList.remove('hidden'); document.getElementById('dep-step-2').classList.add('hidden'); document.getElementById('dep-title').textContent = 'Select Method'; }
+            function showWdStep1() { document.getElementById('wd-step-1').classList.remove('hidden'); document.getElementById('wd-step-2').classList.add('hidden'); document.getElementById('wd-title').textContent = 'Withdraw Funds'; }
+            function previewFile() { const file = document.getElementById('dep-photo').files[0]; const reader = new FileReader(); reader.onload = () => { document.getElementById('dep-preview').src = reader.result; document.getElementById('dep-preview').classList.remove('hidden'); }; if (file) reader.readAsDataURL(file); }
+
+            /* --- NID Verification Logic --- */
+            function openNIDModal() {
+                document.getElementById('nid-modal').classList.remove('hidden');
+            }
+
+            function closeNIDModal() {
+                document.getElementById('nid-modal').classList.add('hidden');
+            }
+
+            function previewNID(side) {
+                const file = document.getElementById(`nid-${side}`).files[0];
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const img = document.getElementById(`nid-${side}-preview`);
+                    img.src = reader.result;
+                    img.classList.remove('hidden');
+                };
+                if (file) reader.readAsDataURL(file);
+            }
+
+            function submitNID() {
+                const name = document.getElementById('nid-name').value;
+                const number = document.getElementById('nid-number').value;
+                const frontFile = document.getElementById('nid-front').files[0];
+                const backFile = document.getElementById('nid-back').files[0];
+
+                if (!name || !number || !frontFile || !backFile) {
+                    tg.showAlert('Please fill all fields and upload both photos!');
+                    return;
+                }
+
+                // Using base64 for now as requested (simple implementation)
+                // Ideally upload to Storage and get URL
+                const frontReader = new FileReader();
+                frontReader.onload = () => {
+                    const frontBase64 = frontReader.result;
+                    const backReader = new FileReader();
+                    backReader.onload = () => {
+                        const backBase64 = backReader.result;
+
+                        const verificationRef = db.ref('nid_verifications').push();
+                        const data = {
+                            id: verificationRef.key,
+                            userId: currentUser.id,
+                            userName: currentUser.name,
+                            submittedName: name,
+                            nidNumber: number,
+                            frontPhoto: frontBase64,
+                            backPhoto: backBase64,
+                            status: 'pending',
+                            timestamp: firebase.database.ServerValue.TIMESTAMP
+                        };
+
+                        verificationRef.set(data).then(() => {
+                            db.ref(`${USERS_NODE}/${currentUser.id}`).update({
+                                verificationStatus: 'pending',
+                                nidSubmitted: true
+                            });
+                            tg.showAlert('NID Submitted for Review!');
+                            closeNIDModal();
+                        });
+                    };
+                    backReader.readAsDataURL(backFile);
+                };
+                frontReader.readAsDataURL(frontFile);
+            }
+
+            window.addEventListener('DOMContentLoaded', initApp);
+
+        </script>
 </body>
 
 </html>
