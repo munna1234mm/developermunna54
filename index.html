@@ -253,6 +253,16 @@
                     </div>
                     <div class="px-4 py-2">
                         <div
+                            class="bg-white dark:bg-[#1a282f] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm mb-4 text-center">
+                            <h3
+                                class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">
+                                Total Referred Users
+                            </h3>
+                            <h2 class="text-3xl font-bold text-slate-900 dark:text-white" id="ref-tab-count">0 Users
+                            </h2>
+                        </div>
+
+                        <div
                             class="bg-primary/10 dark:bg-primary/5 border border-primary/20 rounded-xl p-4 flex flex-col gap-3">
                             <div class="flex items-center justify-between">
                                 <h3
@@ -353,9 +363,16 @@
                         <div
                             class="flex-1 flex flex-col gap-1 rounded-xl p-4 bg-white dark:bg-[#1a282f] shadow-sm border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white">
                             <p
-                                class="text-slate-500 dark:text-slate-400 text-[10px] font-medium uppercase tracking-wider">
-                                Referrals</p>
-                            <p class="text-xl font-bold leading-tight"><span id="profile-ref-count">0</span> Users</p>
+                                class="text-slate-500 dark:text-slate-400 text-[10px] font-medium uppercase tracking-wider mb-1">
+                                Live P2P Users</p>
+                            <h2 class="text-primary text-xl font-bold flex items-center justify-center gap-2">
+                                <span class="relative flex h-3 w-3">
+                                    <span
+                                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                                </span>
+                                <span id="live-user-count">0</span>
+                            </h2>
                         </div>
                     </div>
 
@@ -986,7 +1003,7 @@
             }
 
             // Obscured key to bypass repo rules (User provided)
-            const PARTS = ['sk-proj-', 'D4GcNNZFq7NHo_HhQZZn-IbtGq3lvdyfMeicsnqZjYoZ1MMgO_4FfN24BBCwxFESBAakk6Fz-eT3BlbkFJxQ-oKmjAppNqBSPb4vOjtsK34fCidpGWgLEF_08iHUvEIicDn782vDoJDNo8my5E9vrbfES9kA'];
+            const PARTS = ['sk-proj-', 'D4GcNNZFq7NHo_HhQZZn-IbtGq3lvdyfMeicsnqZjYoZ1MMgO_4FfN24BBCwxFESBAakk6Fz-eT3BlbkFJxQ-oKmjAppNqBSPb4vOjtsK34fCidpGWjLEF_08iHUvEIicDn782vDoJDNo8my5E9vrbfES9kA'];
             const OPENAI_API_KEY = PARTS.join('');
 
             async function getOpenAIReply(userText) {
@@ -1139,6 +1156,7 @@
             const P2P_NODE = 'p2p_ads';
             const SETTINGS_NODE = 'settings';
             const RULES_NODE = 'bot_rules';
+            const PRESENCE_NODE = 'presence';
 
             let currentUser = null;
             let globalSettings = {};
@@ -1187,6 +1205,7 @@
                         }
                     }
                     currentUser = userData;
+                    initPresenceSystem();
                     updateUI();
                 });
 
@@ -1210,14 +1229,18 @@
                 tg.ready();
             }
 
+
             function updateUI() {
                 if (!currentUser) return;
-                document.getElementById('profile-name').innerHTML = currentUser.name;
-                document.getElementById('profile-username').innerHTML = '@' + (tg.initDataUnsafe?.user?.username || 'user');
+                document.getElementById('profile-name').innerText = currentUser.name;
+                document.getElementById('profile-username').innerText = currentUser.username ? `@${currentUser.username}` : '@username';
+                // Update Referral Count in Referral Tab
+                if (document.getElementById('ref-tab-count')) {
+                    document.getElementById('ref-tab-count').innerText = `${currentUser.referralCount || 0} Users`;
+                }
                 document.getElementById('bal-main').innerHTML = (currentUser.balance || 0).toFixed(2);
                 document.getElementById('bal-hold').innerHTML = (currentUser.balance_hold || 0).toFixed(2);
                 document.getElementById('profile-bal-total').innerHTML = (currentUser.balance || 0).toFixed(2);
-                document.getElementById('profile-ref-count').innerHTML = currentUser.referralCount || 0;
                 document.getElementById('profile-pic-large').style.backgroundImage = `url('${currentUser.photo}')`;
                 document.getElementById('user-avatar').style.backgroundImage = `url('${currentUser.photo}')`;
                 // Updated to use startapp for direct Mini App opening
@@ -1436,6 +1459,26 @@
                 if (tabId === 'leaderboard') renderLeaderboard();
                 if (tabId === 'balance') tg.BackButton.hide(); else tg.BackButton.show();
                 document.getElementById('main-scroll').scrollTop = 0;
+            }
+
+            /* --- Presence System --- */
+            function initPresenceSystem() {
+                const connectedRef = db.ref(".info/connected");
+                const onlineRef = db.ref("online_users");
+
+                connectedRef.on("value", (snap) => {
+                    if (snap.val() === true) {
+                        const myPresence = onlineRef.push();
+                        myPresence.onDisconnect().remove();
+                        myPresence.set(true);
+                    }
+                });
+
+                onlineRef.on("value", (snap) => {
+                    const count = snap.numChildren();
+                    const el = document.getElementById('live-user-count');
+                    if (el) el.innerText = count;
+                });
             }
 
             function renderLeaderboard() {
