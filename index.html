@@ -759,6 +759,14 @@
                             class="font-bold">0</span> Stars</p>
                 </div>
 
+                <div id="stars-trade-rules-box"
+                    class="hidden bg-orange-50 dark:bg-orange-900/20 p-3 rounded-xl border border-orange-100 dark:border-orange-900/30">
+                    <p class="text-[10px] font-bold text-orange-600 dark:text-orange-400 uppercase mb-1">Service Rules
+                    </p>
+                    <p id="stars-trade-rules-text"
+                        class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed"></p>
+                </div>
+
                 <div class="space-y-3">
                     <div>
                         <label class="text-xs text-slate-500 mb-1 block">Sent Star Count</label>
@@ -840,6 +848,14 @@
                     class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800 space-y-2">
                     <p class="text-xs text-blue-600 dark:text-blue-400 font-medium">Please provide the login details for
                         the account you are selling.</p>
+                </div>
+
+                <div id="credentials-rules-box"
+                    class="hidden bg-orange-50 dark:bg-orange-900/20 p-3 rounded-xl border border-orange-100 dark:border-orange-900/30">
+                    <p class="text-[10px] font-bold text-orange-600 dark:text-orange-400 uppercase mb-1">Service Rules
+                    </p>
+                    <p id="credentials-rules-text"
+                        class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed"></p>
                 </div>
 
                 <div class="space-y-3">
@@ -924,6 +940,14 @@
                         <p class="text-xs text-slate-500 dark:text-slate-400">Rate per Star</p>
                         <p id="buy-stars-rate" class="text-sm font-bold text-slate-900 dark:text-white">0.00 BDT</p>
                     </div>
+                </div>
+
+                <div id="buy-stars-rules-box"
+                    class="hidden bg-orange-50 dark:bg-orange-900/20 p-3 rounded-xl border border-orange-100 dark:border-orange-900/30">
+                    <p class="text-[10px] font-bold text-orange-600 dark:text-orange-400 uppercase mb-1">Service Rules
+                    </p>
+                    <p id="buy-stars-rules-text" class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                    </p>
                 </div>
 
                 <div class="space-y-4">
@@ -1757,17 +1781,28 @@
                         return;
                     }
 
-                    if (confirm(`Buy ${ad.asset} for ${price} BDT? \n\nCredentials will be delivered immediately.`)) {
+                    let msg = `Buy ${ad.asset} for ${price} BDT? \n\nCredentials will be delivered immediately.`;
+                    if (ad.rules) msg += `\n\nRULES:\n${ad.rules}`;
+
+                    if (confirm(msg)) {
                         confirmPurchase(ad);
                     }
                 }
                 else if (action === 'buy' && ad.asset === 'Stars') {
                     // USER BUYS STARS (Manual Fulfillment)
                     activeStarsAd = ad;
-                    document.getElementById('buy-stars-rate').textContent = `${parseFloat(ad.price).toFixed(2)} BDT`;
-                    document.getElementById('buy-stars-qty').value = '';
-                    document.getElementById('buy-stars-link').value = '';
                     document.getElementById('buy-stars-total').textContent = '0.00 BDT';
+
+                    // Rules
+                    const rulesBox = document.getElementById('buy-stars-rules-box');
+                    const rulesText = document.getElementById('buy-stars-rules-text');
+                    if (ad.rules) {
+                        rulesBox.classList.remove('hidden');
+                        rulesText.textContent = ad.rules;
+                    } else {
+                        rulesBox.classList.add('hidden');
+                    }
+
                     document.getElementById('buy-stars-modal').classList.remove('hidden');
                 }
                 else if (ad && ad.authType === 'credentials') {
@@ -1778,7 +1813,18 @@
                     // Fetch FRESH data mostly for inventory check
                     db.ref(`${P2P_NODE}/${ad.id}`).once('value', snapshot => {
                         const freshAd = snapshot.val();
-                        if (freshAd) activeStarsAd = freshAd;
+                        if (freshAd) {
+                            activeStarsAd = freshAd;
+                            // Rules
+                            const rulesBox = document.getElementById('credentials-rules-box');
+                            const rulesText = document.getElementById('credentials-rules-text');
+                            if (freshAd.rules) {
+                                rulesBox.classList.remove('hidden');
+                                rulesText.textContent = freshAd.rules;
+                            } else {
+                                rulesBox.classList.add('hidden');
+                            }
+                        }
                     });
                 }
                 else if (ad && (ad.asset === 'Stars' || ad.authType !== 'credentials')) {
@@ -1796,6 +1842,16 @@
                             activeStarsAd = freshAd;
                             document.getElementById('stars-needed-count').textContent = freshAd.starCount || '0';
                             document.getElementById('stars-target-link').href = freshAd.targetLink || '#';
+
+                            // Rules
+                            const rulesBox = document.getElementById('stars-trade-rules-box');
+                            const rulesText = document.getElementById('stars-trade-rules-text');
+                            if (freshAd.rules) {
+                                rulesBox.classList.remove('hidden');
+                                rulesText.textContent = freshAd.rules;
+                            } else {
+                                rulesBox.classList.add('hidden');
+                            }
                         }
                     });
                 } else {
