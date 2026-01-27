@@ -1337,9 +1337,12 @@
                 <div class="flex flex-col bg-white dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800 animate-slide-up shadow-sm">
                     <div class="flex justify-between items-start mb-3">
                         <div class="flex items-center gap-3">
-                            <div class="size-10 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold">${ad.asset.charAt(0)}</div>
+                            <div class="size-10 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold uppercase">${ad.asset.charAt(0)}</div>
                             <div>
-                                <div class="flex items-center gap-1 text-slate-900 dark:text-white"><p class="text-sm font-bold">Merchant #${~~(Math.random() * 1000)}</p><span class="material-symbols-outlined text-primary text-[14px] fill-current">verified</span></div>
+                                <div class="flex items-center gap-1 text-slate-900 dark:text-white">
+                                    <p class="text-sm font-bold">${ad.merchant || `Merchant #${~~(Math.random() * 1000)}`}</p>
+                                    <span class="material-symbols-outlined text-primary text-[14px] fill-current">verified</span>
+                                </div>
                                 <p class="text-[11px] text-slate-500 dark:text-slate-400">99% Success • 1k+ Orders</p>
                             </div>
                         </div>
