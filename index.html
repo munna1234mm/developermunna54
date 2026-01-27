@@ -1411,11 +1411,16 @@
                     const actionLabel = currentTab === 'buy' ? 'Buy' : 'Sell';
                     const buttonClass = currentTab === 'buy' ? 'bg-success-green' : 'bg-red-500';
                     const subtitleText = ad.subtitle || `P2P: ${ad.asset}`;
+
+                    const logoHtml = ad.logo
+                        ? `<div class="size-10 rounded-full bg-cover bg-center shrink-0 border border-slate-200 dark:border-slate-700" style="background-image: url('${ad.logo}')"></div>`
+                        : `<div class="size-10 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold uppercase shrink-0">${ad.asset.charAt(0)}</div>`;
+
                     return `
                 <div class="flex flex-col bg-white dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800 animate-slide-up shadow-sm">
                     <div class="flex justify-between items-start mb-3">
                         <div class="flex items-center gap-3">
-                            <div class="size-10 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold uppercase">${ad.asset.charAt(0)}</div>
+                            ${logoHtml}
                             <div>
                                 <div class="flex items-center gap-1 text-slate-900 dark:text-white">
                                     <p class="text-sm font-bold">${ad.merchant || `Merchant #${~~(Math.random() * 1000)}`}</p>
