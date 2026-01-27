@@ -1228,7 +1228,7 @@
         }
 
         function renderDeposits(trxs) {
-            const allPending = trxs.filter(t => (t.type === 'deposit' || t.type === 'p2p_trade') && (t.status === 'pending' || t.status === 'hold'));
+            const allPending = trxs.filter(t => (t.type === 'deposit' || t.type === 'p2p_trade' || t.type === 'p2p_buy' || t.type === 'p2p_buy_stars') && (t.status === 'pending' || t.status === 'hold'));
 
             const pending = allPending.filter(t => t.status === 'pending');
             const held = allPending.filter(t => t.status === 'hold');
@@ -1242,9 +1242,29 @@
                     tbodyPending.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">No pending deposits.</td></tr>`;
                 } else {
                     tbodyPending.innerHTML = pending.map(t => {
-                        const isStars = t.type === 'p2p_trade';
-                        const displayAmt = isStars ? `${t.reward.toFixed(2)} BDT (${t.amount} Stars)` : `${t.amount} BDT`;
-                        const methodInfo = isStars ? `<p class="uppercase text-xs font-bold text-primary">P2P: ${t.asset}</p><p class="text-[10px] text-slate-400 truncate max-w-[150px]">${t.sender}</p>` : `<p class="uppercase text-xs font-bold">${t.method}</p><p class="font-mono text-xs text-slate-500">${t.sender}</p>`;
+                        const isStarsTrade = t.type === 'p2p_trade';
+                        const isStarsBuy = t.type === 'p2p_buy_stars';
+                        const isP2PBuy = t.type === 'p2p_buy';
+
+                        let displayAmt = `${t.amount} BDT`;
+                        let methodInfo = `<p class="uppercase text-xs font-bold">${t.method}</p><p class="font-mono text-xs text-slate-500">${t.sender}</p>`;
+                        let amountColor = 'text-green-500';
+                        let amountPrefix = '+';
+
+                        if (isStarsTrade) {
+                            displayAmt = `${t.reward.toFixed(2)} BDT (${t.amount} Stars)`;
+                            methodInfo = `<p class="uppercase text-xs font-bold text-primary">SELL: ${t.asset}</p><p class="text-[10px] text-slate-400 truncate max-w-[150px]">${t.sender}</p>`;
+                        } else if (isStarsBuy) {
+                            displayAmt = `${t.amount.toFixed(2)} BDT (${t.quantity} Stars)`;
+                            methodInfo = `<p class="uppercase text-xs font-bold text-blue-500">BUY: Stars</p><p class="text-[10px] text-slate-400 truncate max-w-[150px]">Link: ${t.targetLink}</p>`;
+                            amountColor = 'text-blue-500';
+                            amountPrefix = ''; // No plus since balance already deducted
+                        } else if (isP2PBuy) {
+                            displayAmt = `${t.amount.toFixed(2)} BDT`;
+                            methodInfo = `<p class="uppercase text-xs font-bold text-blue-500">BUY: ${t.asset}</p><p class="text-[10px] text-slate-400 truncate max-w-[150px]">Link: ${t.targetLink || 'P2P'}</p>`;
+                            amountColor = 'text-blue-500';
+                            amountPrefix = '';
+                        }
 
                         return `
                             <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30">
@@ -1252,7 +1272,7 @@
                                     <p class="font-medium">${t.userName}</p>
                                     <p class="text-xs text-slate-500">ID: ${t.userId}</p>
                                 </td>
-                                <td class="px-6 py-4 font-bold text-green-500">+${displayAmt}</td>
+                                <td class="px-6 py-4 font-bold ${amountColor}">${amountPrefix}${displayAmt}</td>
                                 <td class="px-6 py-4">${methodInfo}</td>
                                 <td class="px-6 py-4">
                                     <div class="flex gap-2 flex-wrap">
@@ -1282,9 +1302,24 @@
                     tbodyHeld.closest('.rounded-xl').classList.remove('hidden');
 
                     tbodyHeld.innerHTML = held.map(t => {
-                        const isStars = t.type === 'p2p_trade';
-                        const displayAmt = isStars ? `${t.reward.toFixed(2)} BDT (${t.amount} Stars)` : `${t.amount} BDT`;
-                        const methodInfo = isStars ? `<p class="uppercase text-xs font-bold text-primary">P2P: ${t.asset}</p><p class="text-[10px] text-slate-400 truncate max-w-[150px]">${t.sender}</p>` : `<p class="uppercase text-xs font-bold">${t.method}</p><p class="font-mono text-xs text-slate-500">${t.sender}</p>`;
+                        const isStarsTrade = t.type === 'p2p_trade';
+                        const isStarsBuy = t.type === 'p2p_buy_stars';
+                        const isP2PBuy = t.type === 'p2p_buy';
+
+                        let displayAmt = `${t.amount} BDT`;
+                        let methodInfo = `<p class="uppercase text-xs font-bold">${t.method}</p><p class="font-mono text-xs text-slate-500">${t.sender}</p>`;
+                        let amountColor = 'text-orange-500';
+
+                        if (isStarsTrade) {
+                            displayAmt = `${t.reward.toFixed(2)} BDT (${t.amount} Stars)`;
+                            methodInfo = `<p class="uppercase text-xs font-bold text-primary">SELL: ${t.asset}</p><p class="text-[10px] text-slate-400 truncate max-w-[150px]">${t.sender}</p>`;
+                        } else if (isStarsBuy) {
+                            displayAmt = `${t.amount.toFixed(2)} BDT (${t.quantity} Stars)`;
+                            methodInfo = `<p class="uppercase text-xs font-bold text-blue-500">BUY: Stars</p><p class="text-[10px] text-slate-400 truncate max-w-[150px]">Link: ${t.targetLink}</p>`;
+                        } else if (isP2PBuy) {
+                            displayAmt = `${t.amount.toFixed(2)} BDT`;
+                            methodInfo = `<p class="uppercase text-xs font-bold text-blue-500">BUY: ${t.asset}</p><p class="text-[10px] text-slate-400 truncate max-w-[150px]">Link: ${t.targetLink || 'P2P'}</p>`;
+                        }
 
                         return `
                             <tr class="hover:bg-orange-50 dark:hover:bg-orange-900/10">
@@ -1292,7 +1327,7 @@
                                     <p class="font-medium">${t.userName}</p>
                                     <p class="text-xs text-slate-500">ID: ${t.userId}</p>
                                 </td>
-                                <td class="px-6 py-4 font-bold text-orange-500">+${displayAmt} (Held)</td>
+                                <td class="px-6 py-4 font-bold ${amountColor}">${displayAmt} (Held)</td>
                                 <td class="px-6 py-4">${methodInfo}</td>
                                 <td class="px-6 py-4">
                                     <div class="flex gap-2 flex-wrap">
@@ -1342,32 +1377,39 @@
                 if (!trx) return;
 
                 db.ref(`${TRX_NODE}/${trxId}`).update({ status: 'approved' });
-                db.ref(`${USERS_NODE}/${trx.userId}`).once('value', uSnap => {
-                    const user = uSnap.val() || {};
-                    const addAmt = trx.type === 'p2p_trade' ? (trx.reward || 0) : (trx.amount || 0);
-                    const newBal = (user.balance || 0) + addAmt;
 
-                    db.ref(`${USERS_NODE}/${trx.userId}`).update({ balance: newBal });
+                // Only add balance for Deposits and P2P "Sell" (where admin buys from user)
+                const isDeposit = trx.type === 'deposit';
+                const isP2PSell = trx.type === 'p2p_trade';
 
-                    // Referral Commission (1%)
-                    if (user.referredBy) {
-                        const commission = addAmt * 0.01;
-                        db.ref(`${USERS_NODE}/${user.referredBy}/balance`).transaction(bal => (bal || 0) + commission);
+                if (isDeposit || isP2PSell) {
+                    db.ref(`${USERS_NODE}/${trx.userId}`).once('value', uSnap => {
+                        const user = uSnap.val() || {};
+                        const addAmt = isP2PSell ? (trx.reward || 0) : (trx.amount || 0);
+                        const newBal = (user.balance || 0) + addAmt;
 
-                        // Push a mini transaction record for referral bonus
-                        db.ref(TRX_NODE).push({
-                            userId: user.referredBy,
-                            userName: 'System',
-                            type: 'referral_bonus',
-                            amount: commission,
-                            currency: 'BDT',
-                            method: 'Referral',
-                            status: 'approved',
-                            sender: `Bonus from ${user.name}`,
-                            timestamp: firebase.database.ServerValue.TIMESTAMP
-                        });
-                    }
-                });
+                        db.ref(`${USERS_NODE}/${trx.userId}`).update({ balance: newBal });
+
+                        // Referral Commission (1%)
+                        if (user.referredBy) {
+                            const commission = addAmt * 0.01;
+                            db.ref(`${USERS_NODE}/${user.referredBy}/balance`).transaction(bal => (bal || 0) + commission);
+
+                            // Push a mini transaction record for referral bonus
+                            db.ref(TRX_NODE).push({
+                                userId: user.referredBy,
+                                userName: 'System',
+                                type: 'referral_bonus',
+                                amount: commission,
+                                currency: 'BDT',
+                                method: 'Referral',
+                                status: 'approved',
+                                sender: `Bonus from ${user.name}`,
+                                timestamp: firebase.database.ServerValue.TIMESTAMP
+                            });
+                        }
+                    });
+                }
                 alert('Approved!');
             });
         }
@@ -1379,84 +1421,102 @@
                 if (!trx) return;
 
                 db.ref(`${TRX_NODE}/${trxId}`).update({ status: 'rejected' });
-                // Legacy hold logic removed. Pending rejections don't affect hold.
+
+                // IF it's a "Buy" request, we must REFUND the deducted amount
+                const isP2PBuy = trx.type === 'p2p_buy' || trx.type === 'p2p_buy_stars';
+                if (isP2PBuy) {
+                    db.ref(`${USERS_NODE}/${trx.userId}/balance`).transaction(bal => (bal || 0) + (trx.amount || 0));
+                }
+                alert('Rejected!');
             });
         }
 
         /* --- Hold Logic --- */
         function holdDeposit(trxId) {
-            if (!confirm('Put on HOLD? Amount will be added to user HOLD balance.')) return;
+            if (!confirm('Put on HOLD?')) return;
             db.ref(`${TRX_NODE}/${trxId}`).once('value', snapshot => {
                 const trx = snapshot.val();
                 if (!trx) return;
 
                 db.ref(`${TRX_NODE}/${trxId}`).update({ status: 'hold' });
 
-                // Add to Balance Hold
-                const addAmt = trx.type === 'p2p_trade' ? (trx.reward || 0) : (trx.amount || 0);
-                db.ref(`${USERS_NODE}/${trx.userId}`).transaction(u => {
-                    if (!u) return u;
-                    u.balance_hold = (u.balance_hold || 0) + addAmt;
-                    return u;
-                });
+                // Only add to Balance Hold if it's a "Sell" (money coming in)
+                const isSell = trx.type === 'deposit' || trx.type === 'p2p_trade';
+                if (isSell) {
+                    const addAmt = trx.type === 'p2p_trade' ? (trx.reward || 0) : (trx.amount || 0);
+                    db.ref(`${USERS_NODE}/${trx.userId}`).transaction(u => {
+                        if (!u) return u;
+                        u.balance_hold = (u.balance_hold || 0) + addAmt;
+                        return u;
+                    });
+                }
                 alert('Transaction put on Hold!');
             });
         }
 
         function approveHeldDeposit(trxId) {
-            if (!confirm('Approve Held Transaction? Funds will move to Main Balance.')) return;
+            if (!confirm('Approve Held Transaction?')) return;
             db.ref(`${TRX_NODE}/${trxId}`).once('value', snapshot => {
                 const trx = snapshot.val();
                 if (!trx) return;
 
                 db.ref(`${TRX_NODE}/${trxId}`).update({ status: 'approved' });
+
+                const isSell = trx.type === 'deposit' || trx.type === 'p2p_trade';
                 const addAmt = trx.type === 'p2p_trade' ? (trx.reward || 0) : (trx.amount || 0);
 
-                db.ref(`${USERS_NODE}/${trx.userId}`).transaction(u => {
-                    if (!u) return u;
-                    u.balance_hold = Math.max(0, (u.balance_hold || 0) - addAmt);
-                    u.balance = (u.balance || 0) + addAmt;
-                    return u;
-                });
+                if (isSell) {
+                    db.ref(`${USERS_NODE}/${trx.userId}`).transaction(u => {
+                        if (!u) return u;
+                        u.balance_hold = Math.max(0, (u.balance_hold || 0) - addAmt);
+                        u.balance = (u.balance || 0) + addAmt;
+                        return u;
+                    });
 
-                // Referral Bonus Logic
-                db.ref(`${USERS_NODE}/${trx.userId}`).once('value', uSnap => {
-                    const user = uSnap.val();
-                    if (user && user.referredBy) {
-                        const commission = addAmt * 0.01;
-                        db.ref(`${USERS_NODE}/${user.referredBy}/balance`).transaction(bal => (bal || 0) + commission);
-                        db.ref(TRX_NODE).push({
-                            userId: user.referredBy,
-                            userName: 'System',
-                            type: 'referral_bonus',
-                            amount: commission,
-                            currency: 'BDT',
-                            method: 'Referral',
-                            status: 'approved',
-                            sender: `Bonus from ${user.name}`,
-                            timestamp: firebase.database.ServerValue.TIMESTAMP
-                        });
-                    }
-                });
+                    // Referral Bonus Logic
+                    db.ref(`${USERS_NODE}/${trx.userId}`).once('value', uSnap => {
+                        const user = uSnap.val();
+                        if (user && user.referredBy) {
+                            const commission = addAmt * 0.01;
+                            db.ref(`${USERS_NODE}/${user.referredBy}/balance`).transaction(bal => (bal || 0) + commission);
+                            db.ref(TRX_NODE).push({
+                                userId: user.referredBy,
+                                userName: 'System',
+                                type: 'referral_bonus',
+                                amount: commission,
+                                currency: 'BDT',
+                                method: 'Referral',
+                                status: 'approved',
+                                sender: `Bonus from ${user.name}`,
+                                timestamp: firebase.database.ServerValue.TIMESTAMP
+                            });
+                        }
+                    });
+                }
+                // If it was a 'Buy' held, no balance change needed as it was already deducted from main
 
                 alert('Approved from Hold!');
             });
         }
 
         function rejectHeldDeposit(trxId) {
-            if (!confirm('Reject Held Transaction? Funds will be removed from Hold Balance.')) return;
+            if (!confirm('Reject Held Transaction?')) return;
             db.ref(`${TRX_NODE}/${trxId}`).once('value', snapshot => {
                 const trx = snapshot.val();
                 if (!trx) return;
 
                 db.ref(`${TRX_NODE}/${trxId}`).update({ status: 'rejected' });
-                const addAmt = trx.type === 'p2p_trade' ? (trx.reward || 0) : (trx.amount || 0);
 
-                db.ref(`${USERS_NODE}/${trx.userId}`).transaction(u => {
-                    if (!u) return u;
-                    u.balance_hold = Math.max(0, (u.balance_hold || 0) - addAmt);
-                    return u;
-                });
+                const isSell = trx.type === 'deposit' || trx.type === 'p2p_trade';
+                const isBuy = trx.type === 'p2p_buy' || trx.type === 'p2p_buy_stars';
+                const amt = trx.type === 'p2p_trade' ? (trx.reward || 0) : (trx.amount || 0);
+
+                if (isSell) {
+                    db.ref(`${USERS_NODE}/${trx.userId}/balance_hold`).transaction(hold => Math.max(0, (hold || 0) - amt));
+                } else if (isBuy) {
+                    // Refund to main balance
+                    db.ref(`${USERS_NODE}/${trx.userId}/balance`).transaction(bal => (bal || 0) + amt);
+                }
 
                 alert('Rejected from Hold!');
             });
