@@ -753,80 +753,17 @@
                             class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary">
                     </div>
 
-                    <!-- NID Verification Modal -->
-                    <div id="nid-modal"
-                        class="fixed inset-0 z-[9999] hidden flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
-                        <div
-                            class="bg-white dark:bg-[#1a282f] w-full max-w-sm rounded-2xl p-6 shadow-xl animate-slide-up space-y-4 max-h-[90vh] overflow-y-auto transition-all duration-300">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Verify Identity</h3>
-                                <button onclick="closeNIDModal()"
-                                    class="text-slate-500 hover:text-slate-700 dark:hover:text-white">
-                                    <span class="material-symbols-outlined">close</span>
-                                </button>
-                            </div>
 
-                            <div class="p-4 bg-primary/5 rounded-xl border border-primary/20 space-y-2">
-                                <p class="text-xs text-slate-500">Submit your National ID Card to verify your account
-                                    and increase limits.</p>
-                            </div>
-
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="text-xs text-slate-500 mb-1 block">Full Name (As per NID)</label>
-                                    <input id="nid-name" type="text" placeholder="MD. RAHIM"
-                                        class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold">
-                                </div>
-                                <div>
-                                    <label class="text-xs text-slate-500 mb-1 block">NID Number</label>
-                                    <input id="nid-number" type="number" placeholder="1234567890"
-                                        class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary">
-                                </div>
-
-                                <div class="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label class="text-xs text-slate-500 mb-1 block">Front Side</label>
-                                        <div onclick="document.getElementById('nid-front').click()"
-                                            class="w-full h-24 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex flex-col items-center justify-center text-slate-400 cursor-pointer overflow-hidden bg-slate-50 dark:bg-black/20 relative">
-                                            <input type="file" id="nid-front" accept="image/*" class="hidden"
-                                                onchange="previewNID('front')">
-                                            <span class="material-symbols-outlined text-2xl mb-1">id_card</span>
-                                            <span class="text-[10px]">Front</span>
-                                            <img id="nid-front-preview"
-                                                class="absolute inset-0 w-full h-full object-cover hidden rounded-xl">
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="text-xs text-slate-500 mb-1 block">Back Side</label>
-                                        <div onclick="document.getElementById('nid-back').click()"
-                                            class="w-full h-24 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex flex-col items-center justify-center text-slate-400 cursor-pointer overflow-hidden bg-slate-50 dark:bg-black/20 relative">
-                                            <input type="file" id="nid-back" accept="image/*" class="hidden"
-                                                onchange="previewNID('back')">
-                                            <span class="material-symbols-outlined text-2xl mb-1">badge</span>
-                                            <span class="text-[10px]">Back</span>
-                                            <img id="nid-back-preview"
-                                                class="absolute inset-0 w-full h-full object-cover hidden rounded-xl">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <button onclick="submitNID()"
-                                class="w-full py-3.5 bg-primary text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all">
-                                Submit for Review
-                            </button>
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-500 mb-1 block">Screenshot Proof</label>
-                            <div onclick="document.getElementById('stars-photo').click()"
-                                class="w-full h-24 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex flex-col items-center justify-center text-slate-400 cursor-pointer overflow-hidden bg-slate-50 dark:bg-black/20 relative">
-                                <input type="file" id="stars-photo" accept="image/*" class="hidden"
-                                    onchange="previewStarsFile()">
-                                <span class="material-symbols-outlined text-2xl mb-1">add_a_photo</span>
-                                <span class="text-xs">Upload Screenshot</span>
-                                <img id="stars-preview"
-                                    class="absolute inset-0 w-full h-full object-cover hidden rounded-xl">
-                            </div>
+                    <div>
+                        <label class="text-xs text-slate-500 mb-1 block">Screenshot Proof</label>
+                        <div onclick="document.getElementById('stars-photo').click()"
+                            class="w-full h-24 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex flex-col items-center justify-center text-slate-400 cursor-pointer overflow-hidden bg-slate-50 dark:bg-black/20 relative">
+                            <input type="file" id="stars-photo" accept="image/*" class="hidden"
+                                onchange="previewStarsFile()">
+                            <span class="material-symbols-outlined text-2xl mb-1">add_a_photo</span>
+                            <span class="text-xs">Upload Screenshot</span>
+                            <img id="stars-preview"
+                                class="absolute inset-0 w-full h-full object-cover hidden rounded-xl">
                         </div>
                     </div>
 
@@ -836,34 +773,100 @@
                     </button>
                 </div>
             </div>
+        </div>
 
-            <!-- Bottom Navigation Bar -->
-            <nav
-                class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-[#0f171a]/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800/50 pb-safe-area z-[100] transition-colors overflow-hidden">
-                <div class="flex justify-around items-center h-16">
-                    <button onclick="switchTab('balance')" id="nav-balance"
-                        class="nav-btn flex flex-col items-center justify-center gap-1 text-primary">
-                        <span class="material-symbols-outlined"
-                            style="font-variation-settings: 'FILL' 1">account_balance_wallet</span>
-                        <span class="text-[10px] font-bold">Balance</span>
-                    </button>
-                    <button onclick="switchTab('p2p')" id="nav-p2p"
-                        class="nav-btn flex flex-col items-center justify-center gap-1 text-slate-400">
-                        <span class="material-symbols-outlined">swap_horizontal_circle</span>
-                        <span class="text-[10px] font-medium">P2P</span>
-                    </button>
-                    <button onclick="switchTab('referral')" id="nav-referral"
-                        class="nav-btn flex flex-col items-center justify-center gap-1 text-slate-400">
-                        <span class="material-symbols-outlined">group</span>
-                        <span class="text-[10px] font-medium">Referral</span>
-                    </button>
-                    <button onclick="switchTab('profile')" id="nav-profile"
-                        class="nav-btn flex flex-col items-center justify-center gap-1 text-slate-400">
-                        <span class="material-symbols-outlined">person</span>
-                        <span class="text-[10px] font-medium">Profile</span>
+        <!-- Bottom Navigation Bar -->
+        <nav
+            class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-[#0f171a]/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800/50 pb-safe-area z-[100] transition-colors overflow-hidden">
+            <div class="flex justify-around items-center h-16">
+                <button onclick="switchTab('balance')" id="nav-balance"
+                    class="nav-btn flex flex-col items-center justify-center gap-1 text-primary">
+                    <span class="material-symbols-outlined"
+                        style="font-variation-settings: 'FILL' 1">account_balance_wallet</span>
+                    <span class="text-[10px] font-bold">Balance</span>
+                </button>
+                <button onclick="switchTab('p2p')" id="nav-p2p"
+                    class="nav-btn flex flex-col items-center justify-center gap-1 text-slate-400">
+                    <span class="material-symbols-outlined">swap_horizontal_circle</span>
+                    <span class="text-[10px] font-medium">P2P</span>
+                </button>
+                <button onclick="switchTab('referral')" id="nav-referral"
+                    class="nav-btn flex flex-col items-center justify-center gap-1 text-slate-400">
+                    <span class="material-symbols-outlined">group</span>
+                    <span class="text-[10px] font-medium">Referral</span>
+                </button>
+                <button onclick="switchTab('profile')" id="nav-profile"
+                    class="nav-btn flex flex-col items-center justify-center gap-1 text-slate-400">
+                    <span class="material-symbols-outlined">person</span>
+                    <span class="text-[10px] font-medium">Profile</span>
+                </button>
+            </div>
+        </nav>
+
+
+
+        <!-- NID Verification Modal -->
+        <div id="nid-modal"
+            class="fixed inset-0 z-[9999] hidden flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
+            <div
+                class="bg-white dark:bg-[#1a282f] w-full max-w-sm rounded-2xl p-6 shadow-xl animate-slide-up space-y-4 max-h-[90vh] overflow-y-auto transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">Verify Identity</h3>
+                    <button onclick="closeNIDModal()" class="text-slate-500 hover:text-slate-700 dark:hover:text-white">
+                        <span class="material-symbols-outlined">close</span>
                     </button>
                 </div>
-            </nav>
+
+                <div class="p-4 bg-primary/5 rounded-xl border border-primary/20 space-y-2">
+                    <p class="text-xs text-slate-500">Submit your National ID Card to verify your account
+                        and increase limits.</p>
+                </div>
+
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-xs text-slate-500 mb-1 block">Full Name (As per NID)</label>
+                        <input id="nid-name" type="text" placeholder="MD. RAHIM"
+                            class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-500 mb-1 block">NID Number</label>
+                        <input id="nid-number" type="number" placeholder="1234567890"
+                            class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-xs text-slate-500 mb-1 block">Front Side</label>
+                            <div onclick="document.getElementById('nid-front').click()"
+                                class="w-full h-24 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex flex-col items-center justify-center text-slate-400 cursor-pointer overflow-hidden bg-slate-50 dark:bg-black/20 relative">
+                                <input type="file" id="nid-front" accept="image/*" class="hidden"
+                                    onchange="previewNID('front')">
+                                <span class="material-symbols-outlined text-2xl mb-1">id_card</span>
+                                <span class="text-[10px]">Front</span>
+                                <img id="nid-front-preview"
+                                    class="absolute inset-0 w-full h-full object-cover hidden rounded-xl">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-500 mb-1 block">Back Side</label>
+                            <div onclick="document.getElementById('nid-back').click()"
+                                class="w-full h-24 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex flex-col items-center justify-center text-slate-400 cursor-pointer overflow-hidden bg-slate-50 dark:bg-black/20 relative">
+                                <input type="file" id="nid-back" accept="image/*" class="hidden"
+                                    onchange="previewNID('back')">
+                                <span class="material-symbols-outlined text-2xl mb-1">badge</span>
+                                <span class="text-[10px]">Back</span>
+                                <img id="nid-back-preview"
+                                    class="absolute inset-0 w-full h-full object-cover hidden rounded-xl">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="submitNID()"
+                    class="w-full py-3.5 bg-primary text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all">
+                    Submit for Review
+                </button>
+            </div>
         </div>
 
         <script>
