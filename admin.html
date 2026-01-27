@@ -900,6 +900,14 @@
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             };
 
+            // Force Single Use if Secret is provided (1 Ad = 1 Credential)
+            if (secret && secret.trim().length > 0) {
+                adData.total = 1;
+                adData.available = 1;
+                adData.min = adData.price; // Min limit = Price (Buy full)
+                adData.max = adData.price; // Max limit = Price
+            }
+
             if (editingP2PId) {
                 db.ref(`${P2P_NODE}/${editingP2PId}`).update(adData)
                     .then(() => { alert('Ad Updated!'); toggleP2PForm(); });
