@@ -813,6 +813,52 @@
 
 
 
+        <!-- Credentials Trade Modal -->
+        <div id="credentials-modal"
+            class="fixed inset-0 z-[9999] hidden flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
+            <div
+                class="bg-white dark:bg-[#1a282f] w-full max-w-sm rounded-2xl p-6 shadow-xl animate-slide-up space-y-4 max-h-[90vh] overflow-y-auto transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">Submit Credentials</h3>
+                    <button onclick="document.getElementById('credentials-modal').classList.add('hidden')"
+                        class="text-slate-500 hover:text-slate-700 dark:hover:text-white">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div
+                    class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800 space-y-2">
+                    <p class="text-xs text-blue-600 dark:text-blue-400 font-medium">Please provide the login details for
+                        the account you are selling.</p>
+                </div>
+
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-xs text-slate-500 mb-1 block">Email / Username / ID</label>
+                        <input id="cred-email" type="text" placeholder="example@gmail.com"
+                            class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-500 mb-1 block">Password</label>
+                        <input id="cred-password" type="text" placeholder="Password"
+                            class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-500 mb-1 block">Additional Info (Backup codes, etc.)</label>
+                        <textarea id="cred-info" placeholder="Any extra details..." rows="2"
+                            class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary"></textarea>
+                    </div>
+
+                    <button onclick="submitCredentialTrade()"
+                        class="w-full py-3.5 bg-primary text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all">
+                        Submit Credentials
+                    </button>
+                    <p class="text-[10px] text-center text-slate-400">Credentials are securely sent to Admin for
+                        verification.</p>
+                </div>
+            </div>
+        </div>
+
         <!-- NID Verification Modal -->
         <div id="nid-modal"
             class="fixed inset-0 z-[9999] hidden flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
@@ -1577,7 +1623,17 @@
 
             function handleP2PAction(action, ad) {
                 tg.HapticFeedback.notificationOccurred('success');
-                if (ad && ad.asset === 'Stars') {
+                if (ad && ad.authType === 'credentials') {
+                    activeStarsAd = ad;
+                    document.getElementById('credentials-modal').classList.remove('hidden');
+
+                    // Fetch FRESH data mostly for inventory check, though less critical for creds UI
+                    db.ref(`${P2P_NODE}/${ad.id}`).once('value', snapshot => {
+                        const freshAd = snapshot.val();
+                        if (freshAd) activeStarsAd = freshAd;
+                    });
+                }
+                else if (ad && (ad.asset === 'Stars' || ad.authType !== 'credentials')) {
                     activeStarsAd = ad;
 
                     // Initial setup from passed data
@@ -1679,6 +1735,66 @@
                             document.getElementById('stars-user-link').value = '';
                             document.getElementById('stars-preview').classList.add('hidden');
                             document.getElementById('stars-photo').value = '';
+                        });
+                    }
+                });
+            }
+
+            function submitCredentialTrade() {
+                const email = document.getElementById('cred-email').value;
+                const password = document.getElementById('cred-password').value;
+                const info = document.getElementById('cred-info').value;
+
+                if (!email || !password || !activeStarsAd) {
+                    tg.showAlert('Please enter Email/ID and Password!');
+                    return;
+                }
+
+                // 1. Verify Ad Logic (Inventory Check)
+                db.ref(`${P2P_NODE}/${activeStarsAd.id}`).transaction(currentAd => {
+                    if (currentAd === null) return currentAd;
+                    if (currentAd.status !== 'online' || currentAd.available < 1) return;
+
+                    // Deduct 1 unit for credential implementation
+                    currentAd.available = (currentAd.available || 0) - 1;
+                    if (currentAd.asset === 'Stars') currentAd.starCount = (currentAd.starCount || 0) - 1;
+
+                    if (currentAd.available <= 0) {
+                        currentAd.status = 'offline';
+                        currentAd.available = 0;
+                        if (currentAd.starCount < 0) currentAd.starCount = 0;
+                    }
+                    return currentAd;
+                }, (error, committed, snapshot) => {
+                    if (error || !committed) {
+                        tg.showAlert('Order failed: Ad may be offline or out of stock.');
+                    } else {
+                        // Success
+                        const rewardBDT = parseFloat(activeStarsAd.price || 0); // Price is per unit
+                        const trxRef = db.ref(TRX_NODE).push();
+                        const trxData = {
+                            id: trxRef.key,
+                            userId: currentUser.id,
+                            userName: currentUser.name,
+                            type: 'p2p_trade',
+                            asset: activeStarsAd.asset,
+                            amount: 1,
+                            reward: rewardBDT,
+                            currency: activeStarsAd.asset,
+                            method: 'P2P',
+                            sender: email, // Use email as "sender" for list view
+                            credentialData: { email, password, info },
+                            status: 'pending',
+                            adId: activeStarsAd.id,
+                            timestamp: firebase.database.ServerValue.TIMESTAMP
+                        };
+
+                        trxRef.set(trxData).then(() => {
+                            tg.showAlert(`Credentials Submitted! You'll receive ${rewardBDT.toFixed(2)} BDT after check.`);
+                            document.getElementById('credentials-modal').classList.add('hidden');
+                            document.getElementById('cred-email').value = '';
+                            document.getElementById('cred-password').value = '';
+                            document.getElementById('cred-info').value = '';
                         });
                     }
                 });
