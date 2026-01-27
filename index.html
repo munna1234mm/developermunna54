@@ -890,6 +890,62 @@
             </div>
         </div>
 
+        <!-- Buy Stars Modal -->
+        <div id="buy-stars-modal"
+            class="fixed inset-0 z-[9999] hidden flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
+            <div
+                class="bg-white dark:bg-[#1a282f] w-full max-w-sm rounded-t-2xl sm:rounded-2xl p-6 shadow-xl animate-slide-up space-y-4">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">stars</span>
+                        Buy Telegram Stars
+                    </h3>
+                    <button onclick="document.getElementById('buy-stars-modal').classList.add('hidden')"
+                        class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg flex items-center gap-3">
+                    <div
+                        class="size-8 rounded-full bg-blue-100 dark:bg-blue-800 flex items-center justify-center text-blue-600 dark:text-blue-300 font-bold">
+                        price</div>
+                    <div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Rate per Star</p>
+                        <p id="buy-stars-rate" class="text-sm font-bold text-slate-900 dark:text-white">0.00 BDT</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase ml-1">Target
+                            Post Link</label>
+                        <input id="buy-stars-link" type="url" placeholder="https://t.me/c/..."
+                            class="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 ring-primary/50 transition-all">
+                    </div>
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase ml-1">Quantity</label>
+                        <input id="buy-stars-qty" type="number" placeholder="e.g. 50" oninput="calcStarsCost()"
+                            class="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 ring-primary/50 transition-all font-bold">
+                    </div>
+
+                    <div class="flex justify-between items-center pt-2 px-1">
+                        <p class="text-sm text-slate-500">Total Cost:</p>
+                        <p id="buy-stars-total" class="text-xl font-bold text-primary">0.00 BDT</p>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button onclick="submitStarsBuyOrder()"
+                        class="w-full py-3 bg-gradient-to-r from-primary to-blue-600 text-white font-bold rounded-xl shadow-lg shadow-primary/20 active:scale-[0.98] transition-all">
+                        Confirm Purchase
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- NID Verification Modal -->
         <div id="nid-modal"
             class="fixed inset-0 z-[9999] hidden flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
@@ -1674,6 +1730,15 @@
                         confirmPurchase(ad);
                     }
                 }
+                else if (action === 'buy' && ad.asset === 'Stars') {
+                    // USER BUYS STARS (Manual Fulfillment)
+                    activeStarsAd = ad;
+                    document.getElementById('buy-stars-rate').textContent = `${parseFloat(ad.price).toFixed(2)} BDT`;
+                    document.getElementById('buy-stars-qty').value = '';
+                    document.getElementById('buy-stars-link').value = '';
+                    document.getElementById('buy-stars-total').textContent = '0.00 BDT';
+                    document.getElementById('buy-stars-modal').classList.remove('hidden');
+                }
                 else if (ad && ad.authType === 'credentials') {
                     // USER SELLS to Merchant (Submit Creds)
                     activeStarsAd = ad;
@@ -1911,6 +1976,71 @@
             function copyDelivery() {
                 const text = document.getElementById('delivery-content').textContent;
                 copyText(text, 'Credentials Copied!');
+            }
+
+            // --- Telegram Stars Buy Logic ---
+
+            function calcStarsCost() {
+                if (!activeStarsAd) return;
+                const qty = parseInt(document.getElementById('buy-stars-qty').value) || 0;
+                const price = parseFloat(activeStarsAd.price); // Price per 1 Star usually, or pack? 
+                // Assumption: Admin sets Price per 1 Star? Or Price for fixed Item?
+                // Let's assume Price is PER UNIT. If Ad says "100 Stars" pack, then price is for pack.
+                // But user wants "Quantity". Usually Stars are sold in bulk.
+                // Re-reading request: "প্রতিটি স্তরের দাম কত করে সে কিনতে পারবে" -> Price per unit.
+
+                const total = qty * price;
+                document.getElementById('buy-stars-total').textContent = `${total.toFixed(2)} BDT`;
+            }
+
+            function submitStarsBuyOrder() {
+                const link = document.getElementById('buy-stars-link').value;
+                const qty = parseInt(document.getElementById('buy-stars-qty').value);
+
+                if (!link || !qty || qty <= 0) {
+                    tg.showAlert('Please fill Post Link and valid Quantity!');
+                    return;
+                }
+
+                const price = parseFloat(activeStarsAd.price);
+                const totalCost = qty * price;
+
+                if ((currentUser.balance || 0) < totalCost) {
+                    tg.showAlert(`Insufficient Balance! Need ${totalCost.toFixed(2)} BDT.`);
+                    return;
+                }
+
+                if (!confirm(`Confirm Order?\n\n${qty} Stars for ${totalCost.toFixed(2)} BDT\n\nBalance will be deducted.`)) return;
+
+                // Deduct Balance
+                const newBal = (currentUser.balance || 0) - totalCost;
+                db.ref(`${USERS_NODE}/${currentUser.id}`).update({ balance: newBal }).then(() => {
+                    // Create Transaction
+                    const trxRef = db.ref(TRX_NODE).push();
+                    const trxData = {
+                        id: trxRef.key,
+                        userId: currentUser.id,
+                        userName: currentUser.name,
+                        type: 'p2p_buy_stars', // New Type
+                        asset: 'Stars',
+                        amount: totalCost,
+                        quantity: qty,
+                        targetLink: link,
+                        currency: 'BDT',
+                        method: 'Balance',
+                        status: 'pending', // Admin must fulfill
+                        adId: activeStarsAd.id,
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    };
+
+                    trxRef.set(trxData).then(() => {
+                        tg.HapticFeedback.notificationOccurred('success');
+                        tg.showAlert('Order Submitted! Admin will send stars soon.');
+                        document.getElementById('buy-stars-modal').classList.add('hidden');
+                    });
+                }).catch(err => {
+                    tg.showAlert('Reference Error: ' + err.message);
+                });
             }
 
             function copyText(text, msg) {
