@@ -1421,6 +1421,155 @@
 
         tg.BackButton.onClick(handleBack);
 
+        function toggleP2PType(type) {
+            tg.HapticFeedback.selectionChanged();
+            const buyBtn = document.getElementById('btn-p2p-buy');
+            const sellBtn = document.getElementById('btn-p2p-sell');
+            if (type === 'buy') {
+                buyBtn.className = "flex-1 py-2 text-sm font-bold rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm transition-all";
+                sellBtn.className = "flex-1 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 transition-all";
+            } else {
+                sellBtn.className = "flex-1 py-2 text-sm font-bold rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm transition-all";
+                buyBtn.className = "flex-1 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 transition-all";
+            }
+            renderP2PAds();
+        }
+
+        let activeStarsAd = null;
+
+        function handleP2PAction(action, ad) {
+            tg.HapticFeedback.notificationOccurred('success');
+            if (ad && ad.asset === 'Stars') {
+                activeStarsAd = ad;
+                document.getElementById('stars-target-link').href = ad.targetLink || '#';
+                document.getElementById('stars-needed-count').textContent = ad.starCount || '0';
+                document.getElementById('stars-trade-modal').classList.remove('hidden');
+            } else {
+                tg.showAlert(`${action.toUpperCase()} order interface would open here.`);
+            }
+        }
+
+        function closeStarsModal() { document.getElementById('stars-trade-modal').classList.add('hidden'); }
+
+        function previewStarsFile() {
+            const file = document.getElementById('stars-photo').files[0];
+            const reader = new FileReader();
+            reader.onload = () => {
+                document.getElementById('stars-preview').src = reader.result;
+                document.getElementById('stars-preview').classList.remove('hidden');
+            };
+            if (file) reader.readAsDataURL(file);
+        }
+
+        function submitStarsTrade() {
+            const count = parseFloat(document.getElementById('stars-sent-count').value);
+            const userLink = document.getElementById('stars-user-link').value;
+            const photoInput = document.getElementById('stars-photo');
+
+            if (!count || !userLink || !photoInput.files[0] || !activeStarsAd) {
+                tg.showAlert('Please fill all fields and upload screenshot!');
+                return;
+            }
+
+            const rewardBDT = count * parseFloat(activeStarsAd.price || 0);
+
+            const trxRef = db.ref(TRX_NODE).push();
+            const trxData = {
+                id: trxRef.key,
+                userId: currentUser.id,
+                userName: currentUser.name,
+                type: 'p2p_trade',
+                asset: 'Stars',
+                amount: count, // Star count
+                reward: rewardBDT, // BDT reward
+                currency: 'Stars',
+                method: 'P2P',
+                sender: userLink,
+                status: 'pending',
+                photo: document.getElementById('stars-preview').src,
+                adId: activeStarsAd.id || 'manual',
+                targetLink: activeStarsAd.targetLink || '',
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            trxRef.set(trxData).then(() => {
+                tg.showAlert(`Proof Submitted! You will receive ${rewardBDT.toFixed(2)} BDT after verification.`);
+                closeStarsModal();
+                // Reset fields
+                document.getElementById('stars-sent-count').value = '';
+                document.getElementById('stars-user-link').value = '';
+                document.getElementById('stars-preview').classList.add('hidden');
+                document.getElementById('stars-photo').value = '';
+            });
+        }
+
+        function copyText(text, msg) {
+            const tempInput = document.createElement("input");
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+
+            tg.HapticFeedback.notificationOccurred('success');
+            tg.showAlert(msg || 'Copied!');
+        }
+
+        function copyRefLink() {
+            const link = document.getElementById('ref-link').textContent;
+            copyText(link, 'Referral Link Copied!');
+        }
+
+        function inviteFriends() {
+            const link = document.getElementById('ref-link').textContent;
+            const text = encodeURIComponent(
+                "✨━━━━━━━━━━━━━━━━━━✨\n" +
+                "   🏆 VERIFIED BUY & SELL 🏆\n" +
+                "✨━━━━━━━━━━━━━━━━━━✨\n\n" +
+                "🚀 আমাদের নতুন P2P ওয়ালেটে জয়েন করুন এবং আজই ইনকাম শুরু করুন!\n\n" +
+                "🎁 কি কি থাকছে আমাদের অ্যাপে? 🎁\n\n" +
+                "🔹 ১% আজীবন রেফার কমিশন! (Lifetime Bonus)\n" +
+                "🔹 দ্রুত ডিপোজিট ও উইথড্র (Bkash, Nagad, Binance)\n" +
+                "🔹 ১০০% বিশ্বস্ত এবং সিকিউর ট্রানজেকশন।\n\n" +
+                "🔥 বসে না থেকে এখনই জয়েন করুন এবং বন্ধুদের ইনভাইট করে আয় করুন আনলিমিটেড! 📈\n\n" +
+                "👇 জয়েন করার লিঙ্ক এখানে:\n"
+            );
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${text}`;
+            tg.openTelegramLink(shareUrl);
+        }
+
+        function selectDepositMethod(id, unused, name) {
+            const num = globalSettings[`${id}Num`] || '';
+            const min = globalSettings[`${id}Min`] || 0;
+            copyText(num, `${name} Number Copied!`);
+            document.getElementById('dep-method').value = id;
+            document.getElementById('dep-selected-name').textContent = name;
+            document.getElementById('dep-selected-number').textContent = num;
+            document.getElementById('dep-limit-text').textContent = min === 0 ? 'No Limit' : `Min: ${min} BDT`;
+            document.getElementById('dep-step-1').classList.add('hidden');
+            document.getElementById('dep-step-2').classList.remove('hidden');
+            document.getElementById('dep-title').textContent = 'Submit Details';
+        }
+
+        function selectWithdrawMethod(id, name) {
+            document.getElementById('wd-method').value = id;
+            document.getElementById('wd-selected-name').textContent = name;
+            document.getElementById('wd-amount').placeholder = `Min 10 BDT`;
+            document.getElementById('wd-step-1').classList.add('hidden');
+            document.getElementById('wd-step-2').classList.remove('hidden');
+            document.getElementById('wd-title').textContent = 'Withdraw Details';
+        }
+
+        function handleDeposit() { tg.HapticFeedback.impactOccurred('medium'); document.getElementById('deposit-modal').classList.remove('hidden'); showStep1(); }
+        function handleWithdraw() { tg.HapticFeedback.impactOccurred('medium'); document.getElementById('withdraw-modal').classList.remove('hidden'); showWdStep1(); }
+        function closeDepositModal() { document.getElementById('deposit-modal').classList.add('hidden'); }
+        function closeWithdrawModal() { document.getElementById('withdraw-modal').classList.add('hidden'); }
+        function showStep1() { document.getElementById('dep-step-1').classList.remove('hidden'); document.getElementById('dep-step-2').classList.add('hidden'); document.getElementById('dep-title').textContent = 'Select Method'; }
+        function showWdStep1() { document.getElementById('wd-step-1').classList.remove('hidden'); document.getElementById('wd-step-2').classList.add('hidden'); document.getElementById('wd-title').textContent = 'Withdraw Funds'; }
+        function previewFile() { const file = document.getElementById('dep-photo').files[0]; const reader = new FileReader(); reader.onload = () => { document.getElementById('dep-preview').src = reader.result; document.getElementById('dep-preview').classList.remove('hidden'); }; if (file) reader.readAsDataURL(file); }
+
+        window.addEventListener('DOMContentLoaded', initApp);
+
     </script>
 </body>
 
