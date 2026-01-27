@@ -1872,27 +1872,7 @@
 
                     document.getElementById('buy-stars-modal').classList.remove('hidden');
                 }
-                else if (action === 'buy' && ad.asset === 'VPN') {
-                    // USER BUYS VPN
-                    activeStarsAd = ad;
-                    document.getElementById('buy-vpn-rate').textContent = `${parseFloat(ad.price).toFixed(2)} BDT`;
-                    document.getElementById('buy-vpn-name').value = '';
-                    document.getElementById('buy-vpn-email').value = '';
-                    document.getElementById('buy-vpn-desc').value = '';
-
-                    // Rules
-                    const rulesBox = document.getElementById('buy-vpn-rules-box');
-                    const rulesText = document.getElementById('buy-vpn-rules-text');
-                    if (ad.rules) {
-                        rulesBox.classList.remove('hidden');
-                        rulesText.textContent = ad.rules;
-                    } else {
-                        rulesBox.classList.add('hidden');
-                    }
-
-                    document.getElementById('buy-vpn-modal').classList.remove('hidden');
-                }
-                else if (action === 'buy' && ad.asset === 'VPN') {
+                else if (action === 'buy' && ad.authType === 'vpn') {
                     // USER BUYS VPN
                     activeStarsAd = ad;
                     document.getElementById('buy-vpn-rate').textContent = `${parseFloat(ad.price).toFixed(2)} BDT`;
