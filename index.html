@@ -1428,16 +1428,16 @@
                         colorClass = 'bg-purple-500/10 text-purple-500';
                         icon = 'redeem';
                     } else if (isStars) { // User Selling
-                        typeLabel = `Sold ${t.asset || 'Item'}`;
+                        typeLabel = `Sell ${t.asset || 'Item'}`;
                         displayAmount = t.reward;
                         colorClass = 'bg-green-500/10 text-green-500';
                         icon = 'sell';
                     } else if (isP2PBuy) { // User Buying (Credential/Item)
-                        typeLabel = `Bought ${t.asset || 'Item'}`;
+                        typeLabel = `Buy ${t.asset || 'Item'}`;
                         colorClass = 'bg-blue-500/10 text-blue-500';
                         icon = 'shopping_bag';
                     } else if (isStarsBuy) { // User Buying Stars
-                        typeLabel = `Bought ${t.quantity} Stars`;
+                        typeLabel = `Buy Stars`; // Standardized as per user request
                         colorClass = 'bg-blue-500/10 text-blue-500';
                         icon = 'stars';
                     } else if (t.type === 'withdraw') {
