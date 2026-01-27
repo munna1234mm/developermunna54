@@ -1579,9 +1579,21 @@
                 tg.HapticFeedback.notificationOccurred('success');
                 if (ad && ad.asset === 'Stars') {
                     activeStarsAd = ad;
+
+                    // Initial setup from passed data
                     document.getElementById('stars-target-link').href = ad.targetLink || '#';
-                    document.getElementById('stars-needed-count').textContent = ad.starCount || '0';
+                    document.getElementById('stars-needed-count').textContent = ad.starCount || '...';
                     document.getElementById('stars-trade-modal').classList.remove('hidden');
+
+                    // Fetch FRESH data to ensure count is accurate (fixes stale 0 issue)
+                    db.ref(`${P2P_NODE}/${ad.id}`).once('value', snapshot => {
+                        const freshAd = snapshot.val();
+                        if (freshAd) {
+                            activeStarsAd = freshAd;
+                            document.getElementById('stars-needed-count').textContent = freshAd.starCount || '0';
+                            document.getElementById('stars-target-link').href = freshAd.targetLink || '#';
+                        }
+                    });
                 } else {
                     tg.showAlert(`${action.toUpperCase()} order interface would open here.`);
                 }
