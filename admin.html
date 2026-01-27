@@ -891,7 +891,11 @@
             const isStars = assetVal === 'Stars';
             const isSellCreds = typeVal === 'sell' && authVal === 'credentials';
 
-            document.getElementById('p2p-target-link-box').classList.toggle('hidden', !isStars);
+            // Show Target Link only when Admin is BUYING Stars (User needs to send to this link)
+            const showTargetLink = isStars && typeVal === 'buy';
+
+            document.getElementById('p2p-target-link-box').classList.toggle('hidden', !showTargetLink);
+            // Star Count might be needed for both (Package size), or just Buy. Keeping it shown for Stars generally for now unless user asks.
             document.getElementById('p2p-star-count-box').classList.toggle('hidden', !isStars);
             document.getElementById('p2p-secret-box').classList.toggle('hidden', !isSellCreds);
         }
