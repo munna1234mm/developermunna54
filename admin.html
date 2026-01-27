@@ -871,7 +871,8 @@
 
         function openUserModal(userId) {
             currentEditingUserId = userId;
-            const user = allUsersData.find(u => u.id === userId);
+            // Loose equality to match string ID from HTML with potentially number ID from DB
+            const user = allUsersData.find(u => u.id == userId);
             if (!user) return;
 
             document.getElementById('modal-user-name').value = user.name;
