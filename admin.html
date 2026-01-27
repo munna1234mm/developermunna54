@@ -1216,14 +1216,36 @@
                 if (!trx) return;
 
                 db.ref(`${TRX_NODE}/${id}`).update({ status: status });
+
                 if (status === 'rejected') {
-                    db.ref(`${USERS_NODE}/${trx.userId}`).once('value', uSnap => {
-                        const user = uSnap.val() || {};
-                        const newBal = (user.balance || 0) + trx.amount;
-                        db.ref(`${USERS_NODE}/${trx.userId}`).update({ balance: newBal });
-                    });
+                    // Handle Withdrawal Refund
+                    if (trx.type === 'withdrawal') {
+                        db.ref(`${USERS_NODE}/${trx.userId}`).once('value', uSnap => {
+                            const user = uSnap.val() || {};
+                            const newBal = (user.balance || 0) + trx.amount;
+                            db.ref(`${USERS_NODE}/${trx.userId}`).update({ balance: newBal });
+                        });
+                    }
+                    // Handle P2P Ad Restoration
+                    else if (trx.type === 'p2p_trade' && trx.adId && trx.adId !== 'manual') {
+                        db.ref(`${P2P_NODE}/${trx.adId}`).transaction(ad => {
+                            if (!ad) return ad; // Ad deleted
+
+                            // Restore counts
+                            ad.available = (ad.available || 0) + parseFloat(trx.amount);
+                            if (trx.asset === 'Stars') {
+                                ad.starCount = (ad.starCount || 0) + parseFloat(trx.amount);
+                            }
+
+                            // Reactivate if it was offline
+                            if (ad.status === 'offline') {
+                                ad.status = 'online';
+                            }
+                            return ad;
+                        });
+                    }
                 }
-                alert(`Withdrawal ${status}!`);
+                alert(`Transaction ${status}!`);
             });
         }
 
