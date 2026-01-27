@@ -388,6 +388,35 @@
                             </table>
                         </div>
                     </div>
+
+                    <!-- Held Transactions Section -->
+                    <div id="held-transactions-section" class="mt-8 mb-4 hidden">
+                        <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <span class="material-symbols-outlined text-orange-500">pause_circle</span>
+                            Held Transactions
+                        </h2>
+                        <p class="text-sm text-slate-500">Transactions waiting for final approval.</p>
+                    </div>
+
+                    <div
+                        class="bg-white dark:bg-[#1a282f] rounded-xl border border-orange-200 dark:border-orange-900/50 shadow-sm overflow-hidden mb-6 hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead
+                                    class="bg-orange-50 dark:bg-orange-900/10 text-orange-600 dark:text-orange-400 uppercase tracking-wider text-xs">
+                                    <tr>
+                                        <th class="px-6 py-3">User</th>
+                                        <th class="px-6 py-3">Amount</th>
+                                        <th class="px-6 py-3">Method / Sender</th>
+                                        <th class="px-6 py-3">Proof</th>
+                                        <th class="px-6 py-3 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="held-deposits-table-body"
+                                    class="divide-y divide-orange-100 dark:divide-orange-900/20"></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- VIEW: IDENTITY VERIFICATION -->
@@ -1195,41 +1224,87 @@
         }
 
         function renderDeposits(trxs) {
-            const pending = trxs.filter(t => (t.type === 'deposit' || t.type === 'p2p_trade') && t.status === 'pending');
-            const tbody = document.getElementById('deposits-table-body');
-            if (!tbody) return;
+            const allPending = trxs.filter(t => (t.type === 'deposit' || t.type === 'p2p_trade') && (t.status === 'pending' || t.status === 'hold'));
 
-            if (pending.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">No pending deposits.</td></tr>`;
-                return;
+            const pending = allPending.filter(t => t.status === 'pending');
+            const held = allPending.filter(t => t.status === 'hold');
+
+            const tbodyPending = document.getElementById('deposits-table-body');
+            const tbodyHeld = document.getElementById('held-deposits-table-body');
+
+            // Render Pending
+            if (tbodyPending) {
+                if (pending.length === 0) {
+                    tbodyPending.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">No pending deposits.</td></tr>`;
+                } else {
+                    tbodyPending.innerHTML = pending.map(t => {
+                        const isStars = t.type === 'p2p_trade';
+                        const displayAmt = isStars ? `${t.reward.toFixed(2)} BDT (${t.amount} Stars)` : `${t.amount} BDT`;
+                        const methodInfo = isStars ? `<p class="uppercase text-xs font-bold text-primary">P2P: ${t.asset}</p><p class="text-[10px] text-slate-400 truncate max-w-[150px]">${t.sender}</p>` : `<p class="uppercase text-xs font-bold">${t.method}</p><p class="font-mono text-xs text-slate-500">${t.sender}</p>`;
+
+                        return `
+                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30">
+                                <td class="px-6 py-4">
+                                    <p class="font-medium">${t.userName}</p>
+                                    <p class="text-xs text-slate-500">ID: ${t.userId}</p>
+                                </td>
+                                <td class="px-6 py-4 font-bold text-green-500">+${displayAmt}</td>
+                                <td class="px-6 py-4">${methodInfo}</td>
+                                <td class="px-6 py-4">
+                                    <div class="flex gap-2 flex-wrap">
+                                        ${t.photo ? `<button onclick="viewPhoto('${t.photo}')" class="text-primary hover:underline text-xs font-bold flex items-center gap-1"><span class="material-symbols-outlined text-sm">image</span>Proof</button>` : '<span class="text-slate-400 text-xs">No Proof</span>'}
+                                        ${t.credentialData ? `<button onclick="viewCredentials('${t.id}')" class="text-blue-600 hover:underline text-xs font-bold flex items-center gap-1"><span class="material-symbols-outlined text-sm">password</span>Creds</button>` : ''}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-right flex justify-end gap-2">
+                                    <button onclick="approveDeposit('${t.id}')" class="bg-green-500 text-white px-3 py-1 rounded text-xs font-bold">Approve</button>
+                                    <button onclick="holdDeposit('${t.id}')" class="bg-orange-500 text-white px-3 py-1 rounded text-xs font-bold">Hold</button>
+                                    <button onclick="rejectDeposit('${t.id}')" class="bg-red-500 text-white px-3 py-1 rounded text-xs font-bold">Reject</button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
             }
 
-            tbody.innerHTML = pending.map(t => {
-                const isStars = t.type === 'p2p_trade';
-                const displayAmt = isStars ? `${t.reward.toFixed(2)} BDT (${t.amount} Stars)` : `${t.amount} BDT`;
-                const methodInfo = isStars ? `<p class="uppercase text-xs font-bold text-primary">P2P: ${t.asset}</p><p class="text-[10px] text-slate-400 truncate max-w-[150px]">${t.sender}</p>` : `<p class="uppercase text-xs font-bold">${t.method}</p><p class="font-mono text-xs text-slate-500">${t.sender}</p>`;
+            // Render Held
+            if (tbodyHeld) {
+                if (held.length === 0) {
+                    tbodyHeld.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">No held transactions.</td></tr>`;
+                    document.getElementById('held-transactions-section').classList.add('hidden');
+                    tbodyHeld.closest('.rounded-xl').classList.add('hidden');
+                } else {
+                    document.getElementById('held-transactions-section').classList.remove('hidden');
+                    tbodyHeld.closest('.rounded-xl').classList.remove('hidden');
 
-                return `
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30">
-                        <td class="px-6 py-4">
-                            <p class="font-medium">${t.userName}</p>
-                            <p class="text-xs text-slate-500">ID: ${t.userId}</p>
-                        </td>
-                        <td class="px-6 py-4 font-bold text-green-500">+${displayAmt}</td>
-                        <td class="px-6 py-4">${methodInfo}</td>
-                        <td class="px-6 py-4">
-                            <div class="flex gap-2 flex-wrap">
-                                ${t.photo ? `<button onclick="viewPhoto('${t.photo}')" class="text-primary hover:underline text-xs font-bold flex items-center gap-1"><span class="material-symbols-outlined text-sm">image</span>Proof</button>` : '<span class="text-slate-400 text-xs">No Proof</span>'}
-                                ${t.credentialData ? `<button onclick="viewCredentials('${t.id}')" class="text-blue-600 hover:underline text-xs font-bold flex items-center gap-1"><span class="material-symbols-outlined text-sm">password</span>Creds</button>` : ''}
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-right">
-                            <button onclick="approveDeposit('${t.id}')" class="bg-green-500 text-white px-3 py-1 rounded text-xs font-bold mr-2">Approve</button>
-                            <button onclick="rejectDeposit('${t.id}')" class="bg-red-500 text-white px-3 py-1 rounded text-xs font-bold">Reject</button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+                    tbodyHeld.innerHTML = held.map(t => {
+                        const isStars = t.type === 'p2p_trade';
+                        const displayAmt = isStars ? `${t.reward.toFixed(2)} BDT (${t.amount} Stars)` : `${t.amount} BDT`;
+                        const methodInfo = isStars ? `<p class="uppercase text-xs font-bold text-primary">P2P: ${t.asset}</p><p class="text-[10px] text-slate-400 truncate max-w-[150px]">${t.sender}</p>` : `<p class="uppercase text-xs font-bold">${t.method}</p><p class="font-mono text-xs text-slate-500">${t.sender}</p>`;
+
+                        return `
+                            <tr class="hover:bg-orange-50 dark:hover:bg-orange-900/10">
+                                <td class="px-6 py-4">
+                                    <p class="font-medium">${t.userName}</p>
+                                    <p class="text-xs text-slate-500">ID: ${t.userId}</p>
+                                </td>
+                                <td class="px-6 py-4 font-bold text-orange-500">+${displayAmt} (Held)</td>
+                                <td class="px-6 py-4">${methodInfo}</td>
+                                <td class="px-6 py-4">
+                                    <div class="flex gap-2 flex-wrap">
+                                        ${t.photo ? `<button onclick="viewPhoto('${t.photo}')" class="text-primary hover:underline text-xs font-bold flex items-center gap-1"><span class="material-symbols-outlined text-sm">image</span>Proof</button>` : '<span class="text-slate-400 text-xs">No Proof</span>'}
+                                        ${t.credentialData ? `<button onclick="viewCredentials('${t.id}')" class="text-blue-600 hover:underline text-xs font-bold flex items-center gap-1"><span class="material-symbols-outlined text-sm">password</span>Creds</button>` : ''}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-right flex justify-end gap-2">
+                                    <button onclick="approveHeldDeposit('${t.id}')" class="bg-green-500 text-white px-3 py-1 rounded text-xs font-bold">Approve</button>
+                                    <button onclick="rejectHeldDeposit('${t.id}')" class="bg-red-500 text-white px-3 py-1 rounded text-xs font-bold">Reject</button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+            }
         }
 
         function renderWithdrawals(trxs) {
@@ -1267,8 +1342,8 @@
                     const user = uSnap.val() || {};
                     const addAmt = trx.type === 'p2p_trade' ? (trx.reward || 0) : (trx.amount || 0);
                     const newBal = (user.balance || 0) + addAmt;
-                    const newHold = Math.max(0, (user.balance_hold || 0) - (trx.type === 'deposit' ? trx.amount : 0));
-                    db.ref(`${USERS_NODE}/${trx.userId}`).update({ balance: newBal, balance_hold: newHold });
+
+                    db.ref(`${USERS_NODE}/${trx.userId}`).update({ balance: newBal });
 
                     // Referral Commission (1%)
                     if (user.referredBy) {
@@ -1300,11 +1375,86 @@
                 if (!trx) return;
 
                 db.ref(`${TRX_NODE}/${trxId}`).update({ status: 'rejected' });
-                db.ref(`${USERS_NODE}/${trx.userId}`).once('value', uSnap => {
-                    const user = uSnap.val() || {};
-                    const newHold = Math.max(0, (user.balance_hold || 0) - trx.amount);
-                    db.ref(`${USERS_NODE}/${trx.userId}`).update({ balance_hold: newHold });
+                // Legacy hold logic removed. Pending rejections don't affect hold.
+            });
+        }
+
+        /* --- Hold Logic --- */
+        function holdDeposit(trxId) {
+            if (!confirm('Put on HOLD? Amount will be added to user HOLD balance.')) return;
+            db.ref(`${TRX_NODE}/${trxId}`).once('value', snapshot => {
+                const trx = snapshot.val();
+                if (!trx) return;
+
+                db.ref(`${TRX_NODE}/${trxId}`).update({ status: 'hold' });
+
+                // Add to Balance Hold
+                const addAmt = trx.type === 'p2p_trade' ? (trx.reward || 0) : (trx.amount || 0);
+                db.ref(`${USERS_NODE}/${trx.userId}`).transaction(u => {
+                    if (!u) return u;
+                    u.balance_hold = (u.balance_hold || 0) + addAmt;
+                    return u;
                 });
+                alert('Transaction put on Hold!');
+            });
+        }
+
+        function approveHeldDeposit(trxId) {
+            if (!confirm('Approve Held Transaction? Funds will move to Main Balance.')) return;
+            db.ref(`${TRX_NODE}/${trxId}`).once('value', snapshot => {
+                const trx = snapshot.val();
+                if (!trx) return;
+
+                db.ref(`${TRX_NODE}/${trxId}`).update({ status: 'approved' });
+                const addAmt = trx.type === 'p2p_trade' ? (trx.reward || 0) : (trx.amount || 0);
+
+                db.ref(`${USERS_NODE}/${trx.userId}`).transaction(u => {
+                    if (!u) return u;
+                    u.balance_hold = Math.max(0, (u.balance_hold || 0) - addAmt);
+                    u.balance = (u.balance || 0) + addAmt;
+                    return u;
+                });
+
+                // Referral Bonus Logic
+                db.ref(`${USERS_NODE}/${trx.userId}`).once('value', uSnap => {
+                    const user = uSnap.val();
+                    if (user && user.referredBy) {
+                        const commission = addAmt * 0.01;
+                        db.ref(`${USERS_NODE}/${user.referredBy}/balance`).transaction(bal => (bal || 0) + commission);
+                        db.ref(TRX_NODE).push({
+                            userId: user.referredBy,
+                            userName: 'System',
+                            type: 'referral_bonus',
+                            amount: commission,
+                            currency: 'BDT',
+                            method: 'Referral',
+                            status: 'approved',
+                            sender: `Bonus from ${user.name}`,
+                            timestamp: firebase.database.ServerValue.TIMESTAMP
+                        });
+                    }
+                });
+
+                alert('Approved from Hold!');
+            });
+        }
+
+        function rejectHeldDeposit(trxId) {
+            if (!confirm('Reject Held Transaction? Funds will be removed from Hold Balance.')) return;
+            db.ref(`${TRX_NODE}/${trxId}`).once('value', snapshot => {
+                const trx = snapshot.val();
+                if (!trx) return;
+
+                db.ref(`${TRX_NODE}/${trxId}`).update({ status: 'rejected' });
+                const addAmt = trx.type === 'p2p_trade' ? (trx.reward || 0) : (trx.amount || 0);
+
+                db.ref(`${USERS_NODE}/${trx.userId}`).transaction(u => {
+                    if (!u) return u;
+                    u.balance_hold = Math.max(0, (u.balance_hold || 0) - addAmt);
+                    return u;
+                });
+
+                alert('Rejected from Hold!');
             });
         }
 
