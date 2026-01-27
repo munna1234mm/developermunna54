@@ -1546,7 +1546,14 @@
             document.getElementById('dep-selected-name').textContent = name;
             document.getElementById('dep-selected-number').textContent = num;
             document.getElementById('dep-limit-text').textContent = min === 0 ? 'No Limit' : `Min: ${min} BDT`;
-            document.getElementById('dep-amount').placeholder = min > 0 ? min : "10";
+
+            // Binance specific placeholder "00", others "10" or min
+            if (id === 'binance') {
+                document.getElementById('dep-amount').placeholder = "00";
+            } else {
+                document.getElementById('dep-amount').placeholder = min > 0 ? min : "10";
+            }
+
             document.getElementById('dep-step-1').classList.add('hidden');
             document.getElementById('dep-step-2').classList.remove('hidden');
             document.getElementById('dep-title').textContent = 'Submit Details';
@@ -1555,7 +1562,14 @@
         function selectWithdrawMethod(id, name) {
             document.getElementById('wd-method').value = id;
             document.getElementById('wd-selected-name').textContent = name;
-            document.getElementById('wd-amount').placeholder = `Min 10 BDT`;
+
+            // Binance specific placeholder "00", others "Min 10 BDT"
+            if (id === 'binance') {
+                document.getElementById('wd-amount').placeholder = "00";
+            } else {
+                document.getElementById('wd-amount').placeholder = "Min 10 BDT";
+            }
+
             document.getElementById('wd-step-1').classList.add('hidden');
             document.getElementById('wd-step-2').classList.remove('hidden');
             document.getElementById('wd-title').textContent = 'Withdraw Details';
