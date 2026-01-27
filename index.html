@@ -1609,35 +1609,66 @@
                     return;
                 }
 
-                const rewardBDT = count * parseFloat(activeStarsAd.price || 0);
+                // 1. Verify Ad is still valid and has enough quantity
+                db.ref(`${P2P_NODE}/${activeStarsAd.id}`).transaction(currentAd => {
+                    if (currentAd === null) return currentAd; // Ad doesn't exist
 
-                const trxRef = db.ref(TRX_NODE).push();
-                const trxData = {
-                    id: trxRef.key,
-                    userId: currentUser.id,
-                    userName: currentUser.name,
-                    type: 'p2p_trade',
-                    asset: 'Stars',
-                    amount: count, // Star count
-                    reward: rewardBDT, // BDT reward
-                    currency: 'Stars',
-                    method: 'P2P',
-                    sender: userLink,
-                    status: 'pending',
-                    photo: document.getElementById('stars-preview').src,
-                    adId: activeStarsAd.id || 'manual',
-                    targetLink: activeStarsAd.targetLink || '',
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
-                };
+                    if (currentAd.status !== 'online' || currentAd.available < count) {
+                        // Abort transaction if invalid
+                        return;
+                    }
 
-                trxRef.set(trxData).then(() => {
-                    tg.showAlert(`Proof Submitted! You will receive ${rewardBDT.toFixed(2)} BDT after verification.`);
-                    closeStarsModal();
-                    // Reset fields
-                    document.getElementById('stars-sent-count').value = '';
-                    document.getElementById('stars-user-link').value = '';
-                    document.getElementById('stars-preview').classList.add('hidden');
-                    document.getElementById('stars-photo').value = '';
+                    // 2. Decrement values
+                    currentAd.available = (currentAd.available || 0) - count;
+                    if (currentAd.asset === 'Stars') {
+                        currentAd.starCount = (currentAd.starCount || 0) - count;
+                    }
+
+                    // 3. Auto-offline if empty
+                    if (currentAd.available <= 0) {
+                        currentAd.status = 'offline';
+                        currentAd.available = 0;
+                        if (currentAd.starCount < 0) currentAd.starCount = 0;
+                    }
+
+                    return currentAd;
+                }, (error, committed, snapshot) => {
+                    if (error) {
+                        tg.showAlert('Transaction failed: ' + error.message);
+                    } else if (!committed) {
+                        tg.showAlert('Order failed: Ad may be offline or insufficient quantity.');
+                    } else {
+                        // Success: Now create the transaction record
+                        const rewardBDT = count * parseFloat(activeStarsAd.price || 0);
+                        const trxRef = db.ref(TRX_NODE).push();
+                        const trxData = {
+                            id: trxRef.key,
+                            userId: currentUser.id,
+                            userName: currentUser.name,
+                            type: 'p2p_trade',
+                            asset: 'Stars',
+                            amount: count,
+                            reward: rewardBDT,
+                            currency: 'Stars',
+                            method: 'P2P',
+                            sender: userLink,
+                            status: 'pending',
+                            photo: document.getElementById('stars-preview').src,
+                            adId: activeStarsAd.id,
+                            targetLink: activeStarsAd.targetLink || '',
+                            timestamp: firebase.database.ServerValue.TIMESTAMP
+                        };
+
+                        trxRef.set(trxData).then(() => {
+                            tg.showAlert(`Proof Submitted! You will receive ${rewardBDT.toFixed(2)} BDT after verification.`);
+                            closeStarsModal();
+                            // Reset fields
+                            document.getElementById('stars-sent-count').value = '';
+                            document.getElementById('stars-user-link').value = '';
+                            document.getElementById('stars-preview').classList.add('hidden');
+                            document.getElementById('stars-photo').value = '';
+                        });
+                    }
                 });
             }
 
