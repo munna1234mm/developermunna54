@@ -535,6 +535,22 @@
     </div>
     </div>
 
+
+    <!-- Photo View Modal -->
+    <div id="photo-modal"
+        class="fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-fade-in"
+        onclick="closePhotoModal()">
+        <div class="relative max-w-4xl w-full max-h-[90vh] flex items-center justify-center"
+            onclick="event.stopPropagation()">
+            <img id="photo-modal-img" src=""
+                class="max-w-full max-h-[90vh] rounded-xl shadow-2xl object-contain border border-white/10">
+            <button onclick="closePhotoModal()"
+                class="absolute -top-12 right-0 md:-right-12 text-white/70 hover:text-white transition-colors bg-black/50 rounded-full p-2">
+                <span class="material-symbols-outlined text-2xl">close</span>
+            </button>
+        </div>
+    </div>
+
     <!-- User Management Modal -->
     <div id="user-modal"
         class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
@@ -1153,6 +1169,19 @@
                 }
                 alert(`Withdrawal ${status}!`);
             });
+        }
+
+        /* --- Photo Viewer --- */
+        function viewPhoto(url) {
+            if (!url) return;
+            const modal = document.getElementById('photo-modal');
+            const img = document.getElementById('photo-modal-img');
+            img.src = url;
+            modal.classList.remove('hidden');
+        }
+
+        function closePhotoModal() {
+            document.getElementById('photo-modal').classList.add('hidden');
         }
 
         /* --- Verification Logic --- */
