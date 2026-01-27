@@ -1349,12 +1349,21 @@
 
             listContainer.innerHTML = `<div class="flex justify-center py-10"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>`;
 
-            db.ref(USERS_NODE).once('value', snapshot => {
+            db.ref(USERS_NODE).once('value').then(snapshot => {
                 const usersObj = snapshot.val() || {};
                 const users = Object.values(usersObj).sort((a, b) => (b.balance || 0) - (a.balance || 0));
 
+                if (users.length === 0) {
+                    listContainer.innerHTML = `<div class="flex flex-col items-center justify-center py-10 text-slate-500">
+                        <span class="material-symbols-outlined text-[48px] mb-2 opacity-30">group_off</span>
+                        <p class="text-sm">No users found in the leaderboard</p>
+                    </div>`;
+                    return;
+                }
+
                 listContainer.innerHTML = users.map((u, index) => {
                     const rank = index + 1;
+                    const isTop3 = rank <= 3;
                     let rankClass = "bg-slate-100 dark:bg-slate-800 text-slate-500";
                     let rankIcon = "";
 
@@ -1369,22 +1378,28 @@
                         rankIcon = "🥉";
                     }
 
+                    const userPhoto = u.photo || `https://ui-avatars.com/api/?name=${u.name}&background=random`;
+
                     return `
-                        <div class="flex items-center gap-4 bg-white dark:bg-[#1a282f] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-transform active:scale-[0.99] ${rank <= 3 ? 'border-primary/20 bg-primary/5' : ''}">
-                            <div class="size-10 rounded-full flex items-center justify-center text-sm font-bold ${rankClass}">
+                        <div class="flex items-center gap-4 bg-white dark:bg-[#1a282f] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-transform active:scale-[0.99] ${isTop3 ? 'border-primary/20 bg-primary/5' : ''}">
+                            <div class="size-10 rounded-full flex items-center justify-center text-sm font-bold ${rankClass} shrink-0">
                                 ${rankIcon || rank}
                             </div>
-                            <div class="flex-1">
+                            <div class="size-10 rounded-full bg-cover bg-center border border-slate-200 dark:border-slate-700 shrink-0" style="background-image: url('${userPhoto}')"></div>
+                            <div class="flex-1 min-w-0">
                                 <p class="text-slate-900 dark:text-white font-bold leading-tight truncate">${u.name}</p>
                                 <p class="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-mono tracking-tighter">ID: ${u.id}</p>
                             </div>
-                            <div class="text-right">
+                            <div class="text-right shrink-0">
                                 <p class="text-primary font-bold">${(u.balance || 0).toFixed(2)}</p>
                                 <p class="text-[9px] text-slate-400 font-bold uppercase">BDT</p>
                             </div>
                         </div>
                     `;
                 }).join('');
+            }).catch(err => {
+                console.error("Leaderboard Error:", err);
+                listContainer.innerHTML = `<div class="p-4 text-center text-red-500 text-xs">Error loading database. Please check your connection.</div>`;
             });
         }
 
