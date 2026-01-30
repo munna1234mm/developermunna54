@@ -735,6 +735,115 @@
             </div>
         </div>
 
+        <!-- Binance Sell Modal (User SELLS to Merchant) -->
+        <div id="binance-sell-modal"
+            class="fixed inset-0 z-[9999] hidden flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
+            <div
+                class="bg-white dark:bg-[#1a282f] w-full max-w-sm rounded-2xl p-6 shadow-xl animate-slide-up space-y-4 max-h-[90vh] overflow-y-auto transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">Binance Sell</h3>
+                    <button onclick="document.getElementById('binance-sell-modal').classList.add('hidden')"
+                        class="text-slate-500 hover:text-slate-700 dark:hover:text-white">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div
+                    class="p-4 bg-yellow-50 dark:bg-yellow-900/10 rounded-xl border border-yellow-100 dark:border-yellow-900/30 space-y-2">
+                    <p class="text-[10px] text-slate-500 uppercase font-bold">Tap Copy Address</p>
+                    <div
+                        class="flex items-center justify-between bg-white dark:bg-black/20 p-2 rounded-lg border border-yellow-200 dark:border-yellow-900/40">
+                        <p id="bin-sell-wallet" class="text-xs font-mono truncate mr-2 select-all">0x...</p>
+                        <button
+                            onclick="copyText(document.getElementById('bin-sell-wallet').textContent, 'Wallet Copied!')"
+                            class="text-primary hover:text-primary/70">
+                            <span class="material-symbols-outlined text-sm">content_copy</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-xs text-slate-500 mb-1 block">Binance id**</label>
+                        <input id="bin-sell-id" type="text" placeholder="Binance id**"
+                            class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-500 mb-1 block">type your Amount</label>
+                        <input id="bin-sell-amount" type="number" placeholder="type your Amount"
+                            class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-500 mb-1 block">Send Your tnx Id</label>
+                        <input id="bin-sell-chn" type="text" placeholder="Send Your tnx Id"
+                            class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-500 mb-1 block">Submit Your Screenshot</label>
+                        <div onclick="document.getElementById('bin-sell-photo').click()"
+                            class="w-full h-24 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex flex-col items-center justify-center text-slate-400 cursor-pointer overflow-hidden bg-slate-50 dark:bg-black/20 relative">
+                            <input type="file" id="bin-sell-photo" accept="image/*" class="hidden"
+                                onchange="previewBinSellFile()">
+                            <span class="material-symbols-outlined text-2xl mb-1">add_a_photo</span>
+                            <span class="text-xs">Submit Your Screenshot</span>
+                            <img id="bin-sell-preview"
+                                class="absolute inset-0 w-full h-full object-cover hidden rounded-xl">
+                        </div>
+                    </div>
+
+                    <button onclick="submitBinanceSell()"
+                        class="w-full py-3.5 bg-primary text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all">
+                        Submit Order
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Binance Buy Modal (User BUYS from Merchant) -->
+        <div id="binance-buy-modal"
+            class="fixed inset-0 z-[9999] hidden flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
+            <div
+                class="bg-white dark:bg-[#1a282f] w-full max-w-sm rounded-2xl p-6 shadow-xl animate-slide-up space-y-4 max-h-[90vh] overflow-y-auto transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">Binance Buy</h3>
+                    <button onclick="document.getElementById('binance-buy-modal').classList.add('hidden')"
+                        class="text-slate-500 hover:text-slate-700 dark:hover:text-white">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div
+                    class="p-4 bg-yellow-50 dark:bg-yellow-900/10 rounded-xl border border-yellow-100 dark:border-yellow-900/30 space-y-2">
+                    <p class="text-[10px] text-slate-500 uppercase font-bold">Payments Details</p>
+                    <p id="bin-buy-details"
+                        class="text-sm font-medium text-slate-800 dark:text-white whitespace-pre-wrap">...</p>
+                </div>
+
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-xs text-slate-500 mb-1 block">Send Id:***</label>
+                        <input id="bin-buy-sendid" type="text" placeholder="Send Id:***"
+                            class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-500 mb-1 block">Type your Amount</label>
+                        <input id="bin-buy-amount" type="number" placeholder="Type your Amount"
+                            class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-500 mb-1 block">Send your contact id</label>
+                        <input id="bin-buy-contact" type="text" placeholder="Send your contact id"
+                            class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary">
+                    </div>
+
+                    <button onclick="submitBinanceBuy()"
+                        class="w-full py-3.5 bg-primary text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all">
+                        Confirm Purchase
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Stars Trade Modal -->
         <div id="stars-trade-modal"
             class="fixed inset-0 z-[9999] hidden flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
@@ -988,7 +1097,7 @@
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                         <span class="material-symbols-outlined text-indigo-500">vpn_lock</span>
-                        Buy VPN Service
+                        Submit Your Details
                     </h3>
                     <button onclick="document.getElementById('buy-vpn-modal').classList.add('hidden')"
                         class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
@@ -2226,6 +2335,168 @@
                     });
                 }).catch(err => {
                     tg.showAlert('Reference Error: ' + err.message);
+                });
+            }
+
+            function previewBinSellFile() {
+                const file = document.getElementById('bin-sell-photo').files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = document.getElementById('bin-sell-preview');
+                        img.src = e.target.result;
+                        img.classList.remove('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+
+            function submitBinanceSell() {
+                const binId = document.getElementById('bin-sell-id').value;
+                const amount = parseFloat(document.getElementById('bin-sell-amount').value);
+                const tnxId = document.getElementById('bin-sell-chn').value;
+                const photoSrc = document.getElementById('bin-sell-preview').src;
+
+                // Basic Validation
+                if (!binId || !amount || amount <= 0 || !tnxId) {
+                    tg.showAlert('Please fill all fields!');
+                    return;
+                }
+
+                // Photo is important for sell
+                const hasPhoto = !document.getElementById('bin-sell-preview').classList.contains('hidden');
+                if (!hasPhoto) {
+                    tg.showAlert('Please upload a screenshot!');
+                    return;
+                }
+
+                if (!currentUser) return;
+
+                // Ad constraints
+                if (activeStarsAd && (amount < activeStarsAd.min || amount > activeStarsAd.max)) {
+                    tg.showAlert(`Amount must be between ${activeStarsAd.min} and ${activeStarsAd.max}`);
+                    return;
+                }
+
+                // Create Transaction
+                const trxRef = db.ref(TRX_NODE).push();
+
+                // Reward amount (BDT) - Assuming 1:1 or Price is Rate?
+                // Usually Price is Rate per Asset.
+                // If Ad Price is e.g. 115 BDT (per USDT).
+                // Amount entered is usually in Asset (e.g. 10 USDT).
+                // But the Input says "Amount" with placeholder "0.00".
+                // Let's assume Input is in Asset quantity (like Stars).
+
+                // Wait, existing logic for Stars:
+                // amount: count (Stars)
+                // reward: count * (price / 50) ? No, logic specific to Stars.
+
+                // For Binance:
+                // If I am selling 10 USDT. Rate is 115.
+                // I get 1150 BDT.
+                // So Amount Input = Asset Amount?
+                // Or Amount Input = BDT Amount?
+                // Standard P2P usually asks "How much you want to sell?" (in Asset or Fiat).
+                // Let's assume input is in BDT for simplicity or matching existing "Amount" flows which are often BDT?
+                // In Stars Trade: count = input. reward = count * price.
+                // Let's treat Input as Asset Amount for "Sell" if it has a Rate.
+                // "Price" in Ad is usually "Rate".
+
+                // However, without complex calculation UI, let's treat Input as BDT Value if unsure, OR Asset Amount.
+                // Given "Binance Id" and "Tnx Id", it's likely crypto transfer.
+                // Let's assume Input is BDT Amount user expects? OR Asset Amount?
+                // The Ad has "Price" (e.g. 120 BDT).
+                // Let's assume Input is ASSET AMOUNT (e.g. USDT).
+                // Total BDT = Amount * Price.
+
+                const totalBDT = amount * parseFloat(activeStarsAd.price);
+
+                const trxData = {
+                    id: trxRef.key,
+                    userId: currentUser.id,
+                    userName: currentUser.name,
+                    type: 'p2p_trade', // Treating as Sell Trade (User Sells)
+                    subType: 'binance_sell',
+                    asset: activeStarsAd.asset || 'Binance',
+                    amount: amount, // Asset Amount
+                    reward: totalBDT, // BDT User gets
+                    currency: 'BDT', // Payout Currency
+                    method: 'Binance',
+                    sender: binId, // Using Sender field for Binance ID
+                    tnxId: tnxId,  // Custom field
+                    status: 'pending',
+                    photo: photoSrc,
+                    adId: activeStarsAd.id,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                };
+
+                trxRef.set(trxData).then(() => {
+                    tg.showAlert('Sell Order Submitted!');
+                    document.getElementById('binance-sell-modal').classList.add('hidden');
+                });
+            }
+
+            function submitBinanceBuy() {
+                const sendId = document.getElementById('bin-buy-sendid').value;
+                const amount = parseFloat(document.getElementById('bin-buy-amount').value);
+                const contactId = document.getElementById('bin-buy-contact').value;
+
+                if (!sendId || !amount || amount <= 0 || !contactId) {
+                    tg.showAlert('Please fill all fields!');
+                    return;
+                }
+
+                if (!currentUser) return;
+
+                // Check Balance
+                // If User Buys, they pay BDT.
+                // Amount is likely BDT?
+                // If Ad Price is 120. User enters 1200 BDT? Or 10 USDT?
+                // Usually "Amount" input in generic forms is ambiguous. 
+                // Let's assume Input is BDT Amount because we check Balance against it.
+                // If Input is Asset, we multiply by Price.
+
+                // Let's assume Input is BDT Amount for BUY (spending balance).
+                // Because we check `currentUser.balance < amount`.
+
+                if (currentUser.balance < amount) {
+                    tg.showAlert('Insufficient Balance!');
+                    return;
+                }
+
+                // If Ad has checks:
+                if (activeStarsAd && (amount < activeStarsAd.min || activeStarsAd.max > 0 && amount > activeStarsAd.max)) {
+                    tg.showAlert(`Amount must be between ${activeStarsAd.min} and ${activeStarsAd.max}`);
+                    return;
+                }
+
+                const trxRef = db.ref(TRX_NODE).push();
+
+                const trxData = {
+                    id: trxRef.key,
+                    userId: currentUser.id,
+                    userName: currentUser.name,
+                    type: 'p2p_buy', // Buying
+                    subType: 'binance_buy',
+                    asset: activeStarsAd.asset || 'Binance',
+                    amount: amount, // BDT Amount Deducted
+                    sendId: sendId,
+                    contactId: contactId,
+                    currency: 'BDT',
+                    method: 'Balance',
+                    status: 'pending',
+                    adId: activeStarsAd.id,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                };
+
+                trxRef.set(trxData).then(() => {
+                    // Deduct Balance
+                    const newBal = (currentUser.balance || 0) - amount;
+                    db.ref(`${USERS_NODE}/${currentUser.id}`).update({ balance: newBal });
+
+                    tg.showAlert('Purchase Confirmed!');
+                    document.getElementById('binance-buy-modal').classList.add('hidden');
                 });
             }
 

@@ -524,6 +524,8 @@
                                     <option value="screenshot">Screenshot Proof</option>
                                     <option value="credentials">Credentials (Email/Pass)</option>
                                     <option value="vpn">VPN Order Form</option>
+                                    <option value="binance_sell">Binance User Sell Post</option>
+                                    <option value="binance_buy">Binance User Buy Post</option>
                                 </select>
                             </div>
                             <div>
@@ -640,6 +642,28 @@
                                             placeholder="Default: e.g. I want 2 accounts for 1 month..."
                                             class="w-full bg-white dark:bg-slate-800 border-indigo-200 dark:border-indigo-900/50 rounded-lg text-sm p-2">
                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- Binance Specific Config -->
+                            <div id="p2p-binance-config-box"
+                                class="col-span-1 md:col-span-2 hidden bg-yellow-50 dark:bg-yellow-900/10 p-4 rounded-xl border border-yellow-100 dark:border-yellow-900/30 space-y-3">
+                                <h4 class="text-xs font-bold text-yellow-600 dark:text-yellow-400 uppercase">Binance
+                                    Pro Configuration</h4>
+                                <div id="binance-sell-fields" class="hidden">
+                                    <label
+                                        class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Wallet
+                                        Address (User Copies this)</label>
+                                    <input id="p2p-binance-wallet" type="text" placeholder="e.g. 0x123... or TQ..."
+                                        class="w-full bg-white dark:bg-slate-800 border-yellow-200 dark:border-yellow-900/50 rounded-lg text-sm p-2">
+                                </div>
+                                <div id="binance-buy-fields" class="hidden">
+                                    <label
+                                        class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Payment
+                                        Details (Shown to User)</label>
+                                    <textarea id="p2p-binance-details" rows="2"
+                                        placeholder="e.g. Send to Binance ID: 12345678"
+                                        class="w-full bg-white dark:bg-slate-800 border-yellow-200 dark:border-yellow-900/50 rounded-lg text-sm p-2"></textarea>
                                 </div>
                             </div>
                             <div>
@@ -931,6 +955,10 @@
                 document.getElementById('p2p-vpn-placeholder').value = '';
                 document.getElementById('p2p-vpn-desc-placeholder').value = '';
 
+                // Clear Binance Config
+                document.getElementById('p2p-binance-wallet').value = '';
+                document.getElementById('p2p-binance-details').value = '';
+
                 checkAssetType();
             }
         }
@@ -943,6 +971,9 @@
             const isStars = assetVal === 'Stars';
             const isSellCreds = typeVal === 'sell' && authVal === 'credentials';
             const isVpn = authVal === 'vpn';
+            const isBinanceSell = authVal === 'binance_sell';
+            const isBinanceBuy = authVal === 'binance_buy';
+            const isBinance = isBinanceSell || isBinanceBuy;
 
             // Show Target Link only when Admin is BUYING Stars (User needs to send to this link)
             const showTargetLink = isStars && typeVal === 'buy';
@@ -955,6 +986,14 @@
             // Show VPN Config Box
             const vpnBox = document.getElementById('p2p-vpn-config-box');
             if (vpnBox) vpnBox.classList.toggle('hidden', !isVpn);
+
+            // Show Binance Config Box
+            const binanceBox = document.getElementById('p2p-binance-config-box');
+            if (binanceBox) {
+                binanceBox.classList.toggle('hidden', !isBinance);
+                document.getElementById('binance-sell-fields').classList.toggle('hidden', !isBinanceSell);
+                document.getElementById('binance-buy-fields').classList.toggle('hidden', !isBinanceBuy);
+            }
         }
 
         // Attach listeners
@@ -983,6 +1022,10 @@
             const vpnPlaceholder = document.getElementById('p2p-vpn-placeholder').value;
             const vpnDescPlaceholder = document.getElementById('p2p-vpn-desc-placeholder').value;
 
+            // Binance Config
+            const binanceWallet = document.getElementById('p2p-binance-wallet').value;
+            const binanceDetails = document.getElementById('p2p-binance-details').value;
+
             if (!asset || !price || !total || !min || !max) {
                 alert('Please fill all required fields');
                 return;
@@ -992,6 +1035,7 @@
                 type, authType, asset, merchant, subtitle, logo, price, total, min, max,
                 targetLink, starCount, secret, rules,
                 vpnLabel, vpnPlaceholder, vpnDescPlaceholder, // Include VPN fields
+                binanceWallet, binanceDetails, // Include Binance fields
                 available: total,
                 status: 'online',
                 timestamp: firebase.database.ServerValue.TIMESTAMP
@@ -1051,6 +1095,10 @@
                 document.getElementById('p2p-vpn-label').value = ad.vpnLabel || '';
                 document.getElementById('p2p-vpn-placeholder').value = ad.vpnPlaceholder || '';
                 document.getElementById('p2p-vpn-desc-placeholder').value = ad.vpnDescPlaceholder || '';
+
+                // Load Binance Config
+                document.getElementById('p2p-binance-wallet').value = ad.binanceWallet || '';
+                document.getElementById('p2p-binance-details').value = ad.binanceDetails || '';
 
                 checkAssetType();
 
