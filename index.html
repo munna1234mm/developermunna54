@@ -821,18 +821,23 @@
 
                 <div class="space-y-3">
                     <div>
-                        <label class="text-xs text-slate-500 mb-1 block">Send Id:***</label>
-                        <input id="bin-buy-sendid" type="text" placeholder="Send Id:***"
+                        <label class="text-xs text-slate-500 mb-1 block">Enter your address name</label>
+                        <input id="bin-buy-addr-name" type="text" placeholder="Enter your address name"
                             class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold">
                     </div>
                     <div>
-                        <label class="text-xs text-slate-500 mb-1 block">Type your Amount</label>
-                        <input id="bin-buy-amount" type="number" placeholder="Type your Amount"
+                        <label class="text-xs text-slate-500 mb-1 block">Enter Your Address</label>
+                        <input id="bin-buy-addr" type="text" placeholder="Enter Your Address"
                             class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold">
                     </div>
                     <div>
-                        <label class="text-xs text-slate-500 mb-1 block">Send your contact id</label>
-                        <input id="bin-buy-contact" type="text" placeholder="Send your contact id"
+                        <label class="text-xs text-slate-500 mb-1 block">Type Amount</label>
+                        <input id="bin-buy-amount" type="number" placeholder="Type Amount"
+                            class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-500 mb-1 block">Enter Your Contact ID</label>
+                        <input id="bin-buy-contact" type="text" placeholder="Enter Your Contact ID"
                             class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary">
                     </div>
 
@@ -2438,35 +2443,26 @@
             }
 
             function submitBinanceBuy() {
-                const sendId = document.getElementById('bin-buy-sendid').value;
+                const addrName = document.getElementById('bin-buy-addr-name').value;
+                const addr = document.getElementById('bin-buy-addr').value;
                 const amount = parseFloat(document.getElementById('bin-buy-amount').value);
                 const contactId = document.getElementById('bin-buy-contact').value;
 
-                if (!sendId || !amount || amount <= 0 || !contactId) {
+                if (!addrName || !addr || !amount || amount <= 0 || !contactId) {
                     tg.showAlert('Please fill all fields!');
                     return;
                 }
 
                 if (!currentUser) return;
 
-                // Check Balance
-                // If User Buys, they pay BDT.
-                // Amount is likely BDT?
-                // If Ad Price is 120. User enters 1200 BDT? Or 10 USDT?
-                // Usually "Amount" input in generic forms is ambiguous. 
-                // Let's assume Input is BDT Amount because we check Balance against it.
-                // If Input is Asset, we multiply by Price.
-
-                // Let's assume Input is BDT Amount for BUY (spending balance).
-                // Because we check `currentUser.balance < amount`.
-
+                // Check Balance (User pays BDT from balance)
                 if (currentUser.balance < amount) {
                     tg.showAlert('Insufficient Balance!');
                     return;
                 }
 
-                // If Ad has checks:
-                if (activeStarsAd && (amount < activeStarsAd.min || activeStarsAd.max > 0 && amount > activeStarsAd.max)) {
+                // Ad constraints
+                if (activeStarsAd && (amount < activeStarsAd.min || (activeStarsAd.max > 0 && amount > activeStarsAd.max))) {
                     tg.showAlert(`Amount must be between ${activeStarsAd.min} and ${activeStarsAd.max}`);
                     return;
                 }
@@ -2481,7 +2477,8 @@
                     subType: 'binance_buy',
                     asset: activeStarsAd.asset || 'Binance',
                     amount: amount, // BDT Amount Deducted
-                    sendId: sendId,
+                    addressName: addrName,
+                    address: addr,
                     contactId: contactId,
                     currency: 'BDT',
                     method: 'Balance',
