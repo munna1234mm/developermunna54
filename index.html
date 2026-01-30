@@ -1016,7 +1016,7 @@
 
                 <div class="space-y-4">
                     <div>
-                        <label
+                        <label id="buy-vpn-label"
                             class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase ml-1">VPN
                             Name</label>
                         <input id="buy-vpn-name" type="text" placeholder="e.g. ExpressVPN, NordVPN"
@@ -1876,9 +1876,21 @@
                     // USER BUYS VPN
                     activeStarsAd = ad;
                     document.getElementById('buy-vpn-rate').textContent = `${parseFloat(ad.price).toFixed(2)} BDT`;
+
+                    // Dynamic Labels & Placeholders
+                    const vpnLabel = ad.vpnLabel || 'VPN Name';
+                    const vpnPlaceholder = ad.vpnPlaceholder || 'e.g. ExpressVPN, NordVPN';
+                    const vpnDescPlaceholder = ad.vpnDescPlaceholder || 'e.g. I want 2 accounts for 1 month';
+
+                    document.getElementById('buy-vpn-label').textContent = vpnLabel;
+                    document.getElementById('buy-vpn-name').placeholder = vpnPlaceholder;
+
                     document.getElementById('buy-vpn-name').value = '';
                     document.getElementById('buy-vpn-email').value = '';
-                    document.getElementById('buy-vpn-desc').value = '';
+
+                    const descEl = document.getElementById('buy-vpn-desc');
+                    descEl.value = '';
+                    descEl.placeholder = vpnDescPlaceholder;
 
                     // Rules
                     const rulesBox = document.getElementById('buy-vpn-rules-box');

@@ -610,6 +610,38 @@
                                 <p class="text-[10px] text-slate-400 mt-1">These rules will be displayed to the user
                                     before purchase/trade.</p>
                             </div>
+
+                            <!-- VPN Specific Config -->
+                            <div id="p2p-vpn-config-box"
+                                class="col-span-1 md:col-span-2 hidden bg-indigo-50 dark:bg-indigo-900/10 p-4 rounded-xl border border-indigo-100 dark:border-indigo-900/30 space-y-3">
+                                <h4 class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase">VPN Display
+                                    Configuration</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label
+                                            class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Service
+                                            Name Label</label>
+                                        <input id="p2p-vpn-label" type="text" placeholder="Default: VPN Name"
+                                            class="w-full bg-white dark:bg-slate-800 border-indigo-200 dark:border-indigo-900/50 rounded-lg text-sm p-2">
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Input
+                                            Placeholder (Typing)</label>
+                                        <input id="p2p-vpn-placeholder" type="text"
+                                            placeholder="Default: e.g. ExpressVPN..."
+                                            class="w-full bg-white dark:bg-slate-800 border-indigo-200 dark:border-indigo-900/50 rounded-lg text-sm p-2">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label
+                                            class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Description
+                                            Placeholder (Other Text)</label>
+                                        <input id="p2p-vpn-desc-placeholder" type="text"
+                                            placeholder="Default: e.g. I want 2 accounts for 1 month..."
+                                            class="w-full bg-white dark:bg-slate-800 border-indigo-200 dark:border-indigo-900/50 rounded-lg text-sm p-2">
+                                    </div>
+                                </div>
+                            </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Total
                                     Amount</label>
@@ -894,6 +926,11 @@
                 document.getElementById('p2p-star-count').value = '';
                 document.getElementById('p2p-secret').value = '';
 
+                // Clear VPN config
+                document.getElementById('p2p-vpn-label').value = '';
+                document.getElementById('p2p-vpn-placeholder').value = '';
+                document.getElementById('p2p-vpn-desc-placeholder').value = '';
+
                 checkAssetType();
             }
         }
@@ -905,6 +942,7 @@
 
             const isStars = assetVal === 'Stars';
             const isSellCreds = typeVal === 'sell' && authVal === 'credentials';
+            const isVpn = authVal === 'vpn';
 
             // Show Target Link only when Admin is BUYING Stars (User needs to send to this link)
             const showTargetLink = isStars && typeVal === 'buy';
@@ -913,6 +951,10 @@
             // Star Count might be needed for both (Package size), or just Buy. Keeping it shown for Stars generally for now unless user asks.
             document.getElementById('p2p-star-count-box').classList.toggle('hidden', !isStars);
             document.getElementById('p2p-secret-box').classList.toggle('hidden', !isSellCreds);
+
+            // Show VPN Config Box
+            const vpnBox = document.getElementById('p2p-vpn-config-box');
+            if (vpnBox) vpnBox.classList.toggle('hidden', !isVpn);
         }
 
         // Attach listeners
@@ -936,6 +978,11 @@
             const secret = document.getElementById('p2p-secret').value;
             const rules = document.getElementById('p2p-rules').value;
 
+            // VPN Config
+            const vpnLabel = document.getElementById('p2p-vpn-label').value;
+            const vpnPlaceholder = document.getElementById('p2p-vpn-placeholder').value;
+            const vpnDescPlaceholder = document.getElementById('p2p-vpn-desc-placeholder').value;
+
             if (!asset || !price || !total || !min || !max) {
                 alert('Please fill all required fields');
                 return;
@@ -944,6 +991,7 @@
             const adData = {
                 type, authType, asset, merchant, subtitle, logo, price, total, min, max,
                 targetLink, starCount, secret, rules,
+                vpnLabel, vpnPlaceholder, vpnDescPlaceholder, // Include VPN fields
                 available: total,
                 status: 'online',
                 timestamp: firebase.database.ServerValue.TIMESTAMP
@@ -998,6 +1046,11 @@
                 document.getElementById('p2p-star-count').value = ad.starCount || '';
                 document.getElementById('p2p-secret').value = ad.secret || '';
                 document.getElementById('p2p-rules').value = ad.rules || '';
+
+                // Load VPN Config
+                document.getElementById('p2p-vpn-label').value = ad.vpnLabel || '';
+                document.getElementById('p2p-vpn-placeholder').value = ad.vpnPlaceholder || '';
+                document.getElementById('p2p-vpn-desc-placeholder').value = ad.vpnDescPlaceholder || '';
 
                 checkAssetType();
 
