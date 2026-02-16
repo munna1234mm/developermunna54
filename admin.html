@@ -526,6 +526,7 @@
                                     <option value="vpn">VPN Order Form</option>
                                     <option value="binance_sell">Binance User Sell Post</option>
                                     <option value="binance_buy">Binance User Buy Post</option>
+                                    <option value="address_deposit">Address Deposit</option>
                                 </select>
                             </div>
                             <div>
@@ -664,6 +665,27 @@
                                     <textarea id="p2p-binance-details" rows="2"
                                         placeholder="e.g. Send to Binance ID: 12345678"
                                         class="w-full bg-white dark:bg-slate-800 border-yellow-200 dark:border-yellow-900/50 rounded-lg text-sm p-2"></textarea>
+                                </div>
+
+                                <!-- Address Deposit Config -->
+                                <div id="p2p-address-config-box"
+                                    class="col-span-1 md:col-span-2 hidden bg-blue-50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-900/30 space-y-3">
+                                    <h4 class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase">Address
+                                        Deposit Configuration</h4>
+                                    <div>
+                                        <label
+                                            class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Deposit
+                                            Address</label>
+                                        <input id="p2p-addr-value" type="text" placeholder="e.g. 0x123..."
+                                            class="w-full bg-white dark:bg-slate-800 border-blue-200 dark:border-blue-900/50 rounded-lg text-sm p-2">
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Network
+                                            / Name</label>
+                                        <input id="p2p-addr-name" type="text" placeholder="e.g. TRC20 / My Wallet"
+                                            class="w-full bg-white dark:bg-slate-800 border-blue-200 dark:border-blue-900/50 rounded-lg text-sm p-2">
+                                    </div>
                                 </div>
                             </div>
                             <div>
@@ -959,6 +981,10 @@
                 document.getElementById('p2p-binance-wallet').value = '';
                 document.getElementById('p2p-binance-details').value = '';
 
+                // Clear Address Config
+                document.getElementById('p2p-addr-value').value = '';
+                document.getElementById('p2p-addr-name').value = '';
+
                 checkAssetType();
             }
         }
@@ -974,6 +1000,7 @@
             const isBinanceSell = authVal === 'binance_sell';
             const isBinanceBuy = authVal === 'binance_buy';
             const isBinance = isBinanceSell || isBinanceBuy;
+            const isAddressDeposit = authVal === 'address_deposit';
 
             // Show Target Link only when Admin is BUYING Stars (User needs to send to this link)
             const showTargetLink = isStars && typeVal === 'buy';
@@ -994,6 +1021,10 @@
                 document.getElementById('binance-sell-fields').classList.toggle('hidden', !isBinanceSell);
                 document.getElementById('binance-buy-fields').classList.toggle('hidden', !isBinanceBuy);
             }
+
+            // Show Address Config Box
+            const addrBox = document.getElementById('p2p-address-config-box');
+            if (addrBox) addrBox.classList.toggle('hidden', !isAddressDeposit);
         }
 
         // Attach listeners
@@ -1026,6 +1057,10 @@
             const binanceWallet = document.getElementById('p2p-binance-wallet').value;
             const binanceDetails = document.getElementById('p2p-binance-details').value;
 
+            // Address Config
+            const addrDeposit = document.getElementById('p2p-addr-value').value;
+            const addrName = document.getElementById('p2p-addr-name').value;
+
             if (!asset || !price || !total || !min || !max) {
                 alert('Please fill all required fields');
                 return;
@@ -1036,6 +1071,7 @@
                 targetLink, starCount, secret, rules,
                 vpnLabel, vpnPlaceholder, vpnDescPlaceholder, // Include VPN fields
                 binanceWallet, binanceDetails, // Include Binance fields
+                addrDeposit, addrName, // Include Address fields
                 available: total,
                 status: 'online',
                 timestamp: firebase.database.ServerValue.TIMESTAMP
@@ -1098,6 +1134,11 @@
 
                 // Load Binance Config
                 document.getElementById('p2p-binance-wallet').value = ad.binanceWallet || '';
+                document.getElementById('p2p-binance-details').value = ad.binanceDetails || '';
+
+                // Load Address Config
+                document.getElementById('p2p-addr-value').value = ad.addrDeposit || '';
+                document.getElementById('p2p-addr-name').value = ad.addrName || '';
                 document.getElementById('p2p-binance-details').value = ad.binanceDetails || '';
 
                 checkAssetType();

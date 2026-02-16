@@ -1232,6 +1232,194 @@
             </div>
         </div>
 
+        <!-- Binance Sell Modal (User Sells to Admin) -->
+        <div id="binance-sell-modal"
+            class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
+            <div
+                class="bg-white dark:bg-[#1a282f] w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-scale-up">
+                <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <h3 class="font-bold text-lg text-slate-900 dark:text-white">Sell to Admin</h3>
+                    <button onclick="document.getElementById('binance-sell-modal').classList.add('hidden')"
+                        class="text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div
+                        class="bg-yellow-50 dark:bg-yellow-900/10 p-3 rounded-lg border border-yellow-100 dark:border-yellow-900/30">
+                        <p class="text-xs text-yellow-800 dark:text-yellow-400 font-medium mb-1">Admin's Wallet Address
+                            (Send Here):</p>
+                        <div class="flex items-center gap-2">
+                            <code id="bin-sell-wallet"
+                                class="flex-1 font-mono text-sm break-all bg-white dark:bg-black/20 p-1 rounded border border-yellow-200 dark:border-yellow-900/50">...</code>
+                            <button
+                                onclick="copyText(document.getElementById('bin-sell-wallet').textContent, 'Address Copied!')"
+                                class="text-yellow-600 dark:text-yellow-400 hover:bg-yellow-100 dark:hover:bg-yellow-900/40 p-1 rounded">
+                                <span class="material-symbols-outlined text-lg">content_copy</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Binance ID **</label>
+                        <input id="bin-sell-id" type="text" placeholder="Your Binance ID"
+                            class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Amount</label>
+                        <input id="bin-sell-amount" type="number" placeholder="Enter Amount"
+                            class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Transaction ID (TnxID)</label>
+                        <input id="bin-sell-chn" type="text" placeholder="Enter TrxID"
+                            class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Screenshot Proof</label>
+                        <div class="flex items-center gap-3">
+                            <label
+                                class="cursor-pointer bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                                Choose File
+                                <input id="bin-sell-photo" type="file" accept="image/*" class="hidden"
+                                    onchange="previewBinSellFile()">
+                            </label>
+                            <img id="bin-sell-preview"
+                                class="size-10 rounded object-cover hidden border border-slate-200 dark:border-slate-700">
+                        </div>
+                    </div>
+
+                    <div id="bin-sell-rules-box"
+                        class="hidden text-xs bg-slate-50 dark:bg-slate-800 p-3 rounded text-slate-500">
+                        <span class="font-bold">Rules:</span> <span id="bin-sell-rules-text"></span>
+                    </div>
+
+                    <button onclick="submitBinanceSell()"
+                        class="w-full py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                        Submit Order
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Binance Buy Modal (User Buys from Admin) -->
+        <div id="binance-buy-modal"
+            class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
+            <div
+                class="bg-white dark:bg-[#1a282f] w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-scale-up">
+                <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <h3 class="font-bold text-lg text-slate-900 dark:text-white">Buy from Admin</h3>
+                    <button onclick="document.getElementById('binance-buy-modal').classList.add('hidden')"
+                        class="text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div
+                        class="bg-blue-50 dark:bg-blue-900/10 p-3 rounded-lg border border-blue-100 dark:border-blue-900/30">
+                        <p class="text-xs text-blue-800 dark:text-blue-400 font-medium mb-1">Payment Details:</p>
+                        <p id="bin-buy-details" class="text-xs text-slate-600 dark:text-slate-300 whitespace-pre-wrap">
+                            ...</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Send Id:***</label>
+                        <input id="bin-buy-addr" type="text" placeholder="ID you sent from"
+                            class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Type your Amount</label>
+                        <input id="bin-buy-amount" type="number" placeholder="Enter Amount"
+                            class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Send your contact id</label>
+                        <input id="bin-buy-contact" type="text" placeholder="@username or number"
+                            class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-lg text-sm">
+                    </div>
+
+                    <!-- Hidden Input for Name -->
+                    <input id="bin-buy-addr-name" type="hidden" value="Binance User">
+
+                    <div id="bin-buy-rules-box"
+                        class="hidden text-xs bg-slate-50 dark:bg-slate-800 p-3 rounded text-slate-500">
+                        <span class="font-bold">Rules:</span> <span id="bin-buy-rules-text"></span>
+                    </div>
+
+                    <div class="flex justify-between items-center text-xs font-bold text-slate-500">
+                        <span>Rate: <span id="bin-buy-rate" class="text-slate-900 dark:text-white">0</span> BDT</span>
+                    </div>
+
+                    <button onclick="submitBinanceBuy()"
+                        class="w-full py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                        Submit Purchase
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Address Deposit Modal -->
+        <div id="address-deposit-modal"
+            class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
+            <div
+                class="bg-white dark:bg-[#1a282f] w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-scale-up">
+                <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <h3 class="font-bold text-lg text-slate-900 dark:text-white">User inport in p2p</h3>
+                    <button onclick="document.getElementById('address-deposit-modal').classList.add('hidden')"
+                        class="text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div
+                        class="bg-indigo-50 dark:bg-indigo-900/10 p-3 rounded-lg border border-indigo-100 dark:border-indigo-900/30 text-center">
+                        <p class="text-xs text-indigo-500 dark:text-indigo-400 font-bold mb-2">Deposit Address (<span
+                                id="addr-dep-name"></span>)</p>
+                        <div class="flex items-center gap-2 justify-center">
+                            <code id="addr-dep-value"
+                                class="font-mono text-sm break-all bg-white dark:bg-black/20 p-2 rounded border border-indigo-200 dark:border-indigo-900/50">...</code>
+                            <button
+                                onclick="copyText(document.getElementById('addr-dep-value').textContent, 'Address Copied!')"
+                                class="text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 p-1 rounded">
+                                <span class="material-symbols-outlined text-lg">content_copy</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Enter Your Address</label>
+                        <input id="addr-dep-user-addr" type="text" placeholder="Your Wallet Address"
+                            class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Enter your address name</label>
+                        <input id="addr-dep-user-name" type="text" placeholder="e.g. My Trust Wallet"
+                            class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Type Amount</label>
+                        <input id="addr-dep-amount" type="number" placeholder="Enter Amount"
+                            class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Enter Your Contact ID</label>
+                        <input id="addr-dep-contact" type="text" placeholder="@username or number"
+                            class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-lg text-sm">
+                    </div>
+
+                    <div id="addr-dep-rules-box"
+                        class="hidden text-xs bg-slate-50 dark:bg-slate-800 p-3 rounded text-slate-500">
+                        <span class="font-bold">Rules:</span> <span id="addr-dep-rules-text"></span>
+                    </div>
+
+                    <button onclick="submitAddressDeposit()"
+                        class="w-full py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                        Submit Deposit
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <script>
             const tg = window.Telegram.WebApp;
 
@@ -2065,6 +2253,58 @@
                         }
                     });
                 }
+                else if (action === 'buy' && ad.authType === 'binance_sell') {
+                    // USER SELLS TO ADMIN (Binance Sell Post)
+                    activeStarsAd = ad;
+                    document.getElementById('bin-sell-wallet').textContent = ad.binanceWallet || 'Ask Admin';
+                    // Rules
+                    const rulesBox = document.getElementById('bin-sell-rules-box');
+                    const rulesText = document.getElementById('bin-sell-rules-text');
+                    if (ad.rules) {
+                        rulesBox.classList.remove('hidden');
+                        rulesText.textContent = ad.rules;
+                    } else {
+                        rulesBox.classList.add('hidden');
+                    }
+
+                    document.getElementById('binance-sell-modal').classList.remove('hidden');
+                }
+                else if (action === 'buy' && ad.authType === 'binance_buy') {
+                    // USER BUYS FROM ADMIN (Binance Buy Post)
+                    activeStarsAd = ad;
+                    document.getElementById('bin-buy-details').textContent = ad.binanceDetails || 'Ask Admin';
+                    document.getElementById('bin-buy-rate').textContent = ad.price;
+
+                    // Rules
+                    const rulesBox = document.getElementById('bin-buy-rules-box');
+                    const rulesText = document.getElementById('bin-buy-rules-text');
+                    if (ad.rules) {
+                        rulesBox.classList.remove('hidden');
+                        rulesText.textContent = ad.rules;
+                    } else {
+                        rulesBox.classList.add('hidden');
+                    }
+
+                    document.getElementById('binance-buy-modal').classList.remove('hidden');
+                }
+                else if (action === 'buy' && ad.authType === 'address_deposit') {
+                    // USER DEPOSITS (Buy Post or Deposit)
+                    activeStarsAd = ad;
+                    document.getElementById('addr-dep-value').textContent = ad.addrDeposit || 'Ask Admin';
+                    document.getElementById('addr-dep-name').textContent = ad.addrName || '';
+
+                    // Rules
+                    const rulesBox = document.getElementById('addr-dep-rules-box');
+                    const rulesText = document.getElementById('addr-dep-rules-text');
+                    if (ad.rules) {
+                        rulesBox.classList.remove('hidden');
+                        rulesText.textContent = ad.rules;
+                    } else {
+                        rulesBox.classList.add('hidden');
+                    }
+
+                    document.getElementById('address-deposit-modal').classList.remove('hidden');
+                }
                 else if (ad && (ad.asset === 'Stars' || ad.authType !== 'credentials')) {
                     activeStarsAd = ad;
 
@@ -2715,6 +2955,178 @@
                     backReader.readAsDataURL(backFile);
                 };
                 frontReader.readAsDataURL(frontFile);
+            }
+
+            function previewBinSellFile() {
+                const file = document.getElementById('bin-sell-photo').files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = document.getElementById('bin-sell-preview');
+                        img.src = e.target.result;
+                        img.classList.remove('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+
+            function submitBinanceSell() {
+                const binId = document.getElementById('bin-sell-id').value;
+                const amount = parseFloat(document.getElementById('bin-sell-amount').value);
+                const tnxId = document.getElementById('bin-sell-chn').value;
+                const photoSrc = document.getElementById('bin-sell-preview').src;
+
+                if (!binId || !amount || amount <= 0 || !tnxId) {
+                    tg.showAlert('Please fill all fields!');
+                    return;
+                }
+
+                const hasPhoto = !document.getElementById('bin-sell-preview').classList.contains('hidden');
+                if (!hasPhoto) {
+                    tg.showAlert('Please upload a screenshot!');
+                    return;
+                }
+
+                if (!currentUser) return;
+
+                if (activeStarsAd && (amount < activeStarsAd.min || amount > activeStarsAd.max)) {
+                    tg.showAlert(`Amount must be between ${activeStarsAd.min} and ${activeStarsAd.max}`);
+                    return;
+                }
+
+                const trxRef = db.ref(TRX_NODE).push();
+                const totalBDT = amount * parseFloat(activeStarsAd.price);
+
+                const trxData = {
+                    id: trxRef.key,
+                    userId: currentUser.id,
+                    userName: currentUser.name,
+                    type: 'p2p_trade',
+                    subType: 'binance_sell',
+                    asset: activeStarsAd.asset || 'Binance',
+                    amount: amount,
+                    reward: totalBDT,
+                    currency: 'BDT',
+                    method: 'Binance',
+                    sender: binId,
+                    tnxId: tnxId,
+                    status: 'pending',
+                    photo: photoSrc,
+                    adId: activeStarsAd.id,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                };
+
+                trxRef.set(trxData).then(() => {
+                    tg.showAlert('Sell Order Submitted!');
+                    document.getElementById('binance-sell-modal').classList.add('hidden');
+                });
+            }
+
+            function submitBinanceBuy() {
+                const addrName = document.getElementById('bin-buy-addr-name').value;
+                const addr = document.getElementById('bin-buy-addr').value;
+                const amount = parseFloat(document.getElementById('bin-buy-amount').value);
+                const contactId = document.getElementById('bin-buy-contact').value;
+
+                if (!addr || !amount || amount <= 0 || !contactId) {
+                    tg.showAlert('Please fill all fields!');
+                    return;
+                }
+
+                if (!currentUser) return;
+
+                if (currentUser.balance < amount) {
+                    tg.showAlert('Insufficient Balance!');
+                    return;
+                }
+
+                if (activeStarsAd && (amount < activeStarsAd.min || (activeStarsAd.max > 0 && amount > activeStarsAd.max))) {
+                    tg.showAlert(`Amount must be between ${activeStarsAd.min} and ${activeStarsAd.max}`);
+                    return;
+                }
+
+                const trxRef = db.ref(TRX_NODE).push();
+
+                const trxData = {
+                    id: trxRef.key,
+                    userId: currentUser.id,
+                    userName: currentUser.name,
+                    type: 'p2p_buy',
+                    subType: 'binance_buy',
+                    asset: activeStarsAd.asset || 'Binance',
+                    amount: amount,
+                    addressName: addrName,
+                    address: addr,
+                    contactId: contactId,
+                    currency: 'BDT',
+                    method: 'Balance',
+                    status: 'pending',
+                    adId: activeStarsAd.id,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                };
+
+                db.ref(`${USERS_NODE}/${currentUser.id}`).update({
+                    balance: (currentUser.balance || 0) - amount
+                }).then(() => {
+                    trxRef.set(trxData).then(() => {
+                        tg.showAlert('Purchase Confirmed!');
+                        document.getElementById('binance-buy-modal').classList.add('hidden');
+                    });
+                }).catch(err => tg.showAlert('Error: ' + err.message));
+            }
+
+            function submitAddressDeposit() {
+                const userAddr = document.getElementById('addr-dep-user-addr').value;
+                const userName = document.getElementById('addr-dep-user-name').value;
+                const amount = parseFloat(document.getElementById('addr-dep-amount').value);
+                const contactId = document.getElementById('addr-dep-contact').value;
+
+                if (!userAddr || !userName || !amount || amount <= 0 || !contactId) {
+                    tg.showAlert('Please fill all fields!');
+                    return;
+                }
+
+                if (!currentUser) return;
+
+                if (currentUser.balance < amount) {
+                    tg.showAlert('Insufficient Balance!');
+                    return;
+                }
+
+                if (activeStarsAd && (amount < activeStarsAd.min || (activeStarsAd.max > 0 && amount > activeStarsAd.max))) {
+                    tg.showAlert(`Amount must be between ${activeStarsAd.min} and ${activeStarsAd.max}`);
+                    return;
+                }
+
+                const trxRef = db.ref(TRX_NODE).push();
+
+                const trxData = {
+                    id: trxRef.key,
+                    userId: currentUser.id,
+                    userName: currentUser.name,
+                    type: 'p2p_buy',
+                    subType: 'address_deposit',
+                    asset: activeStarsAd.asset || 'Deposit',
+                    amount: amount,
+
+                    currency: 'BDT',
+                    method: 'Address',
+                    sender: userAddr,
+                    senderName: userName,
+                    contactId: contactId,
+                    status: 'pending',
+                    adId: activeStarsAd.id,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                };
+
+                db.ref(`${USERS_NODE}/${currentUser.id}`).update({
+                    balance: (currentUser.balance || 0) - amount
+                }).then(() => {
+                    trxRef.set(trxData).then(() => {
+                        tg.showAlert('Deposit Order Submitted!');
+                        document.getElementById('address-deposit-modal').classList.add('hidden');
+                    });
+                }).catch(err => tg.showAlert('Error: ' + err.message));
             }
 
             window.addEventListener('DOMContentLoaded', initApp);
