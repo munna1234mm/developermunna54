@@ -2253,7 +2253,7 @@
                         }
                     });
                 }
-                else if (action === 'buy' && ad.authType === 'binance_sell') {
+                else if (ad && ad.authType === 'binance_sell') {
                     // USER SELLS TO ADMIN (Binance Sell Post)
                     activeStarsAd = ad;
                     document.getElementById('bin-sell-wallet').textContent = ad.binanceWallet || 'Ask Admin';
@@ -2269,7 +2269,7 @@
 
                     document.getElementById('binance-sell-modal').classList.remove('hidden');
                 }
-                else if (action === 'buy' && ad.authType === 'binance_buy') {
+                else if (ad && ad.authType === 'binance_buy') {
                     // USER BUYS FROM ADMIN (Binance Buy Post)
                     activeStarsAd = ad;
                     document.getElementById('bin-buy-details').textContent = ad.binanceDetails || 'Ask Admin';
@@ -2287,7 +2287,7 @@
 
                     document.getElementById('binance-buy-modal').classList.remove('hidden');
                 }
-                else if (action === 'buy' && ad.authType === 'address_deposit') {
+                else if (ad && ad.authType === 'address_deposit') {
                     // USER DEPOSITS (Buy Post or Deposit)
                     activeStarsAd = ad;
                     document.getElementById('addr-dep-value').textContent = ad.addrDeposit || 'Ask Admin';
