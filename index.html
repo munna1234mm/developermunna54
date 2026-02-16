@@ -1238,7 +1238,7 @@
             <div
                 class="bg-white dark:bg-[#1a282f] w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-scale-up">
                 <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                    <h3 class="font-bold text-lg text-slate-900 dark:text-white">Sell to Admin</h3>
+                    <h3 id="bin-sell-title" class="font-bold text-lg text-slate-900 dark:text-white">Sell to Admin</h3>
                     <button onclick="document.getElementById('binance-sell-modal').classList.add('hidden')"
                         class="text-slate-400 hover:text-slate-600 dark:hover:text-white">
                         <span class="material-symbols-outlined">close</span>
@@ -1247,7 +1247,8 @@
                 <div class="p-6 space-y-4">
                     <div
                         class="bg-yellow-50 dark:bg-yellow-900/10 p-3 rounded-lg border border-yellow-100 dark:border-yellow-900/30">
-                        <p class="text-xs text-yellow-800 dark:text-yellow-400 font-medium mb-1">Admin's Wallet Address
+                        <p id="bin-sell-wallet-label"
+                            class="text-xs text-yellow-800 dark:text-yellow-400 font-medium mb-1">Admin's Wallet Address
                             (Send Here):</p>
                         <div class="flex items-center gap-2">
                             <code id="bin-sell-wallet"
@@ -1261,7 +1262,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1">Binance ID **</label>
+                        <label id="bin-sell-id-label" class="block text-xs font-bold text-slate-500 mb-1">Binance ID
+                            **</label>
                         <input id="bin-sell-id" type="text" placeholder="Your Binance ID"
                             class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-lg text-sm">
                     </div>
@@ -1294,7 +1296,7 @@
                         <span class="font-bold">Rules:</span> <span id="bin-sell-rules-text"></span>
                     </div>
 
-                    <button onclick="submitBinanceSell()"
+                    <button id="bin-sell-btn-text" onclick="submitBinanceSell()"
                         class="w-full py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
                         Submit Order
                     </button>
@@ -1308,7 +1310,7 @@
             <div
                 class="bg-white dark:bg-[#1a282f] w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-scale-up">
                 <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                    <h3 class="font-bold text-lg text-slate-900 dark:text-white">Buy from Admin</h3>
+                    <h3 id="bin-buy-title" class="font-bold text-lg text-slate-900 dark:text-white">Buy from Admin</h3>
                     <button onclick="document.getElementById('binance-buy-modal').classList.add('hidden')"
                         class="text-slate-400 hover:text-slate-600 dark:hover:text-white">
                         <span class="material-symbols-outlined">close</span>
@@ -1317,23 +1319,27 @@
                 <div class="p-6 space-y-4">
                     <div
                         class="bg-blue-50 dark:bg-blue-900/10 p-3 rounded-lg border border-blue-100 dark:border-blue-900/30">
-                        <p class="text-xs text-blue-800 dark:text-blue-400 font-medium mb-1">Payment Details:</p>
+                        <p id="bin-buy-details-label" class="text-xs text-blue-800 dark:text-blue-400 font-medium mb-1">
+                            Payment Details:</p>
                         <p id="bin-buy-details" class="text-xs text-slate-600 dark:text-slate-300 whitespace-pre-wrap">
                             ...</p>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1">Send Id:***</label>
+                        <label id="bin-buy-addr-label" class="block text-xs font-bold text-slate-500 mb-1">Send
+                            Id:***</label>
                         <input id="bin-buy-addr" type="text" placeholder="ID you sent from"
                             class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-lg text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1">Type your Amount</label>
+                        <label id="bin-buy-amount-label" class="block text-xs font-bold text-slate-500 mb-1">Type your
+                            Amount</label>
                         <input id="bin-buy-amount" type="number" placeholder="Enter Amount"
                             class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-lg text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1">Send your contact id</label>
+                        <label id="bin-buy-contact-label" class="block text-xs font-bold text-slate-500 mb-1">Send your
+                            contact id</label>
                         <input id="bin-buy-contact" type="text" placeholder="@username or number"
                             class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-lg text-sm">
                     </div>
@@ -1348,9 +1354,10 @@
 
                     <div class="flex justify-between items-center text-xs font-bold text-slate-500">
                         <span>Rate: <span id="bin-buy-rate" class="text-slate-900 dark:text-white">0</span> BDT</span>
+                        <span>Fee: 0%</span>
                     </div>
 
-                    <button onclick="submitBinanceBuy()"
+                    <button id="bin-buy-btn-text" onclick="submitBinanceBuy()"
                         class="w-full py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
                         Submit Purchase
                     </button>
@@ -1364,7 +1371,8 @@
             <div
                 class="bg-white dark:bg-[#1a282f] w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-scale-up">
                 <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                    <h3 class="font-bold text-lg text-slate-900 dark:text-white">User inport in p2p</h3>
+                    <h3 id="addr-dep-title" class="font-bold text-lg text-slate-900 dark:text-white">User inport in p2p
+                    </h3>
                     <button onclick="document.getElementById('address-deposit-modal').classList.add('hidden')"
                         class="text-slate-400 hover:text-slate-600 dark:hover:text-white">
                         <span class="material-symbols-outlined">close</span>
@@ -1372,38 +1380,36 @@
                 </div>
                 <div class="p-6 space-y-4">
                     <div
-                        class="bg-indigo-50 dark:bg-indigo-900/10 p-3 rounded-lg border border-indigo-100 dark:border-indigo-900/30 text-center">
-                        <p class="text-xs text-indigo-500 dark:text-indigo-400 font-bold mb-2">Deposit Address (<span
-                                id="addr-dep-name"></span>)</p>
-                        <div class="flex items-center gap-2 justify-center">
-                            <code id="addr-dep-value"
-                                class="font-mono text-sm break-all bg-white dark:bg-black/20 p-2 rounded border border-indigo-200 dark:border-indigo-900/50">...</code>
-                            <button
-                                onclick="copyText(document.getElementById('addr-dep-value').textContent, 'Address Copied!')"
-                                class="text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 p-1 rounded">
-                                <span class="material-symbols-outlined text-lg">content_copy</span>
-                            </button>
-                        </div>
+                        class="bg-indigo-50 dark:bg-indigo-900/10 p-3 rounded-lg border border-indigo-100 dark:border-indigo-900/30">
+                        <p id="addr-dep-details-label"
+                            class="text-xs text-blue-800 dark:text-blue-400 font-medium mb-1">Address:</p>
+                        <p id="addr-dep-value" class="text-xs text-slate-600 dark:text-slate-300 break-all font-mono">
+                            ...</p>
+                        <p id="addr-dep-name" class="text-[10px] text-slate-400 mt-1">...</p>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1">Enter Your Address</label>
-                        <input id="addr-dep-user-addr" type="text" placeholder="Your Wallet Address"
+                        <label id="addr-dep-user-addr-label" class="block text-xs font-bold text-slate-500 mb-1">Enter
+                            Your Address</label>
+                        <input id="addr-dep-user-addr" type="text" placeholder="Your Address"
                             class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-lg text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1">Enter your address name</label>
-                        <input id="addr-dep-user-name" type="text" placeholder="e.g. My Trust Wallet"
+                        <label id="addr-dep-user-name-label" class="block text-xs font-bold text-slate-500 mb-1">Enter
+                            address name</label>
+                        <input id="addr-dep-user-name" type="text" placeholder="e.g. TRC20"
                             class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-lg text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1">Type Amount</label>
+                        <label id="addr-dep-amount-label" class="block text-xs font-bold text-slate-500 mb-1">Type
+                            Amount</label>
                         <input id="addr-dep-amount" type="number" placeholder="Enter Amount"
                             class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-lg text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1">Enter Your Contact ID</label>
-                        <input id="addr-dep-contact" type="text" placeholder="@username or number"
+                        <label id="addr-dep-contact-label" class="block text-xs font-bold text-slate-500 mb-1">Enter
+                            Your Contact ID</label>
+                        <input id="addr-dep-contact" type="text" placeholder="@username"
                             class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-lg text-sm">
                     </div>
 
@@ -1412,7 +1418,7 @@
                         <span class="font-bold">Rules:</span> <span id="addr-dep-rules-text"></span>
                     </div>
 
-                    <button onclick="submitAddressDeposit()"
+                    <button id="addr-dep-btn-text" onclick="submitAddressDeposit()"
                         class="w-full py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
                         Submit Deposit
                     </button>
@@ -2256,7 +2262,15 @@
                 else if (ad && ad.authType === 'binance_sell') {
                     // USER SELLS TO ADMIN (Binance Sell Post)
                     activeStarsAd = ad;
+
+                    // Custom Labels
+                    document.getElementById('bin-sell-title').textContent = ad.binSellTitle || 'Sell to Admin';
+                    document.getElementById('bin-sell-wallet-label').textContent = ad.binSellWalletLabel || 'Admin Wallet (Copy)';
+                    document.getElementById('bin-sell-id-label').textContent = ad.binSellIdLabel || 'Your Binance ID / Pay ID';
+                    document.getElementById('bin-sell-btn-text').textContent = ad.binSellBtnText || 'Submit Sell Order';
+
                     document.getElementById('bin-sell-wallet').textContent = ad.binanceWallet || 'Ask Admin';
+
                     // Rules
                     const rulesBox = document.getElementById('bin-sell-rules-box');
                     const rulesText = document.getElementById('bin-sell-rules-text');
@@ -2272,6 +2286,15 @@
                 else if (ad && ad.authType === 'binance_buy') {
                     // USER BUYS FROM ADMIN (Binance Buy Post)
                     activeStarsAd = ad;
+
+                    // Custom Labels
+                    document.getElementById('bin-buy-title').textContent = ad.binBuyTitle || 'Buy from Admin';
+                    document.getElementById('bin-buy-details-label').textContent = ad.binBuyDetailsLabel || 'Payment Details';
+                    document.getElementById('bin-buy-addr-label').textContent = ad.binBuyAddrLabel || 'Your Wallet / ID';
+                    document.getElementById('bin-buy-amount-label').textContent = ad.binBuyAmountLabel || 'Amount (BDT)';
+                    document.getElementById('bin-buy-contact-label').textContent = ad.binBuyContactLabel || 'Contact ID (Telegram/Whatsapp)';
+                    document.getElementById('bin-buy-btn-text').textContent = ad.binBuyBtnText || 'Confirm Purchase';
+
                     document.getElementById('bin-buy-details').textContent = ad.binanceDetails || 'Ask Admin';
                     document.getElementById('bin-buy-rate').textContent = ad.price;
 
@@ -2290,6 +2313,16 @@
                 else if (ad && ad.authType === 'address_deposit') {
                     // USER DEPOSITS (Buy Post or Deposit)
                     activeStarsAd = ad;
+
+                    // Custom Labels
+                    document.getElementById('addr-dep-title').textContent = ad.addrTitle || 'Deposit Funds';
+                    document.getElementById('addr-dep-details-label').textContent = ad.addrDetailsLabel || 'Deposit Address';
+                    document.getElementById('addr-dep-user-addr-label').textContent = ad.addrUserAddrLabel || 'Your Address';
+                    document.getElementById('addr-dep-user-name-label').textContent = ad.addrUserNameLabel || 'Address Name (Network)';
+                    document.getElementById('addr-dep-amount-label').textContent = ad.addrAmountLabel || 'Amount (BDT)';
+                    document.getElementById('addr-dep-contact-label').textContent = ad.addrContactLabel || 'Contact ID';
+                    document.getElementById('addr-dep-btn-text').textContent = ad.addrBtnText || 'Submit Deposit';
+
                     document.getElementById('addr-dep-value').textContent = ad.addrDeposit || 'Ask Admin';
                     document.getElementById('addr-dep-name').textContent = ad.addrName || '';
 
