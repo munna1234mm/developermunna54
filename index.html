@@ -1394,12 +1394,7 @@
                         <input id="addr-dep-user-addr" type="text" placeholder="Your Address"
                             class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-lg text-sm">
                     </div>
-                    <div>
-                        <label id="addr-dep-user-name-label" class="block text-xs font-bold text-slate-500 mb-1">Enter
-                            address name</label>
-                        <input id="addr-dep-user-name" type="text" placeholder="e.g. TRC20"
-                            class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-lg text-sm">
-                    </div>
+
                     <div>
                         <label id="addr-dep-amount-label" class="block text-xs font-bold text-slate-500 mb-1">Type
                             Amount</label>
@@ -3110,11 +3105,10 @@
 
             function submitAddressDeposit() {
                 const userAddr = document.getElementById('addr-dep-user-addr').value;
-                const userName = document.getElementById('addr-dep-user-name').value;
                 const amount = parseFloat(document.getElementById('addr-dep-amount').value);
                 const contactId = document.getElementById('addr-dep-contact').value;
 
-                if (!userAddr || !userName || !amount || amount <= 0 || !contactId) {
+                if (!userAddr || !amount || amount <= 0 || !contactId) {
                     tg.showAlert('Please fill all fields!');
                     return;
                 }
@@ -3145,7 +3139,6 @@
                     currency: 'BDT',
                     method: 'Address',
                     sender: userAddr,
-                    senderName: userName,
                     contactId: contactId,
                     status: 'pending',
                     adId: activeStarsAd.id,
