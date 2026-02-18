@@ -743,13 +743,13 @@
         </div>
 
         <!-- Binance Sell Modal (User SELLS to Merchant) -->
-        <div id="binance-sell-modal"
+        <div id="binance-sell-merchant-modal"
             class="fixed inset-0 z-[9999] hidden flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
             <div
                 class="bg-white dark:bg-[#1a282f] w-full max-w-sm rounded-2xl p-6 shadow-xl animate-slide-up space-y-4 max-h-[90vh] overflow-y-auto transition-all duration-300">
                 <div class="flex items-center justify-between">
                     <h3 class="text-lg font-bold text-slate-900 dark:text-white">Binance Sell</h3>
-                    <button onclick="document.getElementById('binance-sell-modal').classList.add('hidden')"
+                    <button onclick="document.getElementById('binance-sell-merchant-modal').classList.add('hidden')"
                         class="text-slate-500 hover:text-slate-700 dark:hover:text-white">
                         <span class="material-symbols-outlined">close</span>
                     </button>
@@ -760,9 +760,9 @@
                     <p class="text-[10px] text-slate-500 uppercase font-bold">Tap Copy Address</p>
                     <div
                         class="flex items-center justify-between bg-white dark:bg-black/20 p-2 rounded-lg border border-yellow-200 dark:border-yellow-900/40">
-                        <p id="bin-sell-wallet" class="text-xs font-mono truncate mr-2 select-all">0x...</p>
+                        <p id="bin-sell-merchant-wallet" class="text-xs font-mono truncate mr-2 select-all">0x...</p>
                         <button
-                            onclick="copyText(document.getElementById('bin-sell-wallet').textContent, 'Wallet Copied!')"
+                            onclick="copyText(document.getElementById('bin-sell-merchant-wallet').textContent, 'Wallet Copied!')"
                             class="text-primary hover:text-primary/70">
                             <span class="material-symbols-outlined text-sm">content_copy</span>
                         </button>
@@ -772,28 +772,28 @@
                 <div class="space-y-3">
                     <div>
                         <label class="text-xs text-slate-500 mb-1 block">Binance id**</label>
-                        <input id="bin-sell-id" type="text" placeholder="Binance id**"
+                        <input id="bin-sell-merchant-id" type="text" placeholder="Binance id**"
                             class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold">
                     </div>
                     <div>
                         <label class="text-xs text-slate-500 mb-1 block">type your Amount</label>
-                        <input id="bin-sell-amount" type="number" placeholder="type your Amount"
+                        <input id="bin-sell-merchant-amount" type="number" placeholder="type your Amount"
                             class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold">
                     </div>
                     <div>
                         <label class="text-xs text-slate-500 mb-1 block">Send Your tnx Id</label>
-                        <input id="bin-sell-chn" type="text" placeholder="Send Your tnx Id"
+                        <input id="bin-sell-merchant-chn" type="text" placeholder="Send Your tnx Id"
                             class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary">
                     </div>
                     <div>
                         <label class="text-xs text-slate-500 mb-1 block">Submit Your Screenshot</label>
-                        <div onclick="document.getElementById('bin-sell-photo').click()"
+                        <div onclick="document.getElementById('bin-sell-merchant-photo').click()"
                             class="w-full h-24 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex flex-col items-center justify-center text-slate-400 cursor-pointer overflow-hidden bg-slate-50 dark:bg-black/20 relative">
-                            <input type="file" id="bin-sell-photo" accept="image/*" class="hidden"
+                            <input type="file" id="bin-sell-merchant-photo" accept="image/*" class="hidden"
                                 onchange="previewBinSellFile()">
                             <span class="material-symbols-outlined text-2xl mb-1">add_a_photo</span>
                             <span class="text-xs">Submit Your Screenshot</span>
-                            <img id="bin-sell-preview"
+                            <img id="bin-sell-merchant-preview"
                                 class="absolute inset-0 w-full h-full object-cover hidden rounded-xl">
                         </div>
                     </div>
@@ -807,13 +807,13 @@
         </div>
 
         <!-- Binance Buy Modal (User BUYS from Merchant) -->
-        <div id="binance-buy-modal"
+        <div id="binance-buy-merchant-modal"
             class="fixed inset-0 z-[9999] hidden flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
             <div
                 class="bg-white dark:bg-[#1a282f] w-full max-w-sm rounded-2xl p-6 shadow-xl animate-slide-up space-y-4 max-h-[90vh] overflow-y-auto transition-all duration-300">
                 <div class="flex items-center justify-between">
                     <h3 class="text-lg font-bold text-slate-900 dark:text-white">Binance Buy</h3>
-                    <button onclick="document.getElementById('binance-buy-modal').classList.add('hidden')"
+                    <button onclick="document.getElementById('binance-buy-merchant-modal').classList.add('hidden')"
                         class="text-slate-500 hover:text-slate-700 dark:hover:text-white">
                         <span class="material-symbols-outlined">close</span>
                     </button>
@@ -822,29 +822,29 @@
                 <div
                     class="p-4 bg-yellow-50 dark:bg-yellow-900/10 rounded-xl border border-yellow-100 dark:border-yellow-900/30 space-y-2">
                     <p class="text-[10px] text-slate-500 uppercase font-bold">Payments Details</p>
-                    <p id="bin-buy-details"
+                    <p id="bin-buy-merchant-details"
                         class="text-sm font-medium text-slate-800 dark:text-white whitespace-pre-wrap">...</p>
                 </div>
 
                 <div class="space-y-3">
                     <div>
                         <label class="text-xs text-slate-500 mb-1 block">Enter your address name</label>
-                        <input id="bin-buy-addr-name" type="text" placeholder="Enter your address name"
+                        <input id="bin-buy-merchant-addr-name" type="text" placeholder="Enter your address name"
                             class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold">
                     </div>
                     <div>
                         <label class="text-xs text-slate-500 mb-1 block">Enter Your Address</label>
-                        <input id="bin-buy-addr" type="text" placeholder="Enter Your Address"
+                        <input id="bin-buy-merchant-addr" type="text" placeholder="Enter Your Address"
                             class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold">
                     </div>
                     <div>
                         <label class="text-xs text-slate-500 mb-1 block">Type Amount</label>
-                        <input id="bin-buy-amount" type="number" placeholder="Type Amount"
+                        <input id="bin-buy-merchant-amount" type="number" placeholder="Type Amount"
                             class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold">
                     </div>
                     <div>
                         <label class="text-xs text-slate-500 mb-1 block">Enter Your Contact ID</label>
-                        <input id="bin-buy-contact" type="text" placeholder="Enter Your Contact ID"
+                        <input id="bin-buy-merchant-contact" type="text" placeholder="Enter Your Contact ID"
                             class="w-full bg-slate-50 dark:bg-black/20 border-0 rounded-lg p-3 text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-primary">
                     </div>
 
